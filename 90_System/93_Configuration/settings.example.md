@@ -1,22 +1,21 @@
 ---
 type: vault-settings
 vault_name: Abyssal-Vault
-username: ""
-start_date: ""
+username: "fill in your username"
+start_date: "fill in your start_date"
 callout_path: 90_System/97_Daily_Schedule
 schedule_heading: Daily Schedule
 exercise_heading: Calisthenics
 cardio_heading: Cardio
-openweathermap_key: ""
-openweathermap_city: ""
+openweathermap_key: "fill in your openweathermap_api_key"
+openweathermap_city: "fill in your city"
 openweathermap_unit: metric
-tmdb_key: ""
-spoonacular_key: ""
-mega_recovery_key: ""
-rawg_api_key: ""
-steam_api_key: ""
-steam_id: ""
-gog_heroic_auth_path: ""
+tmdb_key: "fill in your tmdb_api_key"
+spoonacular_key: "fill in your spoonacular_api_key"
+rawg_api_key: "fill in your rawg_api_key"
+steam_api_key: "fill in your steam_api_key"
+steam_id: "fill in your steam_id"
+gog_heroic_auth_path: "fill in your gog_heroic_auth_path"
 gog_locale: en-US
 FinanceSchema: 1
 FinanceBook: default
@@ -31,28 +30,29 @@ Budgets: {}
 
 # Vault settings example
 
-Copy this file to `settings.local.md` in the same folder and fill in only the values you use. `settings.local.md` is intentionally ignored by Git and is the local source for credentials, personal identifiers, and machine-specific paths.
+Copy this file to `settings.local.md` in the same folder and replace the placeholder values with your own configuration. `settings.local.md` is intentionally ignored by Git and is the local source for credentials, personal identifiers, and machine-specific paths.
 
 ## Security
 
-Never commit API keys, recovery keys, account identifiers, local authentication files, or other credentials. If a credential has previously been committed elsewhere, removing it from a later commit does not revoke it; rotate that credential with its provider.
+Never commit API keys, account identifiers, local authentication files, recovery keys, or other credentials. This template intentionally does not include any MEGA recovery-key field.
 
 ## Weather
 
-- `openweathermap_key`: OpenWeather API key.
-- `openweathermap_city`: optional default city for weather views not tied to a Place note.
+- `openweathermap_key`: fill in your OpenWeather API key.
+- `openweathermap_city`: fill in your default city if you want a global weather location.
 - `openweathermap_unit`: `metric`, `imperial`, or `standard`.
 
 ## Media and recipes
 
-- `tmdb_key`: TMDB API key used by movie and TV importers.
-- `spoonacular_key`: Spoonacular API key used by the recipe importer.
+- `tmdb_key`: fill in your TMDB API key.
+- `spoonacular_key`: fill in your Spoonacular API key.
 
 ## Game services
 
-- `rawg_api_key`: optional RAWG API key used as metadata fallback.
-- `steam_api_key` and `steam_id`: used for Steam playtime and achievement sync.
-- `gog_heroic_auth_path`: optional local Heroic GOG authentication file path. Do not copy OAuth tokens into the vault.
+- `rawg_api_key`: fill in your RAWG API key if you use the fallback metadata provider.
+- `steam_api_key`: fill in your Steam Web API key.
+- `steam_id`: fill in your Steam account ID.
+- `gog_heroic_auth_path`: fill in the local path to Heroic's GOG authentication file if you use that integration. Do not copy OAuth tokens into the vault.
 - `gog_locale`: locale used for GOG achievement data.
 
 ## Finance defaults
