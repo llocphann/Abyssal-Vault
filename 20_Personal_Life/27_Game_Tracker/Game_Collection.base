@@ -1,0 +1,82 @@
+formulas:
+  packed_game: |-
+    if(categories.containsAny(link("Games")), html(("<article class='abyssal-card' data-status='{status}'>" + "<header class='abyssal-card-head'>" + "<span class='abyssal-kicker'>GAME DOSSIER · {store}</span>" + "<span class='abyssal-status'>{status}</span>" + "</header>" + "<div class='abyssal-identity'>" + "<h3 class='abyssal-title'>{title}</h3>" + "<p class='abyssal-byline'>{developer}{release}</p>" + "</div>" + "<div class='abyssal-meta'>" + "<div class='abyssal-meta-row'><span class='abyssal-meta-label'>Platform</span><span class='abyssal-meta-value abyssal-meta-list'>{platforms}</span></div>" + "<div class='abyssal-meta-row'><span class='abyssal-meta-label'>Genre</span><span class='abyssal-meta-value abyssal-meta-list'>{genres}</span></div>" + "<div class='abyssal-meta-row'><span class='abyssal-meta-label'>Publisher</span><span class='abyssal-meta-value'>{publisher}</span></div>" + "<div class='abyssal-meta-row'><span class='abyssal-meta-label'>Achievements</span><span class='abyssal-meta-value'>{achievements}</span></div>" + "</div>" + "<div class='abyssal-description'><span class='abyssal-description-text' style='--abyss-description-scroll-duration:{scrollDuration}s'>{description}</span></div>" + "<div class='abyssal-progress-row'><span>Completion</span><strong>{completion}</strong></div>" + "<div class='abyssal-progress' style='--abyss-progress:{progress}%'><span></span></div>" + "<footer class='abyssal-card-foot'>" + "<span><b>{rating}</b><small>rating</small></span>" + "<span><b>{playtime}</b><small>played</small></span>" + "<span><b>{metacritic}</b><small>metacritic</small></span>" + "</footer>" + "</article>").replace("{title}", escapeHTML(if(Title, Title.toString(), file.basename.toString()))).replace("{developer}", escapeHTML(if(Developer, Developer.toString(), "Unknown developer"))).replace("{release}", if(ReleaseDate, " · " + escapeHTML(ReleaseDate.toString().slice(0, 4)), "")).replace("{store}", escapeHTML(if(Store, Store.toString(), "LIBRARY"))).replace("{platforms}", if(Platform, list(Platform).slice(0, 3).map("<span>" + escapeHTML(value.toString()) + "</span>").join(""), "<span>—</span>")).replace("{genres}", if(Genre, list(Genre).slice(0, 3).map("<span>" + escapeHTML(value.toString()) + "</span>").join(""), "<span>—</span>")).replace("{publisher}", escapeHTML(if(Publisher, Publisher.toString(), "—"))).replace("{achievements}", if(AchievementsTotal, if(AchievementsUnlocked, AchievementsUnlocked.toString(), "0") + " / " + AchievementsTotal.toString(), "—")).replace("{scrollDuration}", if(Description, max(20, (Description.toString().length / 24).ceil()).toString(), "20")).replace("{description}", escapeHTML(if(Description, Description.toString(), "No description yet."))).replace("{status}", escapeHTML(if(Status, Status.toString(), "Backlog"))).replace("{completion}", if(Completion, Completion.toString() + "%", "0%")).replace("{progress}", if(Completion, Completion.toString(), "0")).replace("{rating}", if(Rating, Rating.toString() + "/10", "—")).replace("{playtime}", if(PlaytimeHours, PlaytimeHours.toString() + "h", "0h")).replace("{metacritic}", if(Metacritic, Metacritic.toString(), "—"))), null)
+properties:
+  Title:
+    displayName: Title
+  Cover:
+    displayName: Cover
+  Backdrop:
+    displayName: Backdrop
+  Platform:
+    displayName: Platforms
+  Developer:
+    displayName: Developer
+  Publisher:
+    displayName: Publisher
+  Genre:
+    displayName: Genres
+  Status:
+    displayName: Status
+  Rating:
+    displayName: Rating
+  PlaytimeHours:
+    displayName: Playtime
+  Completion:
+    displayName: Completion
+  AchievementsUnlocked:
+    displayName: Achievements unlocked
+  AchievementsTotal:
+    displayName: Achievements total
+  ReleaseDate:
+    displayName: Released
+  Metacritic:
+    displayName: Metacritic
+  Store:
+    displayName: Store
+  Description:
+    displayName: Description
+views:
+  - type: cards
+    name: Game Collection
+    filters:
+      and:
+        - categories.containsAny(link("Games"))
+    order:
+      - formula.packed_game
+    sort:
+      - property: file.name
+        direction: ASC
+    image: note.Cover
+    imageFit: cover
+    imageAspectRatio: 1.4
+    cardSize: 240
+  - type: table
+    name: Game Data
+    filters:
+      and:
+        - categories.containsAny(link("Games"))
+    order:
+      - file.name
+      - Cover
+      - Backdrop
+      - Platform
+      - Developer
+      - Publisher
+      - Genre
+      - Status
+      - Rating
+      - PlaytimeHours
+      - Completion
+      - AchievementsUnlocked
+      - AchievementsTotal
+      - ReleaseDate
+      - Metacritic
+      - Store
+      - StoreUrl
+      - Website
+      - Source
+      - SourceUrl
+      - SteamAppId
+      - GogProductId
+      - Description

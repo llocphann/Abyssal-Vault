@@ -1,0 +1,59 @@
+filters:
+  and:
+    - file.folder == "20_Personal_Life/33_Bodybuilding/Gym_n_Calisthenics_Exercises"
+formulas:
+  level_group: if(level, if(level.toString().lower() == "beginner", "Beginner", if(level.toString().lower() == "intermediate", "Intermediate", "Advanced")), "Beginner")
+  animated_demo: if(animation, image(animation.asFile()), null)
+  packed_exercise: |-
+    html(("<article class='ex-card' data-level='{level_attr}'>" + "<header class='ex-card-top'>" + "<span class='ex-level'><span class='ex-level-dot' aria-hidden='true'></span>{level}</span>" + "<span class='ex-play' aria-label='Play exercise preview'><span aria-hidden='true'></span></span>" + "</header>" + "<div class='ex-card-copy'>" + "<h3 class='ex-title'>{title}</h3>" + "<div class='ex-meta'>" + "<span class='ex-meta-item ex-meta-muscle'>" + "<span class='ex-meta-icon' data-muscle='{muscle_attr}' aria-hidden='true'></span>" + "<span class='ex-meta-copy'><small>Primary muscle</small><strong>{muscles}</strong></span>" + "</span>" + "<span class='ex-meta-item ex-meta-equipment'>" + "<span class='ex-meta-icon' data-equipment='{equipment_attr}' aria-hidden='true'></span>" + "<span class='ex-meta-copy'><small>Equipment</small><strong>{equipment}</strong></span>" + "</span>" + "</div>" + "</div>" + "</article>").replace("{level_attr}", escapeHTML(if(level, if(level.toString().lower() == "expert", "advanced", level.toString().lower()), "beginner"))).replace("{level}", escapeHTML(if(level, if(level.toString().lower() == "expert", "Advanced", level.toString().title()), "Beginner"))).replace("{title}", escapeHTML(if(name, name.toString(), file.basename.toString()))).replace("{muscle_attr}", escapeHTML(if(primaryMuscles, list(primaryMuscles).slice(0, 1).join("").toString().lower(), "unknown"))).replace("{muscles}", if(primaryMuscles, list(primaryMuscles).slice(0, 2).map(escapeHTML(value.toString().title())).join(", "), "—")).replace("{equipment_attr}", escapeHTML(if(equipment, equipment.toString().lower(), "body only"))).replace("{equipment}", escapeHTML(if(equipment, equipment.toString().title(), "Body only")))
+    )
+properties:
+  level:
+    displayName: Level
+  primaryMuscles:
+    displayName: Primary muscles
+  secondaryMuscles:
+    displayName: Secondary muscles
+  formula.level_group:
+    displayName: Training level
+views:
+  - type: cards
+    name: Exercise Library
+    order:
+      - formula.animated_demo
+      - formula.packed_exercise
+    sort:
+      - property: name
+        direction: ASC
+    image: note.preview
+    imageFit: cover
+    imageAspectRatio: 1
+    cardSize: 260
+  - type: table
+    name: Exercise Data — Edit
+    order:
+      - file.name
+      - name
+      - level
+      - force
+      - mechanic
+      - equipment
+      - category
+      - primaryMuscles
+      - secondaryMuscles
+      - preview
+      - animation
+    sort:
+      - property: level
+        direction: ASC
+      - property: equipment
+        direction: ASC
+      - property: mechanic
+        direction: DESC
+      - property: force
+        direction: DESC
+    columnSize:
+      note.mechanic: 132
+      note.category: 147
+      note.primaryMuscles: 163
+    rowHeight: medium

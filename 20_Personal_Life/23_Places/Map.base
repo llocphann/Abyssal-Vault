@@ -1,0 +1,148 @@
+filters:
+  and:
+    - or:
+        - file.inFolder("20_Personal_Life/23_Places")
+        - file.inFolder("20_Personal_Life/26_Food_&_Drinks/Restaurants")
+        - file.inFolder("20_Personal_Life/26_Food_&_Drinks/Cafes")
+        - file.inFolder("20_Personal_Life/26_Food_&_Drinks/Bars")
+    - or:
+        - place_type == "tourist"
+        - place_type == "misc"
+        - place_type == "restaurant"
+        - place_type == "cafe"
+        - place_type == "bar"
+formulas:
+  marker_icon: if(place_type == "restaurant", "utensils", if(place_type == "cafe", "coffee", if(place_type == "bar", "wine", if(place_type == "tourist", "landmark", "map-pin"))))
+  marker_color: if(place_type == "restaurant", "#d97706", if(place_type == "cafe", "#8b5e3c", if(place_type == "bar", "#7c3aed", if(place_type == "tourist", "#2563eb", "#64748b"))))
+  cover_image: if(cover, image(cover), null)
+  map_card_back: |-
+    html(
+      (
+        "<article class='map-place-back' data-weather-coordinates='{coordinates}'>" +
+          "<header class='map-place-back-head'>" +
+            "<h3 class='map-place-back-title'>{title}</h3>" +
+          "</header>" +
+          "<div class='map-place-weather-hero'>" +
+            "<span class='map-place-weather-symbol' data-weather-role='symbol' aria-hidden='true'>◌</span>" +
+            "<strong class='map-place-weather-temp' data-weather-role='temp'>—</strong>" +
+            "<span class='map-place-weather-unit' data-weather-role='temp-unit'></span>" +
+            "<span class='map-place-weather-condition' data-weather-role='condition'>Loading current conditions…</span>" +
+          "</div>" +
+          "<div class='map-place-weather-grid'>" +
+            "<div><span>Humidity</span><strong data-weather-role='humidity'>—</strong></div>" +
+            "<div><span>Wind</span><strong data-weather-role='wind'>—</strong></div>" +
+            "<div><span>Clouds</span><strong data-weather-role='clouds'>—</strong></div>" +
+            "<div><span>Type</span><strong>{type}</strong></div>" +
+          "</div>" +
+          "<p class='map-place-back-location'>{location}</p>" +
+          "<footer class='map-place-back-footer'>" +
+            "<span class='map-place-back-status {statusclass}'>{status}</span>" +
+          "</footer>" +
+        "</article>"
+      )
+        .replace("{coordinates}", escapeHTML(if(coordinates, coordinates.toString(), "")))
+        .replace("{title}", escapeHTML(file.basename.toString()))
+        .replace("{type}", escapeHTML(if(place_type == "tourist", "Tourist", if(place_type == "restaurant", "Restaurant", if(place_type == "cafe", "Café", if(place_type == "bar", "Bar", "Place"))))))
+        .replace("{location}", escapeHTML(if(city, city.toString() + if(country, " · " + country.toString(), ""), if(region, region.toString() + if(country, " · " + country.toString(), ""), if(country, country.toString(), "Saved location")))))
+        .replace("{status}", if(visited, "Visited", if(want_to_visit, "Wishlisted", "Saved")))
+        .replace("{statusclass}", if(visited, "is-visited", if(want_to_visit, "is-wishlisted", "is-saved")))
+    )
+  google_maps: if(coordinates, link("https://www.google.com/maps/search/?api=1&query=" + coordinates.toString(), "Google Maps"), null)
+properties:
+  file.name:
+    displayName: Place
+  place_type:
+    displayName: Type
+  coordinates:
+    displayName: Coordinates
+  address:
+    displayName: Address
+  city:
+    displayName: City
+  region:
+    displayName: Region
+  country:
+    displayName: Country
+  visited:
+    displayName: Visited
+  want_to_visit:
+    displayName: Want to visit
+  favorite:
+    displayName: Favorite
+  rating:
+    displayName: Rating
+  last_visited:
+    displayName: Last visited
+  formula.cover_image:
+    displayName: Photo
+  formula.map_card_back:
+    displayName: Place details
+  formula.google_maps:
+    displayName: Map link
+views:
+  - type: map
+    name: Abyssal
+    order:
+      - file.name
+      - formula.cover_image
+      - formula.map_card_back
+    coordinates: note.coordinates
+    markerIcon: formula.marker_icon
+    markerColor: formula.marker_color
+    mapTiles:
+      - https://raw.githubusercontent.com/llocphann/Veil/map-style-host/assets/map-styles/abyssal.json
+    mapTilesDark:
+      - https://raw.githubusercontent.com/llocphann/Veil/map-style-host/assets/map-styles/abyssal.json
+  - type: map
+    name: Map
+    order:
+      - file.name
+      - formula.cover_image
+      - formula.map_card_back
+    coordinates: note.coordinates
+    markerIcon: formula.marker_icon
+    markerColor: formula.marker_color
+    mapTiles:
+      - https://tiles.openfreemap.org/styles/liberty
+    mapTilesDark:
+      - https://tiles.openfreemap.org/styles/liberty
+  - type: table
+    name: All Places
+    order:
+      - file.name
+      - place_type
+      - city
+      - region
+      - country
+      - visited
+      - want_to_visit
+      - favorite
+      - rating
+      - last_visited
+      - formula.google_maps
+  - type: table
+    name: Want to visit
+    filters:
+      and:
+        - want_to_visit == true
+    order:
+      - file.name
+      - place_type
+      - city
+      - country
+      - rating
+      - formula.google_maps
+  - type: table
+    name: Visited
+    filters:
+      and:
+        - visited == true
+    order:
+      - file.name
+      - place_type
+      - city
+      - country
+      - rating
+      - last_visited
+      - favorite
+      - formula.google_maps
