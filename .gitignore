@@ -4,6 +4,8 @@ Thumbs.db
 
 # Local vault secrets and machine-specific configuration
 /90_System/93_Configuration/settings.local.md
+/90_System/93_Configuration/settings.md
+/90_System/93_Configuration/Custom_Views/.homepage-edit-lock.json
 
 # Private areas that are intentionally never part of the reusable vault
 /00_Capture/01_Journal/**/*.md
