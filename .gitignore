@@ -10,6 +10,9 @@ Thumbs.db
 # Private areas that are intentionally never part of the reusable vault
 /00_Capture/01_Journal/**/*.md
 !/00_Capture/01_Journal/**/.gitkeep
+# Community-safe journal examples are intentionally tracked.
+!/00_Capture/01_Journal/Samples/
+!/00_Capture/01_Journal/Samples/*.md
 /20_Personal_Life/21_Legal_&_Identity/**
 !/20_Personal_Life/21_Legal_&_Identity/.gitkeep
 /20_Personal_Life/29_Contact/**
