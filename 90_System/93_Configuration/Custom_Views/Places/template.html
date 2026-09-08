@@ -1,0 +1,127 @@
+<div class="cv-place" data-role="place-root">
+  <header class="cv-place-hero">
+    <img class="cv-place-cover" data-role="place-cover" alt="" hidden>
+    <div class="cv-place-hero-shade" aria-hidden="true"></div>
+    <div class="cv-place-hero-inner">
+      <section class="cv-place-identity" aria-labelledby="cv-place-title">
+        <div class="cv-place-eyebrow">
+          <span data-role="type-label">Place</span><span aria-hidden="true">·</span><span data-role="location-line">Saved location</span>
+        </div>
+        <div class="cv-place-title-row">
+          <div class="cv-place-pin" aria-hidden="true"><span data-role="type-icon">⌖</span></div>
+          <h1 class="cv-place-title" id="cv-place-title">{{file.basename}}</h1>
+        </div>
+        <div class="cv-place-identity-body">
+          <p class="cv-place-address" data-role="hero-address"></p>
+          <div class="cv-place-chips" data-role="hero-chips" aria-label="Place summary"></div>
+          <div class="cv-place-actions">
+            <button type="button" data-action="open-map"><span aria-hidden="true">⌖</span> Abyssal map</button>
+            <button type="button" data-action="directions"><span aria-hidden="true">↗</span> Directions</button>
+            <button type="button" data-action="copy-coordinates"><span aria-hidden="true">⧉</span> Coordinates</button>
+            <a data-role="website-link" target="_blank" rel="noopener noreferrer" hidden>Website ↗</a>
+          </div>
+        </div>
+      </section>
+      <aside class="cv-place-hero-details">
+        <header class="cv-place-hero-details-head">
+          <span class="cv-place-kicker">Details</span>
+          <h2 data-role="details-title">Place profile</h2>
+        </header>
+        <dl class="cv-place-meta-list cv-place-details-list" data-role="details-meta"></dl>
+      </aside>
+    </div>
+  </header>
+
+  <main class="cv-place-workspace">
+    <section class="cv-place-journal">
+      <header class="cv-place-section-head cv-place-section-head--outer">
+        <div><span class="cv-place-kicker">Memory &amp; context</span><h2>Place notes</h2></div>
+        <span class="cv-place-note-hint">What made this place worth remembering?</span>
+      </header>
+      <article class="cv-place-paper" data-role="place-paper">
+        <div class="cv-place-paper-circles" aria-hidden="true"></div>
+        <header class="cv-place-section-head cv-place-section-head--paper">
+          <div>
+            <span class="cv-place-kicker">Your notes</span>
+            <span class="cv-place-note-state" data-role="note-state" aria-live="polite"></span>
+          </div>
+        </header>
+        <div class="cv-place-note-render" data-role="note-render">{{file.content}}</div>
+      </article>
+    </section>
+
+    <aside class="cv-place-meta-column">
+      <section class="cv-place-card cv-place-location-card">
+        <header><span class="cv-place-kicker">Location</span><h2 data-role="location-title">Saved coordinates</h2></header>
+        <div class="cv-place-local-map" data-role="local-map">
+          <div class="cv-place-local-map-embed" data-role="local-map-embed">
+            {{file.path | replace:"/.*/","![[90_System/93_Configuration/Custom_Views/Places/Local.base#Local]]"}}
+          </div>
+          <span class="cv-place-map-caption" aria-hidden="true">ABYSSAL · LOCAL INDEX</span>
+          <span class="cv-place-map-readout">
+            <strong>{{file.basename}}</strong>
+            <code data-role="coordinates">No coordinates</code>
+          </span>
+        </div>
+        <p class="cv-place-map-credit">OpenFreeMap © OpenMapTiles · Data from OpenStreetMap</p>
+        <dl class="cv-place-meta-list" data-role="location-meta"></dl>
+      </section>
+
+      <section class="cv-place-card cv-place-weather-card" data-role="weather-card">
+        <header>
+          <div><span class="cv-place-kicker">Weather</span><h2>Current conditions</h2></div>
+          <div class="cv-place-weather-actions">
+            <button class="cv-place-weather-action" type="button" data-action="weather-refresh" aria-label="Refresh weather">↻</button>
+          </div>
+        </header>
+        <div class="cv-place-weather-main">
+          <div class="cv-place-weather-icon-wrap" aria-hidden="true">
+            <img class="cv-place-weather-icon" data-role="weather-icon" alt="" hidden>
+            <span class="cv-place-weather-symbol" data-role="weather-symbol">◌</span>
+          </div>
+          <div class="cv-place-weather-copy">
+            <div class="cv-place-weather-temp-line"><strong class="cv-place-weather-temp" data-role="weather-temp">—</strong><span class="cv-place-weather-unit" data-role="weather-temp-unit"></span></div>
+            <span class="cv-place-weather-condition" data-role="weather-condition">Weather unavailable</span>
+            <span class="cv-place-weather-description" data-role="weather-description">Add coordinates to load weather</span>
+          </div>
+        </div>
+        <div class="cv-place-weather-metrics">
+          <div class="cv-place-weather-metric"><span>Humidity</span><strong data-role="weather-humidity">—</strong></div>
+          <div class="cv-place-weather-metric"><span>Wind</span><strong data-role="weather-wind">—</strong></div>
+          <div class="cv-place-weather-metric"><span>Clouds</span><strong data-role="weather-clouds">—</strong></div>
+          <div class="cv-place-weather-metric"><span>Pressure</span><strong data-role="weather-pressure">—</strong></div>
+        </div>
+        <p class="cv-place-weather-state" data-role="weather-state" aria-live="polite" hidden></p>
+        <footer class="cv-place-weather-footer">
+          <span data-role="weather-updated">Not synced yet</span>
+        </footer>
+      </section>
+
+      <section class="cv-place-card cv-place-status-card">
+        <header><span class="cv-place-kicker">Status</span><h2>Personal state</h2></header>
+        <div class="cv-place-status-body">
+          <div>
+            <span class="cv-place-control-label">Status</span>
+            <div class="cv-place-status-controls">
+              <button type="button" data-toggle-property="visited">Visited</button>
+              <button type="button" data-toggle-property="want_to_visit">Wishlist</button>
+              <button type="button" data-toggle-property="favorite">Favorite</button>
+            </div>
+          </div>
+          <div>
+            <span class="cv-place-control-label">Your rating</span>
+            <div class="cv-place-rating cv-rating" data-role="rating" role="group" aria-label="Rating from 1 to 10">
+              <div class="cv-rating-stars">
+                <div class="cv-rating-layer cv-rating-layer--empty" data-role="rating-empty" aria-hidden="true"></div>
+                <div class="cv-rating-layer cv-rating-layer--filled" data-role="rating-filled" aria-hidden="true"></div>
+                <div class="cv-rating-hits" data-role="rating-hits"></div>
+              </div>
+              <output class="cv-rating-value" data-role="rating-value"></output>
+            </div>
+          </div>
+          <span class="cv-place-save-state" data-role="save-state" aria-live="polite"></span>
+        </div>
+      </section>
+    </aside>
+  </main>
+</div>
