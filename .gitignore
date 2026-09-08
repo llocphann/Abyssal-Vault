@@ -1,0 +1,40 @@
+# OS / editor noise
+.DS_Store
+Thumbs.db
+
+# Local vault secrets and machine-specific configuration
+/90_System/93_Configuration/settings.local.md
+
+# User-generated private content
+/00_Capture/01_Journal/**/*.md
+!/00_Capture/01_Journal/**/.gitkeep
+/20_Personal_Life/21_Legal_&_Identity/**
+!/20_Personal_Life/21_Legal_&_Identity/.gitkeep
+/20_Personal_Life/29_Contact/**
+!/20_Personal_Life/29_Contact/.gitkeep
+/20_Personal_Life/22_Finance/Records/**/*.md
+!/20_Personal_Life/22_Finance/Records/**/.gitkeep
+/20_Personal_Life/24_Book_Tracker/Books/*
+!/20_Personal_Life/24_Book_Tracker/Books/.gitkeep
+/20_Personal_Life/25_Media_Tracker/Movies/*
+!/20_Personal_Life/25_Media_Tracker/Movies/.gitkeep
+/20_Personal_Life/25_Media_Tracker/TV_Series/*
+!/20_Personal_Life/25_Media_Tracker/TV_Series/.gitkeep
+/20_Personal_Life/27_Game_Tracker/Games/*
+!/20_Personal_Life/27_Game_Tracker/Games/.gitkeep
+
+# Generated/imported personal media
+/90_System/95_Media_Assets/Movies/*
+!/90_System/95_Media_Assets/Movies/.gitkeep
+/90_System/95_Media_Assets/TV_Series/*
+!/90_System/95_Media_Assets/TV_Series/.gitkeep
+/90_System/95_Media_Assets/Games/*
+!/90_System/95_Media_Assets/Games/.gitkeep
+/90_System/95_Media_Assets/Recipes/*
+!/90_System/95_Media_Assets/Recipes/.gitkeep
+/90_System/96_Auto_Attachments/*
+!/90_System/96_Auto_Attachments/.gitkeep
+
+# Local dependency installs
+/.obsidian/node_modules/
+node_modules/
