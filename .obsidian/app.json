@@ -1,0 +1,28 @@
+{
+  "alwaysUpdateLinks": true,
+  "propertiesInDocument": "visible",
+  "promptDelete": false,
+  "defaultViewMode": "preview",
+  "livePreview": false,
+  "readableLineLength": false,
+  "attachmentFolderPath": "90_System/96_Auto_Attachments",
+  "showLineNumber": true,
+  "pdfExportSettings": {
+    "includeName": true,
+    "pageSize": "A4",
+    "landscape": false,
+    "margin": "2",
+    "downscalePercent": 57
+  },
+  "showUnsupportedFiles": true,
+  "spellcheck": false,
+  "uriCallbacks": false,
+  "strictLineBreaks": false,
+  "tabSize": 5,
+  "showIndentGuide": true,
+  "vimMode": false,
+  "openBehavior": "",
+  "settingsPopoutWindow": true,
+  "autoConvertHtml": false,
+  "showInlineTitle": true
+}
