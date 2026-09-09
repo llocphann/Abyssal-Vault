@@ -2,9 +2,10 @@
   "cssTheme": "Border",
   "enabledCssSnippets": [
     "01_Core_System",
-    "02_Homepage_And_Style_Settings",
+    "02_Homepage",
     "03_Bases_Foundation",
     "04_Customized_Base_Cards",
-    "05_Content_Interface_And_Plugins"
+    "05_Content_Interface_And_Plugins",
+    "06_Style_Setting"
   ]
 }
