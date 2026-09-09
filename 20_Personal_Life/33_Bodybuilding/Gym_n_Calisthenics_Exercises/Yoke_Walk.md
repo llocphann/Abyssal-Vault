@@ -1,0 +1,30 @@
+---
+id: Yoke_Walk
+name: Yoke Walk
+level: intermediate
+force: None
+mechanic: compound
+equipment: other
+category: strongman
+primaryMuscles:
+  - quadriceps
+secondaryMuscles:
+  - abdominals
+  - abductors
+  - adductors
+  - calves
+  - glutes
+  - hamstrings
+  - lower back
+tags:
+  - calisthenics
+preview: "[[Yoke_Walk-preview.webp]]"
+animation: "[[Yoke_Walk.gif]]"
+images:
+  - "[[Yoke_Walk.gif]]"
+---
+
+## How to Perform
+1. The yoke is usually done with a yoke apparatus, but is sometimes seen with refrigerators or other heavy objects.
+2. Begin by racking the apparatus across the back of the shoulders. With your head looking forward and back arched, lift the yoke by driving through the heels.
+3. Begin walking as quickly as possible using short, quick steps. You may hold the side posts of the yoke to help steady it and hold it in position. Continue for the given distance as fast as possible, usually 75-100 feet.
