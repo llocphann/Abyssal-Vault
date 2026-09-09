@@ -10,8 +10,7 @@ permissions:
 
 jobs:
   sync:
-    if: github.actor != 'github-actions[bot]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -26,7 +25,6 @@ jobs:
             version="$3"
             dir=".obsidian/plugins/$id"
             base="https://github.com/$repo/releases/download/$version"
-
             mkdir -p "$dir"
             curl -fsSL --retry 3 "$base/main.js" -o "$dir/main.js"
             printf '\n/* nosourcemap */' >> "$dir/main.js"
@@ -38,10 +36,7 @@ jobs:
             path="$1"
             expected="$2"
             actual="$(git hash-object "$path")"
-            if [ "$actual" != "$expected" ]; then
-              echo "SHA mismatch: $path expected $expected got $actual" >&2
-              exit 1
-            fi
+            test "$actual" = "$expected" || { echo "SHA mismatch: $path expected $expected got $actual" >&2; exit 1; }
           }
 
           download_plugin homepage mirnovov/obsidian-homepage 4.5.0
@@ -81,15 +76,12 @@ jobs:
           verify .obsidian/plugins/homepage/manifest.json c5f05835ca9fd9f3bd5f25f6af3b1213f9888861
           verify .obsidian/plugins/homepage/styles.css bd05d848344e1becd5fabbaeed2bc5625239352c
           verify .obsidian/plugins/homepage/data.json 8cc1987f4f6d3b3252028180b25fe9241a5f56b2
-
           verify .obsidian/plugins/custom-views/main.js a93874f7b4eb0450a3bdbcff184e48e219958cc7
           verify .obsidian/plugins/custom-views/manifest.json 824b5edd9bd1f95768a4afa1bc788b3bfe1b1c1d
           verify .obsidian/plugins/custom-views/styles.css 56d3ffd62d293393619e3dcd5aee1e350024b4b4
-
           verify .obsidian/plugins/maps/main.js e2aa4a2045b63945644594f9534899fa1e5d238a
           verify .obsidian/plugins/maps/manifest.json a34ca15f9f6423606c5ba711d0b376e294efb6ae
           verify .obsidian/plugins/maps/styles.css 9075a26798f10fa9ba87cf307f7a04d0ab85fdc2
-
           verify .obsidian/plugins/templater-obsidian/main.js 1d04acf009f7f6aac37c375b6bc51a2f07412268
           verify .obsidian/plugins/templater-obsidian/manifest.json d8e1f5eae64328727353696c13e28cd18eff9c18
           verify .obsidian/plugins/templater-obsidian/styles.css d46f1c509c0986b9787f31e5b28de1d66e77c1a3
@@ -101,9 +93,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .obsidian/plugins
-          if git diff --cached --quiet; then
-            echo "No plugin changes to commit."
-            exit 0
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: bundle required community plugins"
+            git push
           fi
-          git commit -m "chore: bundle required community plugins"
-          git push
