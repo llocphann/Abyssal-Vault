@@ -10,7 +10,7 @@ cardio_heading: Cardio
 openweathermap_key: fill in your openweathermap_api_key
 openweathermap_city: fill in your city
 openweathermap_unit: metric
-tmdb_key: fill in your tmdb_api_key
+tmdb_key: fill in your api key
 spoonacular_key: fill in your spoonacular_api_key
 recipe_provider: auto
 rawg_api_key: fill in your rawg_api_key
