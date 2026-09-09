@@ -153,7 +153,7 @@ body {
 }
 
 /*******************************************************************************
- *                                LAYOUT ENGINE: CALLOUT WIDTH MODIFIERS
+ *                  LAYOUT ENGINE: CALLOUT WIDTH MODIFIERS
  *******************************************************************************/
 
 div[data-callout-metadata*="fw"].callout.callout.callout { flex-grow: 0; flex-shrink: 0; }
@@ -195,7 +195,7 @@ div[data-callout="multi-column"].callout > .callout-content > div[data-callout-m
 div[data-callout="multi-column"].callout > .callout-content > div[data-callout-metadata*="wide-5"] { flex-grow: 5; }
 
 /*******************************************************************************
- *                                GRADIENT CALLOUTS ENGINE
+ *                    GRADIENT CALLOUTS ENGINE
  *******************************************************************************/
 
 .callout[data-callout="gradient_1_1"] { --callout-color: var(--cu-gradient-1-1); }
@@ -347,7 +347,7 @@ div[data-callout="multi-column"].callout > .callout-content > div[data-callout-m
 
 
 /*******************************************************************************
- *                                GRADIENT HEADERS MODULE
+ *                    GRADIENT HEADERS MODULE
  *******************************************************************************/
 
 .gradient_1_1 { color: var(--cu-gradient-1-1) !important; }
@@ -465,7 +465,7 @@ div[data-callout="multi-column"].callout > .callout-content > div[data-callout-m
 }
 
 /*******************************************************************************
- *                                MULTI-COLUMN CALLOUT (MCC) LAYOUT ENGINE
+ *                   MULTI-COLUMN CALLOUT (MCC) LAYOUT ENGINE
  *******************************************************************************/
 
 [data-callout="multi-column"].callout {
@@ -630,7 +630,7 @@ div[data-callout*="multi-column"].callout .callout-content span.image-embed + .s
 }
 
 /*******************************************************************************
- *                                BLANK CONTAINER CALLOUTS
+ *                      BLANK CONTAINER CALLOUTS
  *******************************************************************************/
 
 div[data-callout*="blank"].callout {
@@ -664,7 +664,7 @@ div[data-callout*="blank"] .callout-content::before {
 }
 
 /*******************************************************************************
- *                                TEXT JUSTIFICATION UTILITY
+ *                       TEXT JUSTIFICATION UTILITY
  *******************************************************************************/
 
 .text-justify :is(.markdown-preview-view p, .markdown-source-view .cm-line) {
@@ -672,7 +672,7 @@ div[data-callout*="blank"] .callout-content::before {
 }
 
 /*******************************************************************************
- *                                FLOATING CALLOUTS ENGINE
+ *                       FLOATING CALLOUTS ENGINE
  *******************************************************************************/
 
 @media (min-width: 500px) {
@@ -792,7 +792,7 @@ body[class*="minimal-tab-title"].contextual-typography .minimal-float.markdown-p
 }
 
 /*******************************************************************************
- *                                LIST LAYOUTS ENGINE (COLUMNS, GRID, CARDS)
+ *                 LIST LAYOUTS ENGINE (COLUMNS, GRID, CARDS)
  *******************************************************************************/
 
 :is(div[class*="mcl"].markdown-rendered, .markdown-rendered) a[href*="#mcl"] {
@@ -1281,7 +1281,7 @@ background:var(--cc-p05);
 }
 
 /*******************************************************************************
- *                    OVERLAYS / FEEDBACK APPEARANCE
+ *                        OVERLAYS / FEEDBACK APPEARANCE
  *******************************************************************************/
 
 .tooltip,

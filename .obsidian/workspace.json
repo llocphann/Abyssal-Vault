@@ -10,11 +10,17 @@
           {
             "id": "f76878332c626f27",
             "type": "leaf",
+            "pinned": true,
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "90_System/98_Homepage/Homepage.md",
+                "mode": "preview",
+                "source": true
+              },
+              "pinned": true,
               "icon": "lucide-file",
-              "title": "New tab"
+              "title": "Homepage"
             }
           }
         ]
@@ -172,6 +178,7 @@
   },
   "left-ribbon": {
     "hiddenItems": {
+      "homepage:Open homepage": false,
       "switcher:Open quick switcher": false,
       "graph:Open graph view": false,
       "canvas:Create new canvas": false,
