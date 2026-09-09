@@ -1,0 +1,49 @@
+name: Complete Abyssal source-vault sync
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  sync-snippets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Rebuild exact source-vault snippet layout
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cat .obsidian/snippets/03_Bases_Foundation.css > .obsidian/snippets/03_Bases.css
+          printf '\n' >> .obsidian/snippets/03_Bases.css
+          cat .obsidian/snippets/04_Customized_Base_Cards.css >> .obsidian/snippets/03_Bases.css
+
+          actual_sha="$(git hash-object .obsidian/snippets/03_Bases.css)"
+          expected_sha="bbf19407d1b0af2e17d130d96490033084305136"
+          if [[ "$actual_sha" != "$expected_sha" ]]; then
+            echo "03_Bases.css SHA mismatch: expected $expected_sha, got $actual_sha" >&2
+            exit 1
+          fi
+
+          cp .obsidian/snippets/05_Content_Interface_And_Plugins.css .obsidian/snippets/04_Content_Interface_And_Plugins.css
+          cp .obsidian/snippets/06_Style_Setting.css .obsidian/snippets/05_Style_Setting.css
+
+          rm .obsidian/snippets/03_Bases_Foundation.css
+          rm .obsidian/snippets/04_Customized_Base_Cards.css
+          rm .obsidian/snippets/05_Content_Interface_And_Plugins.css
+          rm .obsidian/snippets/06_Style_Setting.css
+          rm .github/workflows/complete-abyssal-sync.yml
+
+          test "$(git hash-object .obsidian/snippets/04_Content_Interface_And_Plugins.css)" = "bd8b56d68209c1f0bace1e4c8fb5eec0acbb5610"
+          test "$(git hash-object .obsidian/snippets/05_Style_Setting.css)" = "087aec46871a686d9d93768b3b84a84a381a02bf"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Make Abyssal snippets identical to source vault"
+          git push

@@ -22,8 +22,16 @@
       "template": "90_System/91_Templates/Zettelkasten_Template.md"
     },
     {
-      "folder": "20_Personal_Life/24_Book_Tracker/Books",
+      "folder": "10_Projects/12_Personal_Tracks/Book_Tracker/Books",
       "template": "90_System/91_Templates/Book_Template.md"
+    },
+    {
+      "folder": "40_Academics/43_Eng_Selfstudy/Vocabulary",
+      "template": "90_System/91_Templates/Vocabulary_Learning_Template.md"
+    },
+    {
+      "folder": "70_Interests_&_Research/78_Onion_Sites",
+      "template": "90_System/91_Templates/Onion_Site_Template.md"
     },
     {
       "folder": "20_Personal_Life/25_Media_Tracker/Movies",
@@ -67,7 +75,6 @@
   "syntax_highlighting_mobile": true,
   "enabled_templates_hotkeys": [],
   "startup_templates": [
-    "90_System/91_Templates/Bootstrap_Settings.md",
     "90_System/91_Templates/Sync_Places_Custom_View.md"
   ],
   "intellisense_render": "1",
