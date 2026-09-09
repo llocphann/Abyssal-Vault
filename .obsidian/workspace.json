@@ -12,6 +12,21 @@
             "type": "leaf",
             "pinned": true,
             "state": {
+              "type": "bases",
+              "state": {
+                "file": "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
+                "viewName": "Media Library"
+              },
+              "pinned": true,
+              "icon": "lucide-layout-grid",
+              "title": "Media_Tracker"
+            }
+          },
+          {
+            "id": "44296e2a8b2d37d5",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
               "type": "markdown",
               "state": {
                 "file": "90_System/98_Homepage/Homepage.md",
@@ -23,7 +38,8 @@
               "title": "Homepage"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -301,10 +317,28 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "979d954b51f89f6d",
+  "active": "44296e2a8b2d37d5",
   "lastOpenFiles": [
-    "90_System/93_Configuration/settings.md",
+    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
+    "90_System/95_Media_Assets/Recipes/themealdb-53238-cover.jpg",
+    "90_System/95_Media_Assets/Recipes/spoonacular-991010-cover.jpg",
+    "90_System/95_Media_Assets/Recipes/spoonacular-664828-cover.jpg",
+    "90_System/95_Media_Assets/Recipes/spoonacular-649512-cover.jpg",
+    "90_System/95_Media_Assets/Recipes/spoonacular-649225-cover.jpg",
+    "90_System/95_Media_Assets/Recipes/spoonacular-638746-cover.jpg",
+    "90_System/95_Media_Assets/Recipes/spoonacular-632797-cover.jpg",
+    "90_System/95_Media_Assets/Recipes/Illustrations",
+    "90_System/95_Media_Assets/Recipes",
+    "90_System/95_Media_Assets/TV_Series/47665-backdrop.jpg",
+    "90_System/95_Media_Assets/TV_Series/65733-backdrop.jpg",
+    "90_System/95_Media_Assets/TV_Series/65733-cover.jpg",
+    "90_System/95_Media_Assets/Icons",
+    "90_System/95_Media_Assets/Movies",
+    "90_System/95_Media_Assets/Games",
+    "90_System/95_Media_Assets/TV_Series",
+    "20_Personal_Life/25_Media_Tracker/Movies/Train to Busan.md",
     "90_System/98_Homepage/Homepage.md",
+    "90_System/93_Configuration/settings.md",
     "20_Personal_Life/25_Media_Tracker/Movies/Untitled 1.md",
     "20_Personal_Life/25_Media_Tracker/Movies/Untitled.md",
     "90_System/97_Daily_Schedule/01_Monday.md",
@@ -314,21 +348,8 @@
     "90_System/97_Daily_Schedule/04_Thursday.md",
     "90_System/97_Daily_Schedule/02_Tuesday.md",
     "90_System/97_Daily_Schedule/03_Wednesday.md",
-    "90_System/95_Media_Assets/Images/KIROKAZE.gif",
-    "90_System/95_Media_Assets/Images/gas_station.gif",
-    "90_System/95_Media_Assets/Images/kvt.gif",
-    "90_System/95_Media_Assets/Images/qX11MN9W.gif",
-    "90_System/95_Media_Assets/Images/neaeT1qU.gif",
-    "90_System/95_Media_Assets/Images/rain-pixel-art.gif",
-    "90_System/95_Media_Assets/Images/robot.gif",
-    "90_System/95_Media_Assets/Images/street.gif",
-    "90_System/95_Media_Assets/Images/train_and_lake.png",
-    "90_System/95_Media_Assets/Images/vibe.gif",
     "90_System/95_Media_Assets/Images",
     "90_System/95_Media_Assets/Dashboard",
-    "90_System/Dashboard",
-    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
-    "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
-    "20_Personal_Life/27_Game_Tracker/Game_Collection.base"
+    "90_System/Dashboard"
   ]
 }
