@@ -1,9 +1,0 @@
-{
-  "id": "places-weather",
-  "name": "Places Weather",
-  "version": "1.0.0",
-  "minAppVersion": "1.8.0",
-  "description": "Local OpenWeatherMap runtime for Places notes and Map Base cards.",
-  "author": "llocphann",
-  "isDesktopOnly": true
-}
