@@ -9,8 +9,7 @@ const TRANSACTION_FOLDER = `${RECORDS_ROOT}/Transactions`;
 const ACCOUNT_FOLDER = `${RECORDS_ROOT}/Accounts`;
 const SUBSCRIPTION_FOLDER = `${RECORDS_ROOT}/Subscription`;
 const FINANCE_BASE_PATH = "20_Personal_Life/22_Finance/Finance.base";
-const LOCAL_SETTINGS_PATH = "90_System/93_Configuration/settings.local.md";
-const COMPAT_SETTINGS_PATH = "90_System/93_Configuration/settings.md";
+const GLOBAL_SETTINGS_PATH = "90_System/93_Configuration/settings.md";
 const NEW_CATEGORY_VALUE = "__finance_new_category__";
 const TRANSACTION_KINDS = new Set(["expense", "income", "transfer"]);
 const ALL_KINDS = new Set(["expense", "income", "transfer", "account", "subscription"]);
@@ -52,10 +51,9 @@ const safeName = value => {
 };
 const makeId = prefix => `${prefix}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
 
-const settingsFile = financeApp.vault.getAbstractFileByPath?.(LOCAL_SETTINGS_PATH)
-  || financeApp.vault.getAbstractFileByPath?.(COMPAT_SETTINGS_PATH);
-const globalSettings = settingsFile
-  ? financeApp.metadataCache?.getFileCache?.(settingsFile)?.frontmatter || {}
+const globalSettingsFile = financeApp.vault.getAbstractFileByPath?.(GLOBAL_SETTINGS_PATH);
+const globalSettings = globalSettingsFile
+  ? financeApp.metadataCache?.getFileCache?.(globalSettingsFile)?.frontmatter || {}
   : {};
 const currentPage = typeof dv.current === "function" ? dv.current() || {} : {};
 const financeBook = text(viewInput.FinanceBook)
@@ -65,7 +63,7 @@ const financeBook = text(viewInput.FinanceBook)
 const bookCurrency = currencyCode(viewInput.BookCurrency)
   || currencyCode(globalSettings.BookCurrency)
   || currencyCode(currentPage.BookCurrency)
-  || "USD";
+  || "VND";
 
 const knownCategories = new Set(DEFAULT_CATEGORIES);
 for (const file of typeof financeApp.vault.getMarkdownFiles === "function" ? financeApp.vault.getMarkdownFiles() : []) {
@@ -130,28 +128,102 @@ const root = doc.createElement("section");
 root.className = "dv-finance-quick-add";
 root.innerHTML = `
   <header class="dv-finance-quick-head">
-    <div><span class="dv-finance-kicker">QUICK ADD</span><h2>Add finance record</h2><p>Transactions, optional accounts, and recurring subscriptions.</p></div>
+    <div>
+      <span class="dv-finance-kicker">QUICK ADD</span>
+      <h2>Add finance record</h2>
+      <p>Transactions, optional accounts, and recurring subscriptions.</p>
+    </div>
     <button type="button" class="dv-finance-manage" data-finance-manage>Manage base</button>
   </header>
+
   <div class="dv-finance-quick-body">
     <nav class="dv-finance-tabs" role="tablist" aria-label="Finance record type">
-      <button type="button" class="is-active" data-kind="expense" aria-selected="true">Expense</button><button type="button" data-kind="income" aria-selected="false">Income</button><button type="button" data-kind="transfer" aria-selected="false">Transfer</button><button type="button" data-kind="account" aria-selected="false">Account</button><button type="button" data-kind="subscription" aria-selected="false">Subscription</button>
+      <button type="button" class="is-active" data-kind="expense" aria-selected="true">Expense</button>
+      <button type="button" data-kind="income" aria-selected="false">Income</button>
+      <button type="button" data-kind="transfer" aria-selected="false">Transfer</button>
+      <button type="button" data-kind="account" aria-selected="false">Account</button>
+      <button type="button" data-kind="subscription" aria-selected="false">Subscription</button>
     </nav>
-    <form class="dv-finance-form" data-form="transaction"><div class="dv-finance-grid">
-      <label><span>Amount</span><input type="number" min="0" step="any" inputmode="decimal" name="amount" required placeholder="0" /></label><label><span>Account <small>(optional)</small></span><input type="text" name="account" placeholder="Optional source label" /></label><label data-transfer hidden><span>To account <small>(optional)</small></span><input type="text" name="toAccount" placeholder="Optional destination label" /></label><label data-category-field><span>Category</span><select name="category" data-category></select></label><label data-custom-category hidden><span>New category</span><input type="text" name="customCategory" placeholder="Category name" /></label><label class="dv-finance-wide"><span>Description</span><input type="text" name="description" placeholder="What was this for?" /></label><label><span>Date</span><input type="date" name="date" required /></label><label><span>Currency</span><input type="text" name="currency" maxlength="3" placeholder="${bookCurrency}" /></label><label data-transfer hidden><span>Transfer fee</span><input type="number" min="0" step="any" inputmode="decimal" name="feeAmount" placeholder="0" /></label><label><span>FX rate to base</span><input type="number" min="0" step="any" inputmode="decimal" name="fxRate" placeholder="Optional" /></label><label class="dv-finance-check" data-expense><input type="checkbox" name="fixed" /><span>Fixed expense</span></label>
-    </div><div class="dv-finance-actions"><span class="dv-finance-hint" data-transaction-hint>Expense · Records/Transactions</span><button type="submit" class="mod-cta">Add expense</button></div></form>
-    <form class="dv-finance-form" data-form="account" hidden><div class="dv-finance-grid">
-      <label class="dv-finance-wide"><span>Account name</span><input type="text" name="account" required placeholder="e.g. Main bank" /></label><label><span>Account type</span><input type="text" name="accountType" placeholder="Bank, cash, wallet…" /></label><label><span>Currency</span><input type="text" name="currency" maxlength="3" placeholder="${bookCurrency}" /></label><label><span>Opening balance</span><input type="number" step="any" inputmode="decimal" name="openingBalance" value="0" /></label><label><span>Opening date</span><input type="date" name="openingDate" /></label><label><span>Opening FX rate to base</span><input type="number" min="0" step="any" inputmode="decimal" name="openingFxRate" placeholder="Optional" /></label><label><span>Base opening balance</span><input type="number" step="any" inputmode="decimal" name="baseOpeningBalance" placeholder="Auto" /></label><label class="dv-finance-check"><input type="checkbox" name="includeInNetWorth" checked /><span>Include in net worth</span></label><label class="dv-finance-check"><input type="checkbox" name="active" checked /><span>Active</span></label>
-    </div><div class="dv-finance-actions"><span class="dv-finance-hint">Optional · saved to Records/Accounts</span><button type="submit" class="mod-cta">Add account</button></div></form>
-    <form class="dv-finance-form" data-form="subscription" hidden><div class="dv-finance-grid">
-      <label class="dv-finance-wide"><span>Name</span><input type="text" name="name" required placeholder="e.g. Netflix" /></label><label><span>Amount</span><input type="number" min="0" step="any" inputmode="decimal" name="amount" required placeholder="0" /></label><label><span>Account <small>(optional)</small></span><input type="text" name="account" placeholder="Optional label" /></label><label><span>Category</span><select name="category" data-subscription-category></select></label><label data-subscription-custom-category hidden><span>New category</span><input type="text" name="customCategory" placeholder="Category name" /></label><label><span>Currency</span><input type="text" name="currency" maxlength="3" placeholder="${bookCurrency}" /></label><label><span>Due day</span><input type="number" min="1" max="31" name="dueDay" value="1" /></label><label><span>Start date</span><input type="date" name="startDate" /></label><label><span>End date</span><input type="date" name="endDate" /></label><label><span>FX rate to base</span><input type="number" min="0" step="any" inputmode="decimal" name="fxRate" placeholder="Optional" /></label>
-    </div><div class="dv-finance-actions"><span class="dv-finance-hint">Saved to Records/Subscription</span><button type="submit" class="mod-cta">Add subscription</button></div></form>
+
+    <form class="dv-finance-form" data-form="transaction">
+      <div class="dv-finance-grid">
+        <label><span>Amount</span><input type="number" min="0" step="any" inputmode="decimal" name="amount" required placeholder="0" /></label>
+        <label><span>Account <small>(optional)</small></span><input type="text" name="account" placeholder="Optional source label" /></label>
+        <label data-transfer hidden><span>To account <small>(optional)</small></span><input type="text" name="toAccount" placeholder="Optional destination label" /></label>
+        <label data-category-field><span>Category</span><select name="category" data-category></select></label>
+        <label data-custom-category hidden><span>New category</span><input type="text" name="customCategory" placeholder="Category name" /></label>
+        <label class="dv-finance-wide"><span>Description</span><input type="text" name="description" placeholder="What was this for?" /></label>
+        <label><span>Date</span><input type="date" name="date" required /></label>
+        <label><span>Currency</span><input type="text" name="currency" maxlength="3" placeholder="${bookCurrency}" /></label>
+        <label data-transfer hidden><span>Transfer fee</span><input type="number" min="0" step="any" inputmode="decimal" name="feeAmount" placeholder="0" /></label>
+        <label><span>FX rate to base</span><input type="number" min="0" step="any" inputmode="decimal" name="fxRate" placeholder="Optional" /></label>
+        <label class="dv-finance-check" data-expense><input type="checkbox" name="fixed" /><span>Fixed expense</span></label>
+      </div>
+      <div class="dv-finance-actions">
+        <span class="dv-finance-hint" data-transaction-hint>Expense · Records/Transactions</span>
+        <button type="submit" class="mod-cta">Add expense</button>
+      </div>
+    </form>
+
+    <form class="dv-finance-form" data-form="account" hidden>
+      <div class="dv-finance-grid">
+        <label class="dv-finance-wide"><span>Account name</span><input type="text" name="account" required placeholder="e.g. Main bank" /></label>
+        <label><span>Account type</span><input type="text" name="accountType" placeholder="Bank, cash, wallet…" /></label>
+        <label><span>Currency</span><input type="text" name="currency" maxlength="3" placeholder="${bookCurrency}" /></label>
+        <label><span>Opening balance</span><input type="number" step="any" inputmode="decimal" name="openingBalance" value="0" /></label>
+        <label><span>Opening date</span><input type="date" name="openingDate" /></label>
+        <label><span>Opening FX rate to base</span><input type="number" min="0" step="any" inputmode="decimal" name="openingFxRate" placeholder="Optional" /></label>
+        <label><span>Base opening balance</span><input type="number" step="any" inputmode="decimal" name="baseOpeningBalance" placeholder="Auto" /></label>
+        <label class="dv-finance-check"><input type="checkbox" name="includeInNetWorth" checked /><span>Include in net worth</span></label>
+        <label class="dv-finance-check"><input type="checkbox" name="active" checked /><span>Active</span></label>
+      </div>
+      <div class="dv-finance-actions">
+        <span class="dv-finance-hint">Optional · saved to Records/Accounts</span>
+        <button type="submit" class="mod-cta">Add account</button>
+      </div>
+    </form>
+
+    <form class="dv-finance-form" data-form="subscription" hidden>
+      <div class="dv-finance-grid">
+        <label class="dv-finance-wide"><span>Name</span><input type="text" name="name" required placeholder="e.g. Netflix" /></label>
+        <label><span>Amount</span><input type="number" min="0" step="any" inputmode="decimal" name="amount" required placeholder="0" /></label>
+        <label><span>Account <small>(optional)</small></span><input type="text" name="account" placeholder="Optional label" /></label>
+        <label><span>Category</span><select name="category" data-subscription-category></select></label>
+        <label data-subscription-custom-category hidden><span>New category</span><input type="text" name="customCategory" placeholder="Category name" /></label>
+        <label><span>Currency</span><input type="text" name="currency" maxlength="3" placeholder="${bookCurrency}" /></label>
+        <label><span>Due day</span><input type="number" min="1" max="31" name="dueDay" value="1" /></label>
+        <label><span>Start date</span><input type="date" name="startDate" /></label>
+        <label><span>End date</span><input type="date" name="endDate" /></label>
+        <label><span>FX rate to base</span><input type="number" min="0" step="any" inputmode="decimal" name="fxRate" placeholder="Optional" /></label>
+      </div>
+      <div class="dv-finance-actions">
+        <span class="dv-finance-hint">Saved to Records/Subscription</span>
+        <button type="submit" class="mod-cta">Add subscription</button>
+      </div>
+    </form>
+
     <p class="dv-finance-status" data-status aria-live="polite"></p>
-  </div>`;
+  </div>
+`;
 
 const style = doc.createElement("style");
 style.textContent = `
-.dv-finance-quick-add{--df-surface:var(--background-secondary);--df-surface-2:color-mix(in srgb,var(--background-secondary) 84%,var(--background-primary) 16%);--df-hover:var(--background-modifier-hover);--df-border:var(--background-modifier-border);--df-text:var(--text-normal);--df-muted:var(--text-muted);--df-faint:var(--text-faint);--df-accent:var(--interactive-accent);width:100%;overflow:hidden;border:1px solid var(--df-border);border-radius:14px;background:var(--df-surface);color:var(--df-text);box-sizing:border-box}.dv-finance-quick-add *{box-sizing:border-box}.dv-finance-quick-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px 14px;border-bottom:1px solid var(--df-border)}.dv-finance-quick-head h2{margin:0;font-size:1rem}.dv-finance-quick-head p{margin:5px 0 0;color:var(--df-muted);font-size:.76rem}.dv-finance-kicker{display:block;margin-bottom:4px;color:var(--text-accent);font-size:.7rem;font-weight:700;letter-spacing:.14em}.dv-finance-manage{flex:0 0 auto;margin:0;padding:7px 10px;border:1px solid var(--df-border);border-radius:8px;background:transparent;color:var(--df-muted);box-shadow:none;font-size:.74rem}.dv-finance-manage:hover{background:var(--df-hover);color:var(--df-text)}.dv-finance-quick-body{display:grid;gap:16px;padding:16px 18px 18px}.dv-finance-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:3px;border:1px solid var(--df-border);border-radius:10px;background:var(--df-surface-2)}.dv-finance-tabs button{margin:0;padding:7px 11px;border:0;border-radius:7px;background:transparent;color:var(--df-muted);box-shadow:none;font-size:.75rem}.dv-finance-tabs button.is-active{background:color-mix(in srgb,var(--df-accent) 15%,var(--df-surface));color:var(--df-text)}.dv-finance-form{display:grid;gap:14px}.dv-finance-form[hidden],.dv-finance-form [hidden]{display:none!important}.dv-finance-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.dv-finance-grid label{min-width:0;display:grid;align-content:start;gap:6px;color:var(--df-muted);font-size:.7rem}.dv-finance-grid input,.dv-finance-grid select{width:100%;min-width:0;height:34px;margin:0;padding:6px 9px;border:1px solid var(--df-border);border-radius:8px;background:var(--df-surface-2);color:var(--df-text);box-shadow:none;font:inherit;font-size:.78rem}.dv-finance-wide{grid-column:span 2}.dv-finance-grid .dv-finance-check{display:flex;align-items:center;align-self:end;gap:8px;min-height:34px;padding:6px 2px}.dv-finance-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}.dv-finance-hint,.dv-finance-status{color:var(--df-faint);font-size:.7rem}.dv-finance-status{min-height:1.1em;margin:0}.dv-finance-status[data-tone=success]{color:var(--color-green,var(--text-success))}.dv-finance-status[data-tone=error]{color:var(--color-red,var(--text-error))}@media(max-width:800px){.dv-finance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.dv-finance-quick-head,.dv-finance-actions{align-items:stretch;flex-direction:column}.dv-finance-grid{grid-template-columns:1fr}.dv-finance-wide{grid-column:span 1}.dv-finance-tabs button{flex:1 1 calc(33.333% - 6px)}}`;
+  .dv-finance-quick-add{--df-surface:var(--background-secondary);--df-surface-2:color-mix(in srgb,var(--background-secondary) 84%,var(--background-primary) 16%);--df-hover:var(--background-modifier-hover);--df-border:var(--background-modifier-border);--df-text:var(--text-normal);--df-muted:var(--text-muted);--df-faint:var(--text-faint);--df-accent:var(--interactive-accent);width:100%;overflow:hidden;border:1px solid var(--df-border);border-radius:14px;background:var(--df-surface);color:var(--df-text);box-sizing:border-box}
+  .dv-finance-quick-add *{box-sizing:border-box}
+  .dv-finance-quick-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px 14px;border-bottom:1px solid var(--df-border)}
+  .dv-finance-quick-head h2{margin:0;font-size:1rem}.dv-finance-quick-head p{margin:5px 0 0;color:var(--df-muted);font-size:.76rem}
+  .dv-finance-kicker{display:block;margin-bottom:4px;color:var(--text-accent);font-size:.7rem;font-weight:700;letter-spacing:.14em}
+  .dv-finance-manage{flex:0 0 auto;margin:0;padding:7px 10px;border:1px solid var(--df-border);border-radius:8px;background:transparent;color:var(--df-muted);box-shadow:none;font-size:.74rem}.dv-finance-manage:hover{background:var(--df-hover);color:var(--df-text)}
+  .dv-finance-quick-body{display:grid;gap:16px;padding:16px 18px 18px}.dv-finance-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:3px;border:1px solid var(--df-border);border-radius:10px;background:var(--df-surface-2)}
+  .dv-finance-tabs button{margin:0;padding:7px 11px;border:0;border-radius:7px;background:transparent;color:var(--df-muted);box-shadow:none;font-size:.75rem}.dv-finance-tabs button:hover{background:var(--df-hover);color:var(--df-text)}.dv-finance-tabs button.is-active{background:color-mix(in srgb,var(--df-accent) 15%,var(--df-surface));color:var(--df-text);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--df-accent) 34%,transparent)}
+  .dv-finance-form{display:grid;gap:14px}.dv-finance-form[hidden],.dv-finance-form [hidden]{display:none!important}.dv-finance-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.dv-finance-grid label{min-width:0;display:grid;align-content:start;gap:6px;color:var(--df-muted);font-size:.7rem}.dv-finance-grid input,.dv-finance-grid select{width:100%;min-width:0;height:34px;margin:0;padding:6px 9px;border:1px solid var(--df-border);border-radius:8px;background:var(--df-surface-2);color:var(--df-text);box-shadow:none;font:inherit;font-size:.78rem}.dv-finance-grid input:focus,.dv-finance-grid select:focus{border-color:var(--df-accent);outline:none}.dv-finance-wide{grid-column:span 2}
+  .dv-finance-grid .dv-finance-check{display:flex;align-items:center;align-self:end;gap:8px;min-height:34px;padding:6px 2px}
+  .dv-finance-check input[type=checkbox]{appearance:none!important;-webkit-appearance:none!important;flex:0 0 auto;width:16px!important;min-width:16px!important;height:16px!important;margin:0!important;padding:0!important;border:1px solid var(--df-border)!important;border-radius:50%!important;background:var(--df-surface-2)!important;box-shadow:none!important;transform:none!important;opacity:1!important;filter:none!important;cursor:pointer}
+  .dv-finance-check input[type=checkbox]:checked{border-color:var(--df-accent)!important;background:var(--df-accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10'%3E%3Cpath d='M1 5l3 3 7-7' fill='none' stroke='%23fff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 10px 10px no-repeat!important}
+  .dv-finance-check input[type=checkbox]:hover{border-color:color-mix(in srgb,var(--df-accent) 72%,var(--df-border))!important}.dv-finance-check input[type=checkbox]:focus-visible{outline:2px solid color-mix(in srgb,var(--df-accent) 55%,transparent)!important;outline-offset:2px}
+  .dv-finance-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}.dv-finance-actions button{margin:0}.dv-finance-hint,.dv-finance-status{color:var(--df-faint);font-size:.7rem}.dv-finance-status{min-height:1.1em;margin:0}.dv-finance-status[data-tone=success]{color:var(--color-green,var(--text-success))}.dv-finance-status[data-tone=error]{color:var(--color-red,var(--text-error))}.dv-finance-form[aria-busy=true]{opacity:.72}
+  @media(max-width:800px){.dv-finance-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.dv-finance-quick-head,.dv-finance-actions{align-items:stretch;flex-direction:column}.dv-finance-grid{grid-template-columns:1fr}.dv-finance-wide{grid-column:span 1}.dv-finance-tabs button{flex:1 1 calc(33.333% - 6px)}.dv-finance-manage,.dv-finance-actions button{width:100%}}
+`;
 root.prepend(style);
 host.replaceChildren(root);
 
@@ -170,27 +242,216 @@ const subscriptionCustomField = root.querySelector("[data-subscription-custom-ca
 const transactionHint = root.querySelector("[data-transaction-hint]");
 let activeKind = "expense";
 
-function setStatus(message, tone = "") { status.textContent = message; if (tone) status.dataset.tone = tone; else delete status.dataset.tone; }
-function setBusy(form, busy) { form.toggleAttribute("aria-busy", busy); for (const button of form.querySelectorAll("button")) button.disabled = busy; }
+function setStatus(message, tone = "") {
+  status.textContent = message;
+  if (tone) status.dataset.tone = tone;
+  else delete status.dataset.tone;
+}
+
+function setBusy(form, busy) {
+  form.toggleAttribute("aria-busy", busy);
+  for (const button of form.querySelectorAll("button")) button.disabled = busy;
+}
+
 function refreshCategorySelect(select, selected = "") {
   select.replaceChildren();
-  const placeholder = doc.createElement("option"); placeholder.value = ""; placeholder.textContent = "Choose category"; placeholder.disabled = true; placeholder.selected = !selected; select.appendChild(placeholder);
-  for (const category of [...knownCategories].sort((a,b)=>a.localeCompare(b))) { const option=doc.createElement("option"); option.value=category; option.textContent=category; option.selected=category===selected; select.appendChild(option); }
-  const custom=doc.createElement("option"); custom.value=NEW_CATEGORY_VALUE; custom.textContent="New category…"; select.appendChild(custom);
+  const placeholder = doc.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Choose category";
+  placeholder.disabled = true;
+  placeholder.selected = !selected;
+  select.appendChild(placeholder);
+  for (const category of [...knownCategories].sort((a, b) => a.localeCompare(b))) {
+    const option = doc.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    option.selected = category === selected;
+    select.appendChild(option);
+  }
+  const custom = doc.createElement("option");
+  custom.value = NEW_CATEGORY_VALUE;
+  custom.textContent = "New category…";
+  select.appendChild(custom);
 }
-function updateTransactionCustom(){const custom=activeKind!=="transfer"&&transactionCategory.value===NEW_CATEGORY_VALUE;transactionCustomField.hidden=!custom;transactionCustomCategory.required=custom;if(custom)transactionCustomCategory.focus();}
-function updateSubscriptionCustom(){const custom=subscriptionCategory.value===NEW_CATEGORY_VALUE;subscriptionCustomField.hidden=!custom;subscriptionCustomCategory.required=custom;if(custom)subscriptionCustomCategory.focus();}
-function showKind(kind){
-  activeKind=ALL_KINDS.has(kind)?kind:"expense"; for(const tab of tabs){const active=tab.dataset.kind===activeKind;tab.classList.toggle("is-active",active);tab.setAttribute("aria-selected",String(active));}
-  const isTransaction=TRANSACTION_KINDS.has(activeKind); transactionForm.hidden=!isTransaction; accountForm.hidden=activeKind!=="account"; subscriptionForm.hidden=activeKind!=="subscription";
-  if(isTransaction){const isTransfer=activeKind==="transfer";const isExpense=activeKind==="expense";for(const field of root.querySelectorAll("[data-transfer]"))field.hidden=!isTransfer;for(const field of root.querySelectorAll("[data-expense]"))field.hidden=!isExpense;transactionCategoryField.hidden=isTransfer;transactionCategory.required=!isTransfer;if(isTransfer){transactionCategory.value="Transfer";transactionCustomField.hidden=true;transactionCustomCategory.required=false;}else{if(transactionCategory.value==="Transfer")transactionCategory.value="";updateTransactionCustom();}transactionHint.textContent=`${activeKind[0].toUpperCase()}${activeKind.slice(1)} · Records/Transactions`;transactionForm.querySelector('button[type="submit"]').textContent=`Add ${activeKind}`;} setStatus("");
-}
-function resetTransaction(){transactionForm.reset();transactionForm.elements.namedItem("date").value=localDateString();transactionForm.elements.namedItem("currency").value=bookCurrency;refreshCategorySelect(transactionCategory);transactionCustomField.hidden=true;transactionCustomCategory.required=false;}
-function resetAccount(){accountForm.reset();accountForm.elements.namedItem("currency").value=bookCurrency;accountForm.elements.namedItem("openingBalance").value="0";accountForm.elements.namedItem("openingDate").value=localDateString();accountForm.elements.namedItem("includeInNetWorth").checked=true;accountForm.elements.namedItem("active").checked=true;}
-function resetSubscription(){subscriptionForm.reset();subscriptionForm.elements.namedItem("currency").value=bookCurrency;subscriptionForm.elements.namedItem("dueDay").value="1";subscriptionForm.elements.namedItem("startDate").value=localDateString();refreshCategorySelect(subscriptionCategory,"Subscription");subscriptionCategory.value="Subscription";subscriptionCustomField.hidden=true;subscriptionCustomCategory.required=false;}
 
-transactionForm.addEventListener("submit",async event=>{event.preventDefault();const formData=new FormData(transactionForm);const selectedCategory=activeKind==="transfer"?"Transfer":text(formData.get("category"));const category=selectedCategory===NEW_CATEGORY_VALUE?text(formData.get("customCategory")):selectedCategory||"Uncategorised";const amount=Math.abs(numberValue(formData.get("amount")));if(!Number.isFinite(amount)||amount<=0)return setStatus("Amount must be greater than zero.","error");const account=text(formData.get("account"));const toAccount=activeKind==="transfer"?text(formData.get("toAccount")):"";const date=text(formData.get("date"))||localDateString();const transferDescription=account&&toAccount?`${account} to ${toAccount}`:"Transfer";const description=text(formData.get("description"))||(activeKind==="transfer"?transferDescription:activeKind==="income"?"Income":"Expense");const currency=currencyCode(formData.get("currency"))||bookCurrency;const fxRate=numberValue(formData.get("fxRate"));const feeAmount=activeKind==="transfer"?Math.abs(numberValue(formData.get("feeAmount"),0)):0;const id=makeId("TX");setBusy(transactionForm,true);setStatus("Saving…");try{await ensureFolder(TRANSACTION_FOLDER);const path=uniquePath(TRANSACTION_FOLDER,`${date} - ${safeName(description)} - ${id.slice(-6)}`);await financeApp.vault.create(path,transactionContent({id,date,type:activeKind,description,amount,currency,account,toAccount,category,fixed:activeKind==="expense"&&formData.get("fixed")==="on",fxRate,feeAmount}));knownCategories.add(category);resetTransaction();showKind(activeKind);setStatus(`Added ${activeKind}: ${description}.`,"success");}catch(error){setStatus(`Could not create transaction: ${error?.message||error}`,"error");}finally{setBusy(transactionForm,false);}});
-accountForm.addEventListener("submit",async event=>{event.preventDefault();const formData=new FormData(accountForm);const name=text(formData.get("account"));const openingBalance=numberValue(formData.get("openingBalance"),0);if(!name)return setStatus("Account name is required.","error");if(!Number.isFinite(openingBalance))return setStatus("Opening balance must be a number.","error");const data={id:makeId("ACC"),name,type:text(formData.get("accountType"))||"Bank",currency:currencyCode(formData.get("currency"))||bookCurrency,openingBalance,openingDate:text(formData.get("openingDate"))||localDateString(),openingFxRate:numberValue(formData.get("openingFxRate")),baseOpeningBalance:numberValue(formData.get("baseOpeningBalance")),includeInNetWorth:formData.get("includeInNetWorth")==="on",active:formData.get("active")==="on"};setBusy(accountForm,true);setStatus("Saving…");try{await ensureFolder(ACCOUNT_FOLDER);await financeApp.vault.create(uniquePath(ACCOUNT_FOLDER,safeName(name)),accountContent(data));resetAccount();setStatus(`Added account: ${name}.`,"success");}catch(error){setStatus(`Could not create account: ${error?.message||error}`,"error");}finally{setBusy(accountForm,false);}});
-subscriptionForm.addEventListener("submit",async event=>{event.preventDefault();const formData=new FormData(subscriptionForm);const selectedCategory=text(formData.get("category"));const category=selectedCategory===NEW_CATEGORY_VALUE?text(formData.get("customCategory")):selectedCategory||"Subscription";const name=text(formData.get("name"));const amount=Math.abs(numberValue(formData.get("amount")));if(!name)return setStatus("Subscription name is required.","error");if(!Number.isFinite(amount)||amount<=0)return setStatus("Subscription amount must be greater than zero.","error");const data={id:makeId("SUB"),name,amount,account:text(formData.get("account")),category,currency:currencyCode(formData.get("currency"))||bookCurrency,dueDay:Math.max(1,Math.min(31,Math.round(numberValue(formData.get("dueDay"),1)))),startDate:text(formData.get("startDate"))||localDateString(),endDate:text(formData.get("endDate")),fxRate:numberValue(formData.get("fxRate"))};setBusy(subscriptionForm,true);setStatus("Saving…");try{await ensureFolder(SUBSCRIPTION_FOLDER);await financeApp.vault.create(uniquePath(SUBSCRIPTION_FOLDER,safeName(name)),subscriptionContent(data));knownCategories.add(category);resetSubscription();setStatus(`Added subscription: ${name}.`,"success");}catch(error){setStatus(`Could not create subscription: ${error?.message||error}`,"error");}finally{setBusy(subscriptionForm,false);}});
-for(const tab of tabs)tab.addEventListener("click",()=>showKind(tab.dataset.kind||"expense"));transactionCategory.addEventListener("change",updateTransactionCustom);subscriptionCategory.addEventListener("change",updateSubscriptionCustom);root.querySelector("[data-finance-manage]").addEventListener("click",()=>{const file=financeApp.vault.getAbstractFileByPath(FINANCE_BASE_PATH);if(!file)return setStatus("Finance.base was not found.","error");const leaf=financeApp.workspace?.getLeaf?.(true);if(leaf?.openFile)void leaf.openFile(file);});
-resetTransaction();resetAccount();resetSubscription();showKind("expense");
+function updateTransactionCustom() {
+  const custom = activeKind !== "transfer" && transactionCategory.value === NEW_CATEGORY_VALUE;
+  transactionCustomField.hidden = !custom;
+  transactionCustomCategory.required = custom;
+  if (custom) transactionCustomCategory.focus();
+}
+
+function updateSubscriptionCustom() {
+  const custom = subscriptionCategory.value === NEW_CATEGORY_VALUE;
+  subscriptionCustomField.hidden = !custom;
+  subscriptionCustomCategory.required = custom;
+  if (custom) subscriptionCustomCategory.focus();
+}
+
+function showKind(kind) {
+  activeKind = ALL_KINDS.has(kind) ? kind : "expense";
+  for (const tab of tabs) {
+    const active = tab.dataset.kind === activeKind;
+    tab.classList.toggle("is-active", active);
+    tab.setAttribute("aria-selected", String(active));
+  }
+  const isTransaction = TRANSACTION_KINDS.has(activeKind);
+  transactionForm.hidden = !isTransaction;
+  accountForm.hidden = activeKind !== "account";
+  subscriptionForm.hidden = activeKind !== "subscription";
+  if (isTransaction) {
+    const isTransfer = activeKind === "transfer";
+    const isExpense = activeKind === "expense";
+    for (const field of root.querySelectorAll("[data-transfer]")) field.hidden = !isTransfer;
+    for (const field of root.querySelectorAll("[data-expense]")) field.hidden = !isExpense;
+    transactionCategoryField.hidden = isTransfer;
+    transactionCategory.required = !isTransfer;
+    if (isTransfer) {
+      transactionCategory.value = "Transfer";
+      transactionCustomField.hidden = true;
+      transactionCustomCategory.required = false;
+    } else {
+      if (transactionCategory.value === "Transfer") transactionCategory.value = "";
+      updateTransactionCustom();
+    }
+    transactionHint.textContent = `${activeKind[0].toUpperCase()}${activeKind.slice(1)} · Records/Transactions`;
+    transactionForm.querySelector('button[type="submit"]').textContent = `Add ${activeKind}`;
+  }
+  setStatus("");
+}
+
+function resetTransaction() {
+  transactionForm.reset();
+  transactionForm.elements.namedItem("date").value = localDateString();
+  transactionForm.elements.namedItem("currency").value = bookCurrency;
+  refreshCategorySelect(transactionCategory);
+  transactionCustomField.hidden = true;
+  transactionCustomCategory.required = false;
+}
+
+function resetAccount() {
+  accountForm.reset();
+  accountForm.elements.namedItem("currency").value = bookCurrency;
+  accountForm.elements.namedItem("openingBalance").value = "0";
+  accountForm.elements.namedItem("openingDate").value = localDateString();
+  accountForm.elements.namedItem("includeInNetWorth").checked = true;
+  accountForm.elements.namedItem("active").checked = true;
+}
+
+function resetSubscription() {
+  subscriptionForm.reset();
+  subscriptionForm.elements.namedItem("currency").value = bookCurrency;
+  subscriptionForm.elements.namedItem("dueDay").value = "1";
+  subscriptionForm.elements.namedItem("startDate").value = localDateString();
+  refreshCategorySelect(subscriptionCategory, "Subscription");
+  subscriptionCategory.value = "Subscription";
+  subscriptionCustomField.hidden = true;
+  subscriptionCustomCategory.required = false;
+}
+
+transactionForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  const formData = new FormData(transactionForm);
+  const selectedCategory = activeKind === "transfer" ? "Transfer" : text(formData.get("category"));
+  const category = selectedCategory === NEW_CATEGORY_VALUE ? text(formData.get("customCategory")) : selectedCategory || "Uncategorised";
+  const amount = Math.abs(numberValue(formData.get("amount")));
+  if (!Number.isFinite(amount) || amount <= 0) return setStatus("Amount must be greater than zero.", "error");
+  const account = text(formData.get("account"));
+  const toAccount = activeKind === "transfer" ? text(formData.get("toAccount")) : "";
+  const date = text(formData.get("date")) || localDateString();
+  const transferDescription = account && toAccount ? `${account} to ${toAccount}` : "Transfer";
+  const description = text(formData.get("description")) || (activeKind === "transfer" ? transferDescription : activeKind === "income" ? "Income" : "Expense");
+  const currency = currencyCode(formData.get("currency")) || bookCurrency;
+  const fxRate = numberValue(formData.get("fxRate"));
+  const feeAmount = activeKind === "transfer" ? Math.abs(numberValue(formData.get("feeAmount"), 0)) : 0;
+  const id = makeId("TX");
+  setBusy(transactionForm, true);
+  setStatus("Saving…");
+  try {
+    await ensureFolder(TRANSACTION_FOLDER);
+    const path = uniquePath(TRANSACTION_FOLDER, `${date} - ${safeName(description)} - ${id.slice(-6)}`);
+    await financeApp.vault.create(path, transactionContent({id,date,type:activeKind,description,amount,currency,account,toAccount,category,fixed:activeKind === "expense" && formData.get("fixed") === "on",fxRate,feeAmount}));
+    knownCategories.add(category);
+    resetTransaction();
+    showKind(activeKind);
+    setStatus(`Added ${activeKind}: ${description}.`, "success");
+  } catch (error) {
+    setStatus(`Could not create transaction: ${error?.message || error}`, "error");
+  } finally {
+    setBusy(transactionForm, false);
+  }
+});
+
+accountForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  const formData = new FormData(accountForm);
+  const name = text(formData.get("account"));
+  const openingBalance = numberValue(formData.get("openingBalance"), 0);
+  if (!name) return setStatus("Account name is required.", "error");
+  if (!Number.isFinite(openingBalance)) return setStatus("Opening balance must be a number.", "error");
+  const data = {
+    id: makeId("ACC"), name, type: text(formData.get("accountType")) || "Bank",
+    currency: currencyCode(formData.get("currency")) || bookCurrency, openingBalance,
+    openingDate: text(formData.get("openingDate")) || localDateString(),
+    openingFxRate: numberValue(formData.get("openingFxRate")), baseOpeningBalance: numberValue(formData.get("baseOpeningBalance")),
+    includeInNetWorth: formData.get("includeInNetWorth") === "on", active: formData.get("active") === "on",
+  };
+  setBusy(accountForm, true);
+  setStatus("Saving…");
+  try {
+    await ensureFolder(ACCOUNT_FOLDER);
+    await financeApp.vault.create(uniquePath(ACCOUNT_FOLDER, safeName(name)), accountContent(data));
+    resetAccount();
+    setStatus(`Added account: ${name}.`, "success");
+  } catch (error) {
+    setStatus(`Could not create account: ${error?.message || error}`, "error");
+  } finally {
+    setBusy(accountForm, false);
+  }
+});
+
+subscriptionForm.addEventListener("submit", async event => {
+  event.preventDefault();
+  const formData = new FormData(subscriptionForm);
+  const selectedCategory = text(formData.get("category"));
+  const category = selectedCategory === NEW_CATEGORY_VALUE ? text(formData.get("customCategory")) : selectedCategory || "Subscription";
+  const name = text(formData.get("name"));
+  const amount = Math.abs(numberValue(formData.get("amount")));
+  if (!name) return setStatus("Subscription name is required.", "error");
+  if (!Number.isFinite(amount) || amount <= 0) return setStatus("Subscription amount must be greater than zero.", "error");
+  const data = {
+    id: makeId("SUB"), name, amount, account: text(formData.get("account")), category,
+    currency: currencyCode(formData.get("currency")) || bookCurrency,
+    dueDay: Math.max(1, Math.min(31, Math.round(numberValue(formData.get("dueDay"), 1)))),
+    startDate: text(formData.get("startDate")) || localDateString(), endDate: text(formData.get("endDate")),
+    fxRate: numberValue(formData.get("fxRate")),
+  };
+  setBusy(subscriptionForm, true);
+  setStatus("Saving…");
+  try {
+    await ensureFolder(SUBSCRIPTION_FOLDER);
+    await financeApp.vault.create(uniquePath(SUBSCRIPTION_FOLDER, safeName(name)), subscriptionContent(data));
+    knownCategories.add(category);
+    resetSubscription();
+    setStatus(`Added subscription: ${name}.`, "success");
+  } catch (error) {
+    setStatus(`Could not create subscription: ${error?.message || error}`, "error");
+  } finally {
+    setBusy(subscriptionForm, false);
+  }
+});
+
+for (const tab of tabs) tab.addEventListener("click", () => showKind(tab.dataset.kind || "expense"));
+transactionCategory.addEventListener("change", updateTransactionCustom);
+subscriptionCategory.addEventListener("change", updateSubscriptionCustom);
+root.querySelector("[data-finance-manage]").addEventListener("click", () => {
+  const file = financeApp.vault.getAbstractFileByPath(FINANCE_BASE_PATH);
+  if (!file) return setStatus("Finance.base was not found.", "error");
+  const leaf = financeApp.workspace?.getLeaf?.(true);
+  if (leaf?.openFile) void leaf.openFile(file);
+});
+
+resetTransaction();
+resetAccount();
+resetSubscription();
+showKind("expense");

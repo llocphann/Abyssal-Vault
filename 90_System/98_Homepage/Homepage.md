@@ -19,11 +19,14 @@ dv.view("90_System/92_Scripts/Dataview/homepage/info-headers")
 >> [!blank]
 >>> [!multi-column]
 >>>
->>>> [!blank|wide-5]
+>>>> [!blank]
+>>>> ![[797722956_17919373971425474_540898127545340166_n.jpg]]
+>>>
+>>>> [!blank|wide-5] 
 >>>> ```dataviewjs
->>>> dv.view("90_System/92_Scripts/Dataview/homepage/dashboard-calendar")
+>>>> dv.view("90_System/92_Scripts/Dataview/homepage/dashboard-calendar") 
 >>>> ```
->>
+>> 
 >> ```dataviewjs
 >> dv.view("90_System/92_Scripts/Dataview/homepage/exercise-callout")
 >> dv.view("90_System/92_Scripts/Dataview/homepage/cardio-callout")

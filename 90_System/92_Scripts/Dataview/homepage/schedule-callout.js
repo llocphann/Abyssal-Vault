@@ -1,22 +1,22 @@
 dv.container.empty();
 
-const settings = dv.page("90_System/93_Configuration/settings.local")
-              || dv.page("90_System/93_Configuration/settings.example");
+const settings = dv.page("90_System/93_Configuration/settings") 
+              || dv.page("settings");
 
-const folderPath = settings?.file?.frontmatter?.["callout_path"]
-                ?? settings?.["callout_path"]
+const folderPath = settings?.file?.frontmatter?.["callout_path"] 
+                ?? settings?.["callout_path"] 
                 ?? settings?.callout_path;
 
-const targetHeading = settings?.file?.frontmatter?.["schedule_heading"]
-                ?? settings?.["schedule_heading"]
+const targetHeading = settings?.file?.frontmatter?.["schedule_heading"] 
+                ?? settings?.["schedule_heading"] 
                 ?? settings?.schedule_heading;
 const days = [
-    "07_Sunday",
-    "01_Monday",
-    "02_Tuesday",
-    "03_Wednesday",
-    "04_Thursday",
-    "05_Friday",
+    "07_Sunday", 
+    "01_Monday", 
+    "02_Tuesday", 
+    "03_Wednesday", 
+    "04_Thursday", 
+    "05_Friday", 
     "06_Saturday"
 ];
 

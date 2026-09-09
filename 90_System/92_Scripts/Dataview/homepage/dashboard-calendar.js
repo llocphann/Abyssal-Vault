@@ -1,6 +1,6 @@
 dv.container.empty();
 
-const VAULT = dv.app.vault.getName();
+const VAULT = "Obsidian-Vault";
 const F = { daily: "00_Capture/01_Journal" };
 const MON = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 const DOW = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];

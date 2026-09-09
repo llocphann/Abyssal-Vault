@@ -22,8 +22,37 @@
               "icon": "lucide-file",
               "title": "Homepage"
             }
+          },
+          {
+            "id": "547d7cf19008bcb9",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "90_System/93_Configuration/settings.md",
+                "mode": "preview",
+                "source": true
+              },
+              "icon": "lucide-file",
+              "title": "settings"
+            }
+          },
+          {
+            "id": "7e89da16714e95c4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "90_System/93_Configuration/settings.md",
+                "mode": "preview",
+                "source": true
+              },
+              "icon": "lucide-file",
+              "title": "settings"
+            }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -300,14 +329,29 @@
       "obsidian-day-planner:Open Multi-Day View": false
     }
   },
-  "active": "c081451803d30e39",
+  "active": "7e89da16714e95c4",
   "lastOpenFiles": [
     "90_System/98_Homepage/Homepage.md",
-    "90_System/95_Media_Assets/Dashboard/Banner.webp",
-    "90_System/95_Media_Assets/Dashboard/Banner.png",
+    "90_System/97_Daily_Schedule/01_Monday.md",
+    "90_System/97_Daily_Schedule/07_Sunday.md",
+    "90_System/97_Daily_Schedule/06_Saturday.md",
+    "90_System/97_Daily_Schedule/05_Friday.md",
+    "90_System/97_Daily_Schedule/04_Thursday.md",
+    "90_System/97_Daily_Schedule/02_Tuesday.md",
+    "90_System/97_Daily_Schedule/03_Wednesday.md",
+    "90_System/93_Configuration/settings.md",
+    "90_System/95_Media_Assets/Images/KIROKAZE.gif",
+    "90_System/95_Media_Assets/Images/gas_station.gif",
+    "90_System/95_Media_Assets/Images/kvt.gif",
+    "90_System/95_Media_Assets/Images/qX11MN9W.gif",
+    "90_System/95_Media_Assets/Images/neaeT1qU.gif",
+    "90_System/95_Media_Assets/Images/rain-pixel-art.gif",
+    "90_System/95_Media_Assets/Images/robot.gif",
+    "90_System/95_Media_Assets/Images/street.gif",
+    "90_System/95_Media_Assets/Images/train_and_lake.png",
+    "90_System/95_Media_Assets/Images/vibe.gif",
+    "90_System/95_Media_Assets/Images",
     "90_System/95_Media_Assets/Dashboard",
-    "90_System/Dashboard/Banner.webp",
-    "90_System/Dashboard/Banner.png",
     "90_System/Dashboard",
     "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
     "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",

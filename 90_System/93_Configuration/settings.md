@@ -1,22 +1,22 @@
 ---
 type: vault-settings
 vault_name: Abyssal-Vault
-username: "fill in your username"
-start_date: "fill in your start_date"
+username: fill in your username
+start_date: ""
 callout_path: 90_System/97_Daily_Schedule
 schedule_heading: Daily Schedule
 exercise_heading: Calisthenics
 cardio_heading: Cardio
-openweathermap_key: "fill in your openweathermap_api_key"
-openweathermap_city: "fill in your city"
+openweathermap_key: fill in your openweathermap_api_key
+openweathermap_city: fill in your city
 openweathermap_unit: metric
-tmdb_key: "fill in your tmdb_api_key"
-spoonacular_key: "fill in your spoonacular_api_key"
+tmdb_key: fill in your tmdb_api_key
+spoonacular_key: fill in your spoonacular_api_key
 recipe_provider: auto
-rawg_api_key: "fill in your rawg_api_key"
-steam_api_key: "fill in your steam_api_key"
-steam_id: "fill in your steam_id"
-gog_heroic_auth_path: "fill in your gog_heroic_auth_path"
+rawg_api_key: fill in your rawg_api_key
+steam_api_key: fill in your steam_api_key
+steam_id: fill in your steam_id
+gog_heroic_auth_path: fill in your gog_heroic_auth_path
 gog_locale: en-US
 FinanceSchema: 1
 FinanceBook: default
