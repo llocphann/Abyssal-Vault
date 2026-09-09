@@ -3,6 +3,8 @@
   "enabledCssSnippets": [
     "01_Core_System",
     "02_Homepage_And_Style_Settings",
-    "03_Bases_Foundation"
+    "03_Bases_Foundation",
+    "04_Customized_Base_Cards",
+    "05_Content_Interface_And_Plugins"
   ]
 }
