@@ -505,6 +505,10 @@ body.theme-dark {
     --accent-s: var(--accent-dark-s);
     --accent-l: var(--accent-dark-l);
 
+    /* Border upstream maps its default dark underlying layer to background-tertiary.
+     * Abyssal historically used P00 here, so keep the raw variable dark even when
+     * no Style Settings class is present. */
+    --background-underlying: var(--cc-p00, #0a0e10);
     --background-underlying-dark: var(--cc-p00, #0a0e10);
     --workspace-background-translucent: var(--cc-p00, #0a0e10);
 
@@ -576,4 +580,11 @@ body.theme-dark {
     --scrollbar-bg: transparent;
     --scrollbar-thumb-bg: color-mix(in srgb, var(--cc-p07, #3e5965) 55%, transparent);
     --scrollbar-active-thumb-bg: var(--cc-p08, #4e707e);
+}
+
+/* Border 1.13.8 upstream changed the default dark underlying selector to
+ * background-tertiary with !important. Match that selector and restore the
+ * historical Abyssal P00 underlying canvas without patching vendor CSS. */
+body.theme-dark.background-underlying-default-dark {
+    --background-underlying: var(--cc-p00, #0a0e10) !important;
 }
