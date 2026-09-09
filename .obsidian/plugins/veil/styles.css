@@ -1,0 +1,648 @@
+/* Veil keeps the wallpaper in its own layer. Pane surface opacity and optional
+ * whole-pane opacity are independent controls. All colors come from the active
+ * Obsidian theme; the plugin does not hard-code a light or dark palette. */
+body.vault-dashboard-background:not(.is-mobile) {
+  --vault-dashboard-root-pane: color-mix(
+    in srgb,
+    var(--background-mod-root-split, var(--background-primary)) var(--vault-dashboard-pane-opacity, 70%),
+    transparent
+  );
+  --vault-dashboard-left-pane: color-mix(
+    in srgb,
+    var(--background-mod-left-split, var(--background-primary)) var(--vault-dashboard-pane-opacity, 70%),
+    transparent
+  );
+  --vault-dashboard-right-pane: color-mix(
+    in srgb,
+    var(--background-mod-right-split, var(--background-primary)) var(--vault-dashboard-pane-opacity, 70%),
+    transparent
+  );
+}
+
+/* Border exposes separate light/dark semantic pane colors. These fallbacks keep
+ * Veil compatible with that palette without requiring the theme. */
+body.vault-dashboard-background.theme-dark:not(.is-mobile) {
+  --vault-dashboard-root-pane: color-mix(
+    in srgb,
+    var(--background-mod-root-split-dark, var(--background-primary)) var(--vault-dashboard-pane-opacity, 70%),
+    transparent
+  );
+  --vault-dashboard-left-pane: color-mix(
+    in srgb,
+    var(--background-mod-left-split-dark, var(--background-primary)) var(--vault-dashboard-pane-opacity, 70%),
+    transparent
+  );
+  --vault-dashboard-right-pane: color-mix(
+    in srgb,
+    var(--background-mod-right-split-dark, var(--background-primary)) var(--vault-dashboard-pane-opacity, 70%),
+    transparent
+  );
+}
+
+body.vault-dashboard-background.theme-light:not(.is-mobile) {
+  --vault-dashboard-root-pane: color-mix(
+    in srgb,
+    var(--background-mod-root-split-light, var(--background-primary)) var(--vault-dashboard-pane-opacity, 70%),
+    transparent
+  );
+  --vault-dashboard-left-pane: color-mix(
+    in srgb,
+    var(--background-mod-left-split-light, var(--background-primary)) var(--vault-dashboard-pane-opacity, 70%),
+    transparent
+  );
+  --vault-dashboard-right-pane: color-mix(
+    in srgb,
+    var(--background-mod-right-split-light, var(--background-primary)) var(--vault-dashboard-pane-opacity, 70%),
+    transparent
+  );
+}
+
+body.vault-dashboard-background:not(.is-mobile)
+  > .app-container
+  .workspace-split.mod-root {
+  background-color: var(--vault-dashboard-root-pane);
+}
+
+body.vault-dashboard-background:not(.is-mobile)
+  > .app-container
+  .workspace-split.mod-left-split {
+  background-color: var(--vault-dashboard-left-pane);
+}
+
+body.vault-dashboard-background:not(.is-mobile)
+  > .app-container
+  .workspace-split.mod-right-split {
+  background-color: var(--vault-dashboard-right-pane);
+}
+
+body.vault-dashboard-background:not(.is-mobile)
+  .workspace-split:is(.mod-root, .mod-left-split, .mod-right-split)
+  :is(.workspace-tabs, .workspace-tab-container, .workspace-leaf, .workspace-leaf-content, .view-content) {
+  background-color: transparent;
+}
+
+/* Fade only each outer pane group. Nested splits must not multiply opacity. */
+body.vault-dashboard-background.vault-dashboard-fade-pane-content:not(.is-mobile)
+  > .app-container
+  .workspace-split:is(.mod-root, .mod-left-split, .mod-right-split):not(
+    .workspace-split:is(.mod-root, .mod-left-split, .mod-right-split) .workspace-split
+  ) {
+  opacity: var(--vault-dashboard-pane-content-opacity, 1);
+}
+
+/* The negative layer sits above the body background and below app content.
+ * Wallpaper filters therefore never reach native panes or note content. */
+html body.vault-dashboard-background:not(.is-mobile):is(.theme-light, .theme-dark) {
+  isolation: isolate;
+  background-color: var(--background-underlying, var(--background-primary));
+  background-image: none;
+  background-blend-mode: normal;
+}
+
+.vault-dashboard-wallpaper {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  contain: strict;
+  pointer-events: none;
+  user-select: none;
+  opacity: var(--vdb-transition-opacity, var(--vdb-opacity, 0.15));
+  transition: opacity var(--vdb-transition-duration, 320ms) ease;
+}
+
+.vault-dashboard-wallpaper::before,
+.vault-dashboard-wallpaper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  display: none;
+  pointer-events: none;
+}
+
+.vault-dashboard-wallpaper::before {
+  z-index: 2;
+  background: var(--vdb-overlay-color, var(--interactive-accent));
+  opacity: var(--vdb-overlay-opacity, 0.3);
+  mix-blend-mode: var(--vdb-overlay-blend-mode, color);
+}
+
+.vault-dashboard-wallpaper[data-color-overlay="true"]::before {
+  display: block;
+}
+
+.vault-dashboard-wallpaper[hidden],
+body:not(.vault-dashboard-background) > .vault-dashboard-wallpaper,
+body.is-mobile > .vault-dashboard-wallpaper {
+  display: none;
+}
+
+.vault-dashboard-wallpaper > .vault-dashboard-wallpaper-media {
+  position: absolute;
+  inset: calc(0px - var(--vdb-blur-bleed, 0px));
+  display: block;
+  width: calc(100% + var(--vdb-blur-bleed, 0px) * 2);
+  height: calc(100% + var(--vdb-blur-bleed, 0px) * 2);
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  object-fit: var(--vdb-fit, cover);
+  object-position: var(--vdb-position-x, 50%) var(--vdb-position-y, 50%);
+  transform: scale(var(--vdb-media-scale, 1));
+  transform-origin: var(--vdb-position-x, 50%) var(--vdb-position-y, 50%);
+  filter: var(--vdb-filter, none);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.vault-dashboard-wallpaper[data-effect="retro"]::after {
+  z-index: 3;
+  display: block;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    color-mix(in srgb, var(--text-normal) 16%, transparent) 4px
+  );
+  opacity: calc(var(--vdb-effect-opacity, 0.2) * 0.42);
+  mix-blend-mode: soft-light;
+}
+
+.vault-dashboard-wallpaper[data-effect="glitch"]::after {
+  z-index: 3;
+  display: block;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-red, var(--interactive-accent)) 38%, transparent),
+      transparent 32%,
+      color-mix(in srgb, var(--color-cyan, var(--text-accent)) 34%, transparent)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 5px,
+      color-mix(in srgb, var(--text-normal) 18%, transparent) 6px 7px
+    );
+  opacity: var(--vdb-effect-opacity, 0.24);
+  mix-blend-mode: screen;
+  animation: veil-glitch-overlay var(--vdb-effect-speed, 260ms) steps(2, end) infinite;
+}
+
+.vault-dashboard-wallpaper[data-effect="glitch"] > .vault-dashboard-wallpaper-media {
+  animation: veil-glitch-media var(--vdb-effect-speed, 260ms) steps(2, end) infinite;
+  will-change: transform;
+}
+
+.vault-dashboard-wallpaper[data-effect="tv-noise"]::after {
+  z-index: 3;
+  display: block;
+  background-image:
+    repeating-radial-gradient(
+      circle at 17% 31%,
+      color-mix(in srgb, var(--text-normal) 28%, transparent) 0 1px,
+      transparent 1px 3px
+    ),
+    repeating-linear-gradient(
+      87deg,
+      transparent 0 2px,
+      color-mix(in srgb, var(--background-primary) 42%, transparent) 2px 3px
+    );
+  background-size: 5px 5px, 7px 4px;
+  opacity: var(--vdb-effect-opacity, 0.24);
+  mix-blend-mode: overlay;
+  animation: veil-tv-noise var(--vdb-effect-speed, 260ms) steps(2, end) infinite;
+  will-change: background-position;
+}
+
+.vault-dashboard-wallpaper[data-animation-paused="true"][data-effect="glitch"]::after,
+.vault-dashboard-wallpaper[data-animation-paused="true"][data-effect="glitch"]
+  > .vault-dashboard-wallpaper-media,
+.vault-dashboard-wallpaper[data-animation-paused="true"][data-effect="tv-noise"]::after {
+  animation-play-state: paused;
+}
+
+@keyframes veil-glitch-media {
+  0%,
+  68%,
+  100% {
+    transform: scale(var(--vdb-glitch-scale, 1.01)) translate3d(0, 0, 0);
+  }
+
+  70% {
+    transform: scale(var(--vdb-glitch-scale, 1.01)) translate3d(var(--vdb-effect-shift, 3px), 0, 0);
+  }
+
+  74% {
+    transform: scale(var(--vdb-glitch-scale, 1.01)) translate3d(calc(0px - var(--vdb-effect-shift, 3px)), 0, 0);
+  }
+}
+
+@keyframes veil-glitch-overlay {
+  0%,
+  62%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+
+  64% {
+    transform: translate3d(var(--vdb-effect-shift, 3px), -1%, 0, 0);
+  }
+
+  70% {
+    transform: translate3d(calc(0px - var(--vdb-effect-shift, 3px)), 1%, 0);
+  }
+}
+
+@keyframes veil-tv-noise {
+  0% { background-position: 0 0, 0 0; }
+  25% { background-position: 13px -7px, -9px 11px; }
+  50% { background-position: -11px 5px, 7px -13px; }
+  75% { background-position: 5px 17px, -15px -3px; }
+  100% { background-position: -17px -11px, 13px 7px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vault-dashboard-wallpaper[data-reduce-motion="true"] {
+    transition-duration: 0ms;
+  }
+
+  .vault-dashboard-wallpaper[data-reduce-motion="true"][data-effect="glitch"]::after,
+  .vault-dashboard-wallpaper[data-reduce-motion="true"][data-effect="glitch"]
+    > .vault-dashboard-wallpaper-media,
+  .vault-dashboard-wallpaper[data-reduce-motion="true"][data-effect="tv-noise"]::after {
+    animation: none;
+  }
+}
+
+.vault-dashboard-wallpaper-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    var(--vdb-vignette-shape, ellipse) farthest-corner at center,
+    transparent var(--vdb-vignette-radius, 55%),
+    var(--shadow, var(--background-modifier-cover, var(--background-primary))) 100%
+  );
+  opacity: var(--vdb-vignette-intensity, 0.4);
+  pointer-events: none;
+  z-index: 4;
+}
+
+.vault-dashboard-wallpaper-vignette[hidden] {
+  display: none;
+}
+
+/* Settings styles are confined to Veil's own controls. */
+.veil-settings-tabs-setting {
+  padding-top: 0;
+  border: 0;
+}
+
+.veil-settings-tabs-setting .setting-item-info {
+  display: none;
+}
+
+.veil-settings-tabs-setting .setting-item-control {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.veil-settings-tabs {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: var(--background-secondary);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.veil-settings-tab {
+  min-width: max-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--size-4-1);
+  padding: var(--size-4-2) var(--size-4-3);
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-muted);
+  box-shadow: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.veil-settings-tab:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.veil-settings-tab[aria-selected="true"] {
+  border-color: color-mix(in srgb, var(--interactive-accent) 48%, transparent);
+  background: color-mix(in srgb, var(--interactive-accent) 14%, transparent);
+  color: var(--text-accent);
+}
+
+.veil-settings-tab:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+}
+
+.veil-settings-tab-icon,
+.veil-settings-tab-icon > svg {
+  width: var(--icon-s);
+  height: var(--icon-s);
+  display: block;
+}
+
+.veil-settings-root:not([data-veil-settings-tab="wallpaper"]) .veil-settings-panel-wallpaper,
+.veil-settings-root:not([data-veil-settings-tab="rules"]) .veil-settings-panel-rules,
+.veil-settings-root:not([data-veil-settings-tab="effects"]) .veil-settings-panel-effects,
+.veil-settings-root:not([data-veil-settings-tab="video"]) .veil-settings-panel-video,
+.veil-settings-root:not([data-veil-settings-tab="actions"]) .veil-settings-panel-actions,
+.veil-settings-root:not([data-veil-settings-tab="support"]) .veil-settings-panel-support {
+  display: none;
+}
+
+.vault-dashboard-wallpaper-status {
+  margin: 0 0 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s, 6px);
+  color: var(--text-muted);
+  background: var(--background-secondary);
+  overflow-wrap: anywhere;
+  font-size: var(--font-ui-small);
+}
+
+.vault-dashboard-wallpaper-status[data-tone="error"] {
+  color: var(--text-error);
+}
+
+.vault-dashboard-wallpaper-status[data-tone="success"] {
+  color: var(--text-success, var(--text-accent));
+}
+
+/* Wallpaper library is rendered only on explicit user request through the command palette. */
+.veil-wallpaper-library-modal {
+  width: min(1100px, 92vw);
+  max-width: 92vw;
+}
+
+.veil-wallpaper-library-description,
+.veil-wallpaper-library-summary {
+  color: var(--text-muted);
+  font-size: var(--font-ui-small);
+}
+
+.veil-wallpaper-library-toolbar {
+  display: flex;
+  gap: var(--size-4-2);
+  align-items: center;
+  margin: var(--size-4-3) 0;
+}
+
+.veil-wallpaper-library-search {
+  min-width: 180px;
+  flex: 1 1 320px;
+}
+
+.veil-wallpaper-library-filters {
+  display: flex;
+  gap: var(--size-4-1);
+  flex: 0 0 auto;
+}
+
+.veil-wallpaper-library-filter.is-active,
+.veil-wallpaper-library-filter[aria-pressed="true"] {
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
+.veil-wallpaper-library-summary {
+  margin-bottom: var(--size-4-2);
+}
+
+.veil-wallpaper-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--size-4-3);
+}
+
+.veil-wallpaper-library-card {
+  position: relative;
+  min-width: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-secondary);
+  overflow: hidden;
+}
+
+.veil-wallpaper-library-card[data-selected="true"] {
+  border-color: var(--interactive-accent);
+  box-shadow: inset 0 0 0 1px var(--interactive-accent);
+}
+
+.veil-wallpaper-library-select {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-normal);
+  box-shadow: none;
+  text-align: left;
+}
+
+.veil-wallpaper-library-select:hover,
+.veil-wallpaper-library-select:focus-visible {
+  background: var(--background-modifier-hover);
+}
+
+.veil-wallpaper-library-select:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+}
+
+.veil-wallpaper-library-preview {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--background-primary-alt, var(--background-primary));
+}
+
+.veil-wallpaper-library-preview > img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.veil-wallpaper-library-preview.is-error > img {
+  visibility: hidden;
+}
+
+.veil-wallpaper-library-video-icon,
+.veil-wallpaper-library-video-icon > svg {
+  width: var(--icon-xl, 32px);
+  height: var(--icon-xl, 32px);
+  color: var(--text-muted);
+}
+
+.veil-wallpaper-library-type {
+  position: absolute;
+  right: var(--size-4-1);
+  bottom: var(--size-4-1);
+  padding: 1px var(--size-4-1);
+  border-radius: var(--radius-s);
+  background: color-mix(in srgb, var(--background-primary) 84%, transparent);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: var(--line-height-tight);
+}
+
+.veil-wallpaper-library-name,
+.veil-wallpaper-library-path {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.veil-wallpaper-library-name {
+  padding: var(--size-4-2) var(--size-4-2) 0;
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-semibold);
+}
+
+.veil-wallpaper-library-path {
+  padding: 0 var(--size-4-2) var(--size-4-2);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.veil-wallpaper-library-favorite {
+  position: absolute;
+  top: var(--size-4-1);
+  right: var(--size-4-1);
+  width: 30px;
+  height: 30px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--background-primary) 88%, transparent);
+  color: var(--text-muted);
+  box-shadow: none;
+}
+
+.veil-wallpaper-library-favorite[data-favorite="true"] {
+  color: var(--interactive-accent);
+}
+
+.veil-wallpaper-library-favorite[data-favorite="true"] > svg {
+  fill: currentColor;
+}
+
+.veil-wallpaper-library-empty {
+  grid-column: 1 / -1;
+  padding: var(--size-4-6);
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.veil-wallpaper-library-more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--size-4-4);
+}
+
+@media (max-width: 700px) {
+  .veil-wallpaper-library-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .veil-wallpaper-library-filters {
+    flex-wrap: wrap;
+  }
+
+  .veil-wallpaper-library-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}
+
+.veil-support-link {
+  --veil-support-background: #fd0;
+  --veil-support-foreground: #000;
+
+  box-sizing: border-box;
+  width: max-content;
+  max-width: none;
+  min-width: max-content;
+  display: inline-flex;
+  gap: var(--size-2-2, 8px);
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  padding: var(--size-4-1, 4px) var(--size-4-3, 12px);
+  border: 1px solid var(--veil-support-foreground);
+  border-radius: var(--button-radius, 5px);
+  color: var(--veil-support-foreground);
+  background-color: var(--veil-support-background);
+  background-image: none;
+  box-shadow: var(--input-shadow);
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-semibold);
+  line-height: var(--line-height-tight);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.veil-support-link:hover,
+.veil-support-link:focus-visible {
+  color: var(--veil-support-foreground);
+  background-color: color-mix(in srgb, var(--veil-support-background) 86%, #fff);
+  text-decoration: none;
+}
+
+.veil-support-link:focus-visible {
+  outline: 2px solid var(--veil-support-foreground);
+  outline-offset: 2px;
+}
+
+.veil-support-link:active {
+  transform: translateY(1px);
+}
+
+.veil-support-link-icon,
+.veil-support-link-icon > svg {
+  flex: 0 0 auto;
+  display: inline-flex;
+  width: var(--icon-size, 16px);
+  height: var(--icon-size, 16px);
+}
+
+.veil-support-link-label {
+  flex: 0 0 auto;
+  display: block;
+  white-space: nowrap;
+}

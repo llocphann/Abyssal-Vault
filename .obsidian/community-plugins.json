@@ -21,5 +21,6 @@
   "vault-dashboard-background",
   "veil",
   "ledge",
-  "mlir-syntax-highlight"
+  "mlir-syntax-highlight",
+  "dataview"
 ]

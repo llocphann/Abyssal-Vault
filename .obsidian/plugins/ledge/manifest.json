@@ -1,0 +1,10 @@
+{
+  "id": "ledge",
+  "name": "Ledge",
+  "version": "2.1.0",
+  "minAppVersion": "1.13.7",
+  "description": "Add a context-aware edge dock with visibility rules, custom trigger surfaces, icons, colors, reveal timing, and drag-and-drop ordering.",
+  "author": "llocphann",
+  "fundingUrl": "https://www.buymeacoffee.com/llocphann",
+  "isDesktopOnly": true
+}
