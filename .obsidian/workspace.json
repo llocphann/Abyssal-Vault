@@ -34,9 +34,25 @@
               "icon": "lucide-layout-grid",
               "title": "Media_Tracker"
             }
+          },
+          {
+            "id": "a7e1edc22fb3a656",
+            "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "90_System/98_Homepage/Homepage.md",
+                "mode": "preview",
+                "source": true
+              },
+              "pinned": true,
+              "icon": "lucide-file",
+              "title": "Homepage"
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -314,11 +330,11 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "ec765b46f929a475",
+  "active": "a7e1edc22fb3a656",
   "lastOpenFiles": [
+    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
     "90_System/98_Homepage/Homepage.md",
     "20_Personal_Life/23_Places/Map.base",
-    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
     "20_Personal_Life/24_Book_Tracker/Books/A_Dance_with_Dragons.md",
     "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
     "90_System/97_Daily_Schedule/01_Monday.md",
