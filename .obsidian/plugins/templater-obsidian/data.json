@@ -68,6 +68,7 @@
   "enabled_templates_hotkeys": [],
   "startup_templates": [
     "90_System/91_Templates/Bootstrap_Settings.md",
+    "90_System/91_Templates/Check_Required_Plugins.md",
     "90_System/91_Templates/Sync_Places_Custom_View.md"
   ],
   "intellisense_render": "1",
