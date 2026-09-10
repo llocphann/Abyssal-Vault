@@ -1,4 +1,6 @@
 <%*
+const { Notice } = require("obsidian");
+
 const required = [
   {
     id: "maps",
