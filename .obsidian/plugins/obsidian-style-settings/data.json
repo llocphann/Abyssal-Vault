@@ -71,7 +71,7 @@
   "floating-toc-styles@@indicator-bar-position": 0,
   "floating-toc-styles@@focus-heading": 0.3,
   "floating-toc-styles@@floating-toc-remove-heading-indicator": false,
-  "abyssal-vault@@startup-progress-style": "pb-loader-cassette",
+  "abyssal-vault@@startup-progress-style": "pb-loader-dots",
   "Appearance-dark@@mod-right-split-background-select-dark": "mod-right-split-background-primary-dark",
   "abyssal-vault@@cc-p00": "#0A0E10",
   "abyssal-vault@@cc-p01": "#0C1113",

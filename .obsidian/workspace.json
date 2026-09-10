@@ -25,15 +25,14 @@
             "type": "leaf",
             "pinned": true,
             "state": {
-              "type": "markdown",
+              "type": "bases",
               "state": {
-                "file": "90_System/98_Homepage/Homepage.md",
-                "mode": "preview",
-                "source": true
+                "file": "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
+                "viewName": "Media Library"
               },
               "pinned": true,
-              "icon": "lucide-file",
-              "title": "Homepage"
+              "icon": "lucide-layout-grid",
+              "title": "Media_Tracker"
             }
           }
         ],
@@ -318,8 +317,8 @@
   "active": "ec765b46f929a475",
   "lastOpenFiles": [
     "90_System/98_Homepage/Homepage.md",
-    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
     "20_Personal_Life/23_Places/Map.base",
+    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
     "20_Personal_Life/24_Book_Tracker/Books/A_Dance_with_Dragons.md",
     "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
     "90_System/97_Daily_Schedule/01_Monday.md",
