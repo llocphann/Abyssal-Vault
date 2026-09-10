@@ -40,7 +40,7 @@ copy of this repository.**
 
 ## Weather
 
-- `openweathermap_key` is used by weather integrations, including Places Weather.
+- `openweathermap_key` is used by the Places Custom Views weather runtime and other weather integrations.
 - `openweathermap_city` is the fallback city for weather views not tied to a Place note.
 - `openweathermap_unit` supports `metric`, `imperial`, and `standard`.
 
