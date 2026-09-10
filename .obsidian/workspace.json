@@ -10,20 +10,18 @@
           {
             "id": "18f3e51d6fb8afb1",
             "type": "leaf",
-            "pinned": true,
             "state": {
               "type": "bases",
               "state": {
                 "file": "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
                 "viewName": "Media Library"
               },
-              "pinned": true,
               "icon": "lucide-layout-grid",
               "title": "Media_Tracker"
             }
           },
           {
-            "id": "44296e2a8b2d37d5",
+            "id": "ec765b46f929a475",
             "type": "leaf",
             "pinned": true,
             "state": {
@@ -157,7 +155,7 @@
       {
         "id": "faa38c380235c599",
         "type": "tabs",
-        "dimension": 23.665338645418327,
+        "dimension": 23.524720893141946,
         "children": [
           {
             "id": "21fab2252cb21bfd",
@@ -264,7 +262,7 @@
       {
         "id": "af65bb7ac822414a",
         "type": "tabs",
-        "dimension": 50.199203187250994,
+        "dimension": 51.674641148325364,
         "children": [
           {
             "id": "ddb492e143439b97",
@@ -279,12 +277,12 @@
         ]
       },
       {
-        "id": "c07a012bb8fb50f8",
+        "id": "4b266b3d65ff2f45",
         "type": "tabs",
-        "dimension": 26.13545816733068,
+        "dimension": 24.800637958532697,
         "children": [
           {
-            "id": "483e221474c9c9de",
+            "id": "53afeb1e7e8c6603",
             "type": "leaf",
             "state": {
               "type": "graph",
@@ -317,9 +315,21 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "44296e2a8b2d37d5",
+  "active": "ec765b46f929a475",
   "lastOpenFiles": [
+    "90_System/98_Homepage/Homepage.md",
     "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
+    "20_Personal_Life/23_Places/Map.base",
+    "20_Personal_Life/24_Book_Tracker/Books/A_Dance_with_Dragons.md",
+    "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
+    "90_System/97_Daily_Schedule/01_Monday.md",
+    "90_System/93_Configuration/settings.example.md",
+    "90_System/97_Daily_Schedule/03_Wednesday.md",
+    "90_System/97_Daily_Schedule/02_Tuesday.md",
+    "20_Personal_Life/33_Bodybuilding/Bodybuilding.base",
+    "20_Personal_Life/26_Food_&_Drinks/FoodnDrinks.base",
+    "20_Personal_Life/22_Finance/Finance_Dashboard.md",
+    "20_Personal_Life/27_Game_Tracker/Game_Collection.base",
     "90_System/95_Media_Assets/Recipes/themealdb-53238-cover.jpg",
     "90_System/95_Media_Assets/Recipes/spoonacular-991010-cover.jpg",
     "90_System/95_Media_Assets/Recipes/spoonacular-664828-cover.jpg",
@@ -334,22 +344,13 @@
     "90_System/95_Media_Assets/TV_Series/65733-cover.jpg",
     "90_System/95_Media_Assets/Icons",
     "90_System/95_Media_Assets/Movies",
-    "90_System/95_Media_Assets/Games",
-    "90_System/95_Media_Assets/TV_Series",
     "20_Personal_Life/25_Media_Tracker/Movies/Train to Busan.md",
-    "90_System/98_Homepage/Homepage.md",
     "90_System/93_Configuration/settings.md",
     "20_Personal_Life/25_Media_Tracker/Movies/Untitled 1.md",
     "20_Personal_Life/25_Media_Tracker/Movies/Untitled.md",
-    "90_System/97_Daily_Schedule/01_Monday.md",
     "90_System/97_Daily_Schedule/07_Sunday.md",
     "90_System/97_Daily_Schedule/06_Saturday.md",
     "90_System/97_Daily_Schedule/05_Friday.md",
-    "90_System/97_Daily_Schedule/04_Thursday.md",
-    "90_System/97_Daily_Schedule/02_Tuesday.md",
-    "90_System/97_Daily_Schedule/03_Wednesday.md",
-    "90_System/95_Media_Assets/Images",
-    "90_System/95_Media_Assets/Dashboard",
-    "90_System/Dashboard"
+    "90_System/97_Daily_Schedule/04_Thursday.md"
   ]
 }

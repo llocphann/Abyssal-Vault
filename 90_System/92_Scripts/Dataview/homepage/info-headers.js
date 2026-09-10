@@ -10,7 +10,6 @@ const F = {
   quick: "00_Capture/03_Zettelkasten",
   movie_note: "20_Personal_Life/25_Media_Tracker/Movies",
   tvseries_note: "20_Personal_Life/25_Media_Tracker/TV_Series",
-  oniondir: "70_Interests_&_Research/78_Onion_Sites",
 };
 
 const pad = n => String(n).padStart(2, "0");
@@ -285,7 +284,6 @@ try {
   btn(bar, "/cornell", `${F.cornelldir}/`);
   btn(bar, "/movies", `${F.movie_note}/`);
   btn(bar, "/tvseries", `${F.tvseries_note}/`);
-  btn(bar, "/web-site", `${F.oniondir}/`);
 } catch (e) {
   actionsRoot.createDiv({ cls: "hd-empty", text: "Actions error: " + e.message });
 }
