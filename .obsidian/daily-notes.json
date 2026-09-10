@@ -1,0 +1,5 @@
+{
+  "folder": "00_Capture/01_Journal",
+  "format": "YYYY/MMMM/DD-MM-YYYY-dddd",
+  "template": "90_System/91_Templates/Journal_Template.md"
+}

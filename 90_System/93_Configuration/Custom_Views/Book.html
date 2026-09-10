@@ -1,0 +1,38 @@
+<div class="cv-book">
+  <header class="cv-book-hero">
+    <div class="cv-book-hero-inner">
+      <figure class="cv-book-cover-shell">
+        <div class="cv-book-cover-frame">
+          <img class="cv-book-cover" data-role="book-cover" alt="Cover for {{file.basename}}" hidden />
+          <span class="cv-book-cover-fallback" data-role="book-cover-fallback" aria-hidden="true">BOOK</span>
+        </div>
+        <figcaption class="cv-book-cover-caption">
+          <span class="cv-book-status-badge" data-role="book-status-badge">To read</span>
+        </figcaption>
+      </figure>
+      <section class="cv-book-identity" aria-labelledby="cv-book-title">
+        <span class="cv-book-eyebrow">Reading dossier</span>
+        <h1 class="cv-book-title cv-book-inline-edit" id="cv-book-title" data-role="book-title" data-edit-property="Title" contenteditable="plaintext-only" role="textbox" aria-label="Book title" spellcheck="true">{{file.basename}}</h1>
+        <p class="cv-book-author">by <span class="cv-book-inline-edit" data-role="book-author" data-edit-property="Author" contenteditable="plaintext-only" role="textbox" aria-label="Book author" spellcheck="true">Unknown author</span></p>
+        <div class="cv-book-genres" data-role="book-genres" aria-label="Genres"></div>
+        <section class="cv-book-progress" aria-label="Reading progress">
+          <div class="cv-book-progress-head"><div><span class="cv-book-control-label">Reading progress</span><strong data-role="book-progress-pages">0 / 0 pages</strong></div><output data-role="book-progress-percent">0%</output></div>
+          <div class="cv-book-progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-role="book-progress-track"><span class="cv-book-progress-fill" data-role="book-progress-fill"></span></div>
+        </section>
+      </section>
+      <aside class="cv-book-quick-panel" aria-label="Book controls">
+        <div class="cv-book-control-group"><span class="cv-book-control-label">Reading status</span><div class="cv-book-status-controls" data-role="book-status-controls"><button type="button" data-status-value="Haven't started">To read</button><button type="button" data-status-value="Currently reading">Reading</button><button type="button" data-status-value="Finished">Finished</button></div></div>
+        <div class="cv-book-control-group"><span class="cv-book-control-label">Pages</span><div class="cv-book-page-control"><label><span>Current</span><input data-role="book-page-input" type="number" min="0" inputmode="numeric" aria-label="Current page" /></label><span class="cv-book-page-divider" aria-hidden="true">/</span><label><span>Total</span><input data-role="book-total-input" type="number" min="0" inputmode="numeric" aria-label="Total pages" /></label><button type="button" data-action="save-book-pages">Update</button></div></div>
+        <div class="cv-book-control-group"><span class="cv-book-control-label">Your rating</span><div class="cv-book-rating" data-role="book-rating" role="group" aria-label="Rating from 1 to 5 stars"><button type="button" data-rating="1" aria-label="Rate 1 star">★</button><button type="button" data-rating="2" aria-label="Rate 2 stars">★</button><button type="button" data-rating="3" aria-label="Rate 3 stars">★</button><button type="button" data-rating="4" aria-label="Rate 4 stars">★</button><button type="button" data-rating="5" aria-label="Rate 5 stars">★</button></div></div>
+        <span class="cv-book-save-state" data-role="book-save-state" aria-live="polite"></span>
+      </aside>
+    </div>
+  </header>
+  <main class="cv-book-workspace">
+    <article class="cv-book-journal-card"><header class="cv-book-section-head"><div><span class="cv-book-kicker">Marginalia &amp; memory</span><h2>Reading notebook</h2></div><div class="cv-book-note-actions"><span class="cv-book-note-state" data-role="book-note-state" aria-live="polite"></span></div></header><div class="cv-book-note-render" data-role="book-note-render">{{file.content}}</div></article>
+    <aside class="cv-book-meta-column" aria-label="Book details">
+      <section class="cv-book-meta-card"><header><span class="cv-book-kicker">Edit metadata here</span><h2>Book details</h2></header><div class="cv-book-fields"><label class="cv-book-field"><span>Cover</span><input data-role="book-cover-input" type="text" autocomplete="off" placeholder="[[cover.jpg]] or URL" /></label><label class="cv-book-field"><span>Genres</span><input data-role="book-genres-input" type="text" autocomplete="off" placeholder="[[Fantasy]], [[Adventure]]" /></label><label class="cv-book-field"><span>Started</span><input data-role="book-started-input" type="date" /></label><label class="cv-book-field"><span>Finished</span><input data-role="book-finished-input" type="date" /></label></div></section>
+      <section class="cv-book-map-card"><span class="cv-book-kicker">Notebook map</span><h2>What to capture</h2><ol><li><span>01</span><div><strong>Synopsis</strong><small>What the book is about.</small></div></li><li><span>02</span><div><strong>Notes &amp; takeaways</strong><small>Ideas worth keeping.</small></div></li><li><span>03</span><div><strong>Highlights</strong><small>Quotes with page references.</small></div></li><li><span>04</span><div><strong>Review &amp; thoughts</strong><small>Your judgement after reading.</small></div></li><li><span>05</span><div><strong>Connections</strong><small>Books, topics and applications.</small></div></li></ol></section>
+    </aside>
+  </main>
+</div>

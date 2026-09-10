@@ -1,0 +1,26 @@
+---
+id: Stairmaster
+name: Stairmaster
+level: intermediate
+force: None
+mechanic: None
+equipment: machine
+category: cardio
+primaryMuscles:
+  - quadriceps
+secondaryMuscles:
+  - calves
+  - glutes
+  - hamstrings
+tags:
+  - calisthenics
+preview: "[[Stairmaster-preview.webp]]"
+animation: "[[Stairmaster.gif]]"
+images:
+  - "[[Stairmaster.gif]]"
+---
+
+## How to Perform
+1. To begin, step onto the stairmaster and select the desired option from the menu. You can choose a manual setting, or you can select a program to run. Typically, you can enter your age and weight to estimate the amount of calories burned during exercise.
+2. Pump your legs up and down in an established rhythm, driving the pedals down but not all the way to the floor. It is recommended that you maintain your grip on the handles so that you don't fall. The handles can be used to monitor your heart rate to help you stay at an appropriate intensity.
+3. Stairmasters offer convenience, cardiovascular benefits, and usually have less impact than running outside. They are typically much harder than other cardio equipment. A 150 lb person will typically burn over 300 calories in 30 minutes, compared to about 175 calories walking.

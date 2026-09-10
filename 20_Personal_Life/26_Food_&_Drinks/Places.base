@@ -1,0 +1,90 @@
+filters:
+  and:
+    - or:
+        - file.inFolder("20_Personal_Life/26_Food_&_Drinks/Restaurants")
+        - file.inFolder("20_Personal_Life/26_Food_&_Drinks/Cafes")
+        - file.inFolder("20_Personal_Life/26_Food_&_Drinks/Bars")
+    - or:
+        - place_type == "restaurant"
+        - place_type == "cafe"
+        - place_type == "bar"
+formulas:
+  google_maps: if(coordinates, link("https://www.google.com/maps/search/?api=1&query=" + coordinates.toString(), "Google Maps"), null)
+properties:
+  file.name:
+    displayName: Place
+  place_type:
+    displayName: Type
+  cuisine:
+    displayName: Cuisine
+  city:
+    displayName: City
+  country:
+    displayName: Country
+  visited:
+    displayName: Visited
+  want_to_visit:
+    displayName: Want to visit
+  favorite:
+    displayName: Favorite
+  rating:
+    displayName: Rating
+  price_level:
+    displayName: Price
+  formula.google_maps:
+    displayName: Map link
+views:
+  - type: table
+    name: All
+    order:
+      - file.name
+      - place_type
+      - cuisine
+      - city
+      - country
+      - visited
+      - want_to_visit
+      - favorite
+      - rating
+      - price_level
+      - formula.google_maps
+  - type: table
+    name: Restaurants
+    filters:
+      and:
+        - place_type == "restaurant"
+    order:
+      - file.name
+      - cuisine
+      - city
+      - country
+      - visited
+      - rating
+      - price_level
+      - formula.google_maps
+  - type: table
+    name: Cafes
+    filters:
+      and:
+        - place_type == "cafe"
+    order:
+      - file.name
+      - city
+      - country
+      - visited
+      - rating
+      - price_level
+      - formula.google_maps
+  - type: table
+    name: Bars
+    filters:
+      and:
+        - place_type == "bar"
+    order:
+      - file.name
+      - city
+      - country
+      - visited
+      - rating
+      - price_level
+      - formula.google_maps

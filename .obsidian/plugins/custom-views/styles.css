@@ -1,0 +1,425 @@
+.cv-hidden {
+    display: none;
+}
+
+.cv-bases-collector-host {
+    position: fixed;
+    left: -10000px;
+    top: 0;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.cv-codemirror-container {
+    width: 100%;
+    margin-bottom: 0.75rem;
+}
+
+.cv-codemirror-container .cm-editor.cm-editor {
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 4px;
+    font-size: var(--font-inputs);
+    height: 24em;
+    outline: none;
+    text-align: left;
+}
+
+.cv-codemirror-container .cm-line,
+.cv-codemirror-container .cm-lineNumbers {
+    font-family: var(--font-monospace);
+}
+
+.cv-codemirror-container .cm-scroller {
+    font-family: var(--font-monospace);
+    font-size: var(--font-text-size);
+}
+
+.cv-codemirror-container .cm-search.cm-panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--size-4-2);
+    padding: var(--size-4-2);
+}
+
+.cv-codemirror-container .cm-panels.cm-panels-bottom {
+    margin: var(--size-2-3);
+    border-radius: var(--radius-s);
+    border: 1px solid var(--background-modifier-border);
+    background-color: var(--menu-background);
+}
+.cv-codemirror-container .cm-panels.cm-panels-bottom button[name="close"] {
+    position: absolute;
+    top: var(--size-2-3);
+    inset-inline-end: var(--size-2-3);
+    -webkit-app-region: no-drag;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--size-2-2) var(--size-2-3);
+    cursor: var(--cursor);
+    border-radius: var(--clickable-icon-radius);
+    corner-shape: var(--corner-shape);
+    color: var(--icon-color);
+    height: auto;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    outline: none;
+}
+
+.cv-codemirror-container
+    .cm-panels.cm-panels-bottom
+    button[name="close"]:hover {
+    box-shadow: none;
+    color: var(--icon-color-hover);
+    background-color: var(--background-modifier-hover);
+}
+
+.cv-codemirror-container
+    .cm-panels.cm-panels-bottom
+    button[name="close"]:active {
+    color: var(--icon-color-focused);
+    background-color: var(--background-modifier-hover);
+}
+.cv-codemirror-container
+    .cm-panels.cm-panels-bottom
+    button[name="close"]:active {
+    background: var(--background-modifier-active);
+}
+
+.cv-codemirror-container .cm-search input.cm-textfield {
+    -webkit-app-region: no-drag;
+    background: var(--background-modifier-form-field);
+    border: var(--input-border-width) solid var(--background-modifier-border);
+    color: var(--text-normal);
+    font-family: inherit;
+    padding: var(--input-padding);
+    font-size: var(--font-ui-small);
+    border-radius: var(--input-radius);
+    corner-shape: var(--input-corner-shape);
+    outline: none;
+    display: block;
+    width: 100%;
+    margin-right: var(--size-4-6);
+}
+
+.cv-codemirror-container .cm-search button {
+    --text-color: var(--text-normal);
+    -webkit-app-region: no-drag;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    font-size: var(--font-ui-small);
+    border-radius: var(--button-radius);
+    corner-shape: var(--button-corner-shape);
+    border: 0;
+    padding: var(--size-4-1) var(--size-4-3);
+    height: var(--input-height);
+    font-weight: var(--input-font-weight);
+    cursor: var(--cursor);
+    font-family: inherit;
+    outline: none;
+    user-select: none;
+    white-space: nowrap;
+    background: var(--interactive-normal);
+    box-shadow: var(--input-shadow);
+}
+
+.cv-codemirror-container .cm-panels.cm-panels-bottom label {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    gap: var(--size-2-1);
+    justify-content: center;
+    width: fit-content;
+    font-size: var(--font-ui-small);
+    color: var(--text-muted);
+}
+.cv-codemirror-container .cm-panels.cm-panels-bottom label input {
+    margin: 0;
+    padding: 0;
+}
+
+/* Native Bases supplies the filter rows, pickers, chips, and formula editor. */
+.cv-native-filter-host {
+    padding: var(--size-4-2);
+    border: var(--border-width) solid var(--background-modifier-border);
+    border-radius: var(--radius-m);
+}
+
+.cv-edit-view-modal.modal-content {
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.cv-edit-view-modal h2 {
+    margin-top: 0;
+    margin-bottom: var(--size-4-4);
+}
+
+.cv-edit-view-modal h3 {
+    margin-top: var(--size-4-4);
+    margin-bottom: var(--size-4-2);
+}
+
+.cv-modal-button-container {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--size-4-2);
+    margin-top: var(--size-4-4);
+    padding-top: var(--size-4-4);
+    border-top: var(--border-width) solid var(--background-modifier-border);
+}
+
+.cv-margin-left-auto {
+    margin-left: auto;
+}
+
+/* Doubled selectors override Obsidian's layout system without important */
+.obsidian-custom-view-hidden .markdown-source-view.markdown-source-view,
+.obsidian-custom-view-hidden .markdown-preview-view.markdown-preview-view {
+    display: none;
+}
+
+/* Restore display for the content container inside our overlay (it has
+   markdown-preview-view class for CSS inheritance but must not be hidden) */
+.obsidian-custom-view-render .markdown-preview-view.markdown-preview-view {
+    display: block;
+}
+
+/* Restore display for preview views rendered inside embeds within templates */
+.obsidian-custom-view-hidden
+    .markdown-embed-content
+    .markdown-preview-view.markdown-preview-view {
+    display: block;
+}
+
+.obsidian-custom-view-render {
+    padding: 30px;
+    height: 100%;
+    overflow-y: auto;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--background-primary);
+    z-index: 10;
+    /* The overlay is detached from the reading view, so it doesn't inherit the
+       text-selectability that themes grant to .markdown-preview-view. Re-enable
+       it here so rendered text (and links) can be selected, matching the native
+       reading view. Elements that opt out (e.g. drag handles) keep their own
+       user-select rule, which targets them directly and still wins. */
+    user-select: text;
+    -webkit-user-select: text;
+}
+
+.obsidian-custom-view-render.obsidian-custom-view-pending {
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Both overlay modes are anchored below the pane's navigation bar. */
+.obsidian-custom-view-hidden,
+.obsidian-custom-view-editable {
+    position: relative;
+}
+
+.workspace-leaf-content.cv-hide-navigation > .view-header {
+    display: none;
+}
+
+.obsidian-custom-view-render .markdown-rendered-content {
+    margin-top: 20px;
+}
+
+.obsidian-custom-view-render .markdown-preview-section {
+    padding: 0;
+}
+
+/* Override modal styles for suggestion modals — needs body prefix for specificity over .modal */
+body .cv-suggestion-container.modal {
+    position: fixed;
+    margin: 0;
+    transform: none;
+    max-width: 500px;
+    max-height: 300px;
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    box-shadow: var(--shadow-s);
+    border-radius: var(--radius-m);
+}
+
+/* ─── Editable Content Mode ─────────────────────────────────────────────────── */
+
+/* In editable mode, hide the reading preview but NOT the source/editor view */
+.obsidian-custom-view-editable .markdown-preview-view.markdown-preview-view {
+    display: none;
+}
+
+/* Restore display for the content container inside our overlay in editable mode */
+.obsidian-custom-view-editable
+    .obsidian-custom-view-render
+    .markdown-preview-view.markdown-preview-view {
+    display: block;
+}
+
+/* Restore display for preview views rendered inside embeds within templates */
+.obsidian-custom-view-editable
+    .markdown-embed-content
+    .markdown-preview-view.markdown-preview-view {
+    display: block;
+}
+
+/* The template overlay in editable mode uses same layout as readonly */
+.obsidian-custom-view-editable .obsidian-custom-view-render {
+    padding: 30px;
+    height: 100%;
+    overflow-y: auto;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: var(--background-primary);
+    z-index: 10;
+}
+
+/* The editor embedded in the content placeholder should flow naturally */
+.obsidian-custom-view-editable
+    [data-cv-editable-placeholder]
+    .markdown-source-view.markdown-source-view {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    position: relative;
+}
+
+.obsidian-custom-view-editable
+    [data-cv-editable-placeholder]
+    .cm-editor.cm-editor {
+    height: auto;
+    max-height: none;
+}
+
+.obsidian-custom-view-editable
+    [data-cv-editable-placeholder]
+    .cm-scroller.cm-scroller {
+    overflow: visible;
+}
+
+/* The zero-height frontmatter widget */
+.cv-frontmatter-hidden {
+    display: none;
+}
+
+.cv-suggestion-container.modal .modal-content {
+    padding: 0;
+    max-height: 300px;
+}
+
+.cv-suggestion-container .prompt-input-container {
+    margin-top: 2px;
+}
+
+.cv-suggestion-container .prompt-input-container input {
+    color: var(--text-normal);
+    font-family: inherit;
+    padding: var(--input-padding);
+    padding-inline-start: 36px;
+    font-size: var(--font-ui-small);
+    border-radius: var(--input-radius);
+    height: var(--input-height);
+    outline: none;
+}
+
+.cv-modal-container {
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: 0;
+    width: 100%;
+    z-index: var(--layer-modal);
+}
+
+/* Combobox positioning — needs body prefix for specificity over .modal */
+body .cv-combobox-positioned {
+    position: fixed;
+    margin: 0;
+    transform: none;
+    left: var(--cv-combobox-left, auto);
+    top: var(--cv-combobox-top, auto);
+}
+
+body .cv-modal-bg-hidden {
+    display: none;
+}
+
+body .cv-clear-button-hidden {
+    display: none;
+}
+
+/* ─── Disabled JS Editor ───────────────────────────────────────────────────── */
+
+.cv-editor-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.cv-js-disabled-notice {
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+    margin-top: 0;
+}
+
+/* ─── Per-view Display Options ─────────────────────────────────────────────── */
+/* Follows obsidian-hider's pattern: a class on the container hides
+   descendant elements via CSS.  These only take effect in editing view
+   (live preview) where the editor is reparented into the overlay.
+   Properties are always hidden in reading view (MarkdownRenderer.render
+   does not produce the native .metadata-container or .inline-title). */
+
+.cv-hide-properties .markdown-source-view .metadata-container {
+    display: none;
+}
+.cv-hide-properties
+    .markdown-source-view.is-live-preview.show-properties
+    .metadata-container:not(.mod-error) {
+    display: none;
+}
+
+.cv-hide-inline-title .markdown-source-view .inline-title {
+    display: none;
+}
+
+/* Experimental branch: hold the last painted note, with no crossfade. */
+:root[data-cv-navigation-held] {
+    view-transition-name: none;
+}
+:root[data-cv-navigation-held]::view-transition-group(cv-note),
+:root[data-cv-navigation-held]::view-transition-image-pair(cv-note),
+:root[data-cv-navigation-held]::view-transition-old(cv-note),
+:root[data-cv-navigation-held]::view-transition-new(cv-note) {
+    animation: none;
+    mix-blend-mode: normal;
+}
+
+/* Preserve layout while masking the working pane, including inline opacity values. */
+.view-content.cv-navigation-preparing {
+    filter: opacity(0);
+    pointer-events: none;
+}
+.cv-navigation-snapshot {
+    position: absolute;
+    margin: 0;
+    box-sizing: border-box;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 10;
+}

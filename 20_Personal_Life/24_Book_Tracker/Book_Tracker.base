@@ -1,0 +1,119 @@
+filters:
+  and:
+    - file.tags == ["#Book"]
+    - '!file.inFolder("90_System")'
+    - '!file.inFolder("99_Archives")'
+formulas:
+  front_status: |-
+    html(
+      (
+        "<span class='book-front-status' data-status=\"{status_attr}\">" +
+          "<span class='book-front-status-inner'>" +
+            "<strong>{status}</strong>" +
+          "</span>" +
+        "</span>"
+      )
+        .replace("{status_attr}", escapeHTML(if(Status, Status.toString(), "Not set")))
+        .replace("{status}", escapeHTML(if(Status, if(Status.toString().lower() == "currently reading", "Reading", if(Status.toString().lower() == "haven't started", "To read", Status.toString())), "Not set")))
+    )
+  packed_book: |-
+    html(
+      (
+        "<article class='book-back'>" +
+          "<header class='book-back-header'>" +
+            "<span class='book-back-kicker'>Book Collection</span>" +
+            "<h3 class='book-back-title'>{title}</h3>" +
+            "<p class='book-back-author'>{author}</p>" +
+          "</header>" +
+          "<aside class='book-margin-notes' aria-hidden='true'>" +
+            "<span class='book-margin-x'>×</span>" +
+            "<span class='book-margin-arrow'>↳</span>" +
+            "<span class='book-margin-note'>keep</span>" +
+          "</aside>" +
+          "<div class='book-back-genres'>{genres}</div>" +
+          "<div class='book-back-reading'>" +
+            "<div class='book-back-status-row'>" +
+              "<span class='book-back-label'>Reading status</span>" +
+              "<span class='book-back-status' data-status=\"{status_attr}\">{status}</span>" +
+            "</div>" +
+            "<div class='book-back-progress' role='img' aria-label='{progress_label}'>" +
+              "<span class='book-back-progress-fill' style='--book-progress:{progress_fill}%'></span>" +
+            "</div>" +
+            "<div class='book-back-progress-meta'>" +
+              "<span>{pages}</span>" +
+              "<strong>{progress_value}%</strong>" +
+            "</div>" +
+          "</div>" +
+          "<footer class='book-back-footer'>" +
+            "<span class='book-back-rating-label'>Rating</span>" +
+            "<span class='book-back-rating' aria-label='{rating_label}'>{rating}</span>" +
+          "</footer>" +
+        "</article>"
+      )
+        .replace("{title}", escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+        .replace("{author}", escapeHTML(if(Author, Author.toString(), "Unknown author")))
+        .replace("{genres}", if(Genre, list(Genre).slice(0, 3).map("<span>" + escapeHTML(value.toString()) + "</span>").join(""), if(genre, list(genre).slice(0, 3).map("<span>" + escapeHTML(value.toString()) + "</span>").join(""), "<span>Uncategorised</span>")))
+        .replace("{status_attr}", escapeHTML(if(Status, Status.toString(), "Not set")))
+        .replace("{status}", escapeHTML(if(Status, Status.toString(), "Not set")))
+        .replace("{progress_fill}", if(TotalPages, min(100, max(0, ((if(CurrentPage, CurrentPage, 0) / TotalPages) * 100).round())).toString(), "0"))
+        .replace("{progress_value}", if(TotalPages, min(100, max(0, ((if(CurrentPage, CurrentPage, 0) / TotalPages) * 100).round())).toString(), "0"))
+        .replace("{progress_label}", escapeHTML(if(TotalPages, if(CurrentPage, CurrentPage.toString(), "0") + " of " + TotalPages.toString() + " pages read", "Reading progress unavailable")))
+        .replace("{pages}", escapeHTML(if(TotalPages, if(CurrentPage, CurrentPage.toString(), "0") + " / " + TotalPages.toString() + " pages", if(CurrentPage, CurrentPage.toString() + " pages read", "Pages unavailable"))))
+        .replace("{rating}", if(Rating, escapeHTML(Rating.toString()).replace(/⭐/g, "<i class='book-star' aria-hidden='true'>★</i>"), "<span class='book-rating-empty'>not rated</span>"))
+        .replace("{rating_label}", escapeHTML(if(Rating, "Rating " + Rating.toString(), "Not rated")))
+    )
+properties:
+  Genre:
+    displayName: Genre
+  genre:
+    displayName: Genre (legacy)
+  CurrentPage:
+    displayName: Current page
+  TotalPages:
+    displayName: Total pages
+views:
+  - type: cards
+    name: Book Collection
+    order:
+      - formula.front_status
+      - formula.packed_book
+    sort:
+      - property: Title
+        direction: ASC
+    image: note.Cover
+    imageAspectRatio: 1.5
+    cardSize: 230
+  - type: table
+    name: Book Data — Edit
+    order:
+      - Title
+      - Author
+      - Cover
+      - Genre
+      - genre
+      - Status
+      - CurrentPage
+      - TotalPages
+      - Rating
+      - DateStarted
+      - DateFinished
+      - file.name
+    sort:
+      - property: Status
+        direction: ASC
+      - property: Author
+        direction: ASC
+      - property: Title
+        direction: ASC
+    summaries:
+      Total pages: Empty
+    columnSize:
+      note.Title: 306
+      note.Author: 249
+      note.Cover: 180
+      note.Genre: 300
+      note.genre: 300
+      note.Status: 181
+      note.CurrentPage: 122
+      note.TotalPages: 122
+      note.Rating: 130

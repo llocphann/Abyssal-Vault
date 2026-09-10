@@ -1,0 +1,590 @@
+/* ========================================================================== */
+/* Abyssal Vault — Style Settings + durable Border semantic color bridge      */
+/* ========================================================================== */
+
+/* @settings
+name: Abyssal Vault
+id: abyssal-vault
+settings:
+  - id: theme-palette-title
+    title: Theme Palette
+    description: Carbon Cyan palette for the Abyssal Vault dark theme. These tokens drive the Obsidian/Border semantic color bridge below, so Border updates can no longer wipe the vault palette.
+    type: heading
+    level: 1
+    collapsed: false
+  - id: cc-p00
+    title: P00 — Deepest Background
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#0a0e10'
+  - id: cc-p01
+    title: P01 — Pane Background
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#0c1113'
+  - id: cc-p02
+    title: P02 — Secondary Surface
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#10181b'
+  - id: cc-p03
+    title: P03 — Raised Surface
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#162024'
+  - id: cc-p04
+    title: P04 — Hover Surface
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#1d2a2f'
+  - id: cc-p05
+    title: P05 — Active Surface
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#26363e'
+  - id: cc-p06
+    title: P06 — Strong Border
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#30464f'
+  - id: cc-p07
+    title: P07 — Subtle UI
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#3e5965'
+  - id: cc-p08
+    title: P08 — Disabled UI
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#4e707e'
+  - id: cc-p09
+    title: P09 — Faint Text
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#5f899b'
+  - id: cc-p10
+    title: P10 — Secondary UI Text
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#7da0b0'
+  - id: cc-p11
+    title: P11 — Muted Text
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#a0bac5'
+  - id: cc-p12
+    title: P12 — Main Text
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#c6d6dc'
+  - id: cc-p13
+    title: P13 — Strongest Text
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#e6edef'
+  - id: cc-accent-heading
+    title: Accent
+    type: heading
+    level: 2
+    collapsed: false
+  - id: cc-accent
+    title: Cyan Accent
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#a0cddf'
+
+  - id: startup-progress-title
+    title: Startup Progress Bar
+    type: heading
+    level: 1
+    collapsed: true
+  - id: startup-progress-style
+    title: Loading Animation Style
+    description: Choose the startup loading animation
+    type: class-select
+    allowEmpty: false
+    default: pb-loader-default
+    options:
+      - label: Default
+        value: pb-loader-default
+      - label: Dots
+        value: pb-loader-dots
+      - label: Animated Face
+        value: pb-loader-face
+      - label: Retro Cassette
+        value: pb-loader-cassette
+      - label: Loading Letters
+        value: pb-loader-letters
+
+  - id: geometry-title
+    title: Geometry
+    description: Non-color geometry shared by the custom snippets. Theme colors are controlled by Theme Palette.
+    type: heading
+    level: 1
+    collapsed: true
+  - id: callout-corner-radius
+    title: Callout Corner Radius
+    description: Corner radius for Quote/Info/math callouts
+    type: variable-number-slider
+    default: 12
+    min: 0
+    max: 24
+    step: 1
+    format: px
+  - id: lake-radius
+    title: Markdown Table / General Corner Radius
+    type: variable-number-slider
+    default: 12
+    min: 0
+    max: 24
+    step: 1
+    format: px
+  - id: bases-radius
+    title: Bases View Corner Radius
+    type: variable-number-slider
+    default: 12
+    min: 0
+    max: 24
+    step: 1
+    format: px
+
+  - id: column-layout-title
+    title: Column & List Layout
+    description: Multi-column callouts, floating callouts, list columns and list cards. Colors inherit the Abyssal Theme Palette.
+    type: heading
+    level: 1
+    collapsed: true
+  - id: multi-column-title
+    title: Multi Column Callout Settings
+    type: heading
+    level: 2
+    collapsed: true
+  - id: mc-callout-general-title
+    title: MCC -- General
+    type: heading
+    level: 3
+    collapsed: false
+  - id: mcc-img-snw-display
+    title: Hide SNW indicator for images in MC Callout
+    type: variable-select
+    default: none
+    options:
+      - label: Show
+        value: inline
+      - label: Hide
+        value: none
+  - id: mc-callout-width-title
+    title: MCC -- Width
+    type: heading
+    level: 3
+    collapsed: false
+  - id: callout-min-width
+    title: Minimum Sub-Callout Width
+    description: for sub-callout in [!multi-column]. in px units
+    type: variable-number-slider
+    default: 200
+    min: 100
+    max: 500
+    step: 50
+    format: px
+  - id: callout-nowrap-min-width
+    title: Minimum NO-WRAP Sub-Callout Width
+    description: for sub-callout in [!multi-column|no-wrap]. in px units
+    type: variable-number-slider
+    default: 250
+    min: 100
+    max: 500
+    step: 50
+    format: px
+  - id: mc-callout-gap-title
+    title: MCC -- Gap & Margin
+    type: heading
+    level: 3
+    collapsed: false
+  - id: callout-gap
+    title: Sub-Callout Gap (any unit)
+    description: NO spacing between figure and unit
+    type: variable-text
+    default: 1em
+  - id: callout-margin
+    title: Sub-Callout Margin (any unit)
+    description: to allow some spacing for box-shadow
+    type: variable-text
+    default: 0px
+
+  - id: float-callout-title
+    title: Float Callout Settings
+    type: heading
+    level: 2
+    collapsed: true
+  - id: float-callout-general-title
+    title: FC -- General
+    type: heading
+    level: 3
+    collapsed: false
+  - id: float-callout-snw-display
+    title: Hide SNW indicator in Callout Float / Aside
+    type: variable-select
+    default: none
+    options:
+      - label: Show
+        value: inline-block
+      - label: Hide
+        value: none
+  - id: float-width-title
+    title: FC -- Width
+    type: heading
+    level: 3
+    collapsed: false
+  - id: float-small-width
+    title: Floating Callout Width - Small (in px)
+    type: variable-number-slider
+    default: 300
+    min: 200
+    max: 450
+    step: 50
+    format: px
+  - id: float-medium-width
+    title: Floating Callout Width - Medium (in px)
+    type: variable-number-slider
+    default: 400
+    min: 300
+    max: 550
+    step: 50
+    format: px
+  - id: float-large-width
+    title: Floating Callout Width - Large (in px)
+    type: variable-number-slider
+    default: 600
+    min: 500
+    max: 750
+    step: 50
+    format: px
+  - id: float-gap-title
+    title: FC -- Gap & Margin
+    type: heading
+    level: 3
+    collapsed: false
+  - id: float-callout-top-margin
+    title: Adjust top margin for Float Left and Float Right
+    description: Can use em or px unit
+    type: variable-text
+    default: 0em
+  - id: float-left-callout-margin-inline
+    title: Adjust left-right margin for Float Left Callout
+    description: Enter in this order - "left right". Can use em or px unit
+    type: variable-text
+    default: 0px 12px
+  - id: float-right-callout-margin-inline
+    title: Adjust left-right margin for Float Right Callout
+    description: Enter in this order - "left right". Can use em or px unit
+    type: variable-text
+    default: 12px 0px
+
+  - id: mc-list-column-title
+    title: List Column
+    description: using `{.xxx-column-list-xxx}` and `#mcl/list-column`
+    type: heading
+    level: 2
+    collapsed: true
+  - id: list-column-width-title
+    title: Width control for List Column
+    type: heading
+    level: 3
+    collapsed: false
+  - id: list-min-width
+    title: Minimum Column Width (in px)
+    type: variable-number-slider
+    default: 200
+    min: 100
+    max: 500
+    step: 50
+    format: px
+  - id: list-column-deco-title
+    title: Decoratives control for List Column
+    type: heading
+    level: 3
+    collapsed: false
+  - id: col-rule-width
+    title: Ruler (vertical line between columns) width for List Column
+    description: in px unit. Set to 0 to disable ruler
+    type: variable-number-slider
+    default: 1
+    min: 0
+    max: 4
+    step: 1
+    format: px
+
+  - id: mc-list-grid-title
+    title: List Grid and List Card
+    description: using `#mcl/list-grid` and `#mcl/list-card`
+    type: heading
+    level: 2
+    collapsed: true
+  - id: list-grid-card-width-title
+    title: Width control for List Grid and List Card
+    type: heading
+    level: 3
+    collapsed: false
+  - id: list-grid-min-width
+    title: Minimum width for normal List Grid/Card
+    description: For `#mcl-list-grid` or `#mcl-list-card`. Can use em or px unit
+    type: variable-text
+    default: 250px
+  - id: list-grid-wide-min-width
+    title: Minimum width for Wide List Grid/Card
+    description: For `#mcl/list-grid-wide` or `#mcl/list-card-wide`. Can use em or px unit
+    type: variable-text
+    default: 350px
+  - id: list-card-deco-title
+    title: Decoratives control for List Card
+    type: heading
+    level: 3
+    collapsed: false
+  - id: mcl-card-header-border-width
+    title: Bottom border for first header in List Card
+    description: Can use em or px unit. Set to 0 to disable the border
+    type: variable-text
+    default: 1px
+  - id: mcl-card-gap
+    title: Gap between cards for List Card
+    description: Can use em or px unit
+    type: variable-text
+    default: 0.2em
+  - id: mcl-card-border-width
+    title: Border width for each card in List Card
+    description: Can use em or px unit. Set to 0 to disable the border
+    type: variable-text
+    default: 1px
+
+  - id: gradient-callout-title
+    title: Gradient Callout Settings
+    description: Gradient colors inherit the Abyssal Theme Palette; only typography and geometry are configurable here.
+    type: heading
+    level: 2
+    collapsed: true
+  - id: callout-font
+    title: Callout Text Font
+    description: Font used for content in the callout
+    type: variable-text
+    default: 'Sans-serif'
+  - id: callout-title-font-family
+    title: Callout Title Font
+    description: Font used for the title of the callouts
+    type: variable-text
+    default: 'Sans-serif'
+  - id: callout-font-size
+    title: Callout Text Size
+    type: variable-number
+    description: Callout content size in pt
+    default: 10
+    format: pt
+  - id: callout-title-font-size
+    title: Callout Title Size
+    description: Callout title size in pt
+    type: variable-number
+    default: 12
+    format: pt
+  - id: callout-opacity-dim
+    title: Callout Opacity Dimness
+    description: Sets transparency of surrounding callouts when hovering
+    type: variable-number-slider
+    default: 0.3
+    min: 0
+    max: 1
+    step: 0.05
+  - id: callout-title-font-weight
+    title: Callout Title Font Weight
+    description: How bold the title appears
+    type: variable-number-slider
+    default: 700
+    min: 0
+    max: 1000
+    step: 100
+  - id: border-radius
+    title: Callout Radius
+    description: Adjust the radius of the callout
+    type: variable-number
+    default: 10
+    format: px
+
+  - id: image-settings-title
+    title: Image Settings
+    type: heading
+    level: 3
+    collapsed: true
+  - id: image-height
+    title: Image Height
+    description: Callout image height in px
+    type: variable-number
+    default: 75
+    format: px
+  - id: image-width
+    title: Image Width
+    description: Callout image width in px
+    type: variable-number
+    default: 75
+    format: px
+
+  - id: gradient-headers-title
+    title: Gradient Headers
+    type: heading
+    level: 2
+    collapsed: true
+  - id: header-font-family
+    title: Header Font Type
+    description: Font used for text in the header
+    type: variable-text
+    default: 'Trebuchet MS'
+  - id: header-font-size
+    title: Header Font Size
+    type: variable-number
+    default: 22
+    format: pt
+  - id: header-font-weight
+    title: Callout Title Font Weight
+    description: How bold the header appears
+    type: variable-number-slider
+    default: 100
+    min: 0
+    max: 1000
+    step: 100
+  - id: gradient-header-location
+    title: Center Heading
+    description: Moves your headings to the center when toggled
+    type: class-toggle
+  - id: border-settings-title
+    title: Border Settings
+    type: heading
+    level: 3
+    collapsed: true
+  - id: gradient-border
+    title: Enable Borders
+    description: Enables heading borders
+    type: class-toggle
+  - id: header-gradient-border-size
+    title: Border Size
+    type: variable-number
+    default: 2
+    format: px
+  - id: header-gradient-border-radius
+    title: Border Radius
+    type: variable-number
+    default: 10
+    format: px
+*/
+
+/*******************************************************************************
+ * ABYSSAL CARBON CYAN → OBSIDIAN/BORDER SEMANTIC BRIDGE
+ * -----------------------------------------------------------------------------
+ * This restores the vault's pre-Border-1.13.8 colors without modifying
+ * .obsidian/themes/Border/theme.css. Border remains vendor-owned/updatable;
+ * the vault owns this compatibility layer.
+ *******************************************************************************/
+body.theme-dark {
+    /* Preserve the original Carbon Cyan accent hue used by Border internals. */
+    --accent-dark-h: 196.667;
+    --accent-dark-s: 49.219%;
+    --accent-dark-l: 75.098%;
+    --accent-h: var(--accent-dark-h);
+    --accent-s: var(--accent-dark-s);
+    --accent-l: var(--accent-dark-l);
+
+    /* Border upstream maps its default dark underlying layer to background-tertiary.
+     * Abyssal historically used P00 here, so keep the raw variable dark even when
+     * no Style Settings class is present. */
+    --background-underlying: var(--cc-p00, #0a0e10);
+    --background-underlying-dark: var(--cc-p00, #0a0e10);
+    --workspace-background-translucent: var(--cc-p00, #0a0e10);
+
+    --background-primary: var(--cc-p01, #0c1113);
+    --background-mod-left-split-dark: var(--cc-p01, #0c1113);
+    --background-mod-left-split: var(--cc-p01, #0c1113);
+    --background-mod-root-split-dark: var(--cc-p01, #0c1113);
+    --background-mod-root-split: var(--cc-p01, #0c1113);
+    --background-mod-right-split-dark: var(--cc-p01, #0c1113);
+    --background-mod-right-split: var(--cc-p01, #0c1113);
+
+    --background-primary-alt: var(--cc-p02, #10181b);
+    --background-secondary: var(--cc-p02, #10181b);
+    --background-secondary-alt: var(--cc-p03, #162024);
+    --background-tertiary: var(--cc-p03, #162024);
+
+    --background-modifier-hover: var(--cc-p04, #1d2a2f);
+    --background-modifier-active-hover: var(--cc-p05, #26363e);
+    --background-modifier-form-field: var(--cc-p02, #10181b);
+    --background-modifier-form-field-highlighted: var(--cc-p03, #162024);
+    --background-modifier-border-muted: color-mix(in srgb, var(--cc-p06, #30464f) 24%, transparent);
+    --background-modifier-border: color-mix(in srgb, var(--cc-p06, #30464f) 48%, transparent);
+    --background-modifier-border-hover: color-mix(in srgb, var(--cc-p07, #3e5965) 70%, transparent);
+    --background-modifier-border-focus: var(--cc-p07, #3e5965);
+
+    --text-normal: var(--cc-p12, #c6d6dc);
+    --text-muted: var(--cc-p11, #a0bac5);
+    --text-faint: var(--cc-p09, #5f899b);
+    --text-accent: var(--cc-accent, #a0cddf);
+    --text-accent-hover: color-mix(in srgb, var(--cc-accent, #a0cddf) 70%, var(--cc-p13, #e6edef) 30%);
+    --text-on-accent: var(--cc-p00, #0a0e10);
+    --text-selection: color-mix(in srgb, var(--cc-accent, #a0cddf) 24%, transparent);
+    --text-highlight-bg: var(--cc-p04, #1d2a2f);
+    --text-highlight-bg-active: var(--cc-p05, #26363e);
+    --caret-color: var(--cc-accent, #a0cddf);
+
+    --interactive-normal: var(--cc-p02, #10181b);
+    --interactive-hover: var(--cc-p04, #1d2a2f);
+    --interactive-accent: var(--cc-accent, #a0cddf);
+    --interactive-accent-hover: color-mix(in srgb, var(--cc-accent, #a0cddf) 78%, var(--cc-p13, #e6edef) 22%);
+
+    --titlebar-background: var(--cc-p00, #0a0e10);
+    --titlebar-background-focused: var(--cc-p00, #0a0e10);
+    --tab-container-background: var(--cc-p00, #0a0e10);
+    --tab-background-active: var(--cc-p01, #0c1113);
+    --background-activated-tab-header-dark: var(--cc-p01, #0c1113);
+    --ribbon-background: var(--cc-p01, #0c1113);
+
+    --tab-text-color: var(--cc-p10, #7da0b0);
+    --tab-text-color-active-current: var(--cc-p12, #c6d6dc);
+    --tab-text-color-focused: var(--cc-p11, #a0bac5);
+    --tab-text-color-focused-active-current: var(--cc-p13, #e6edef);
+    --nav-item-color: var(--cc-p10, #7da0b0);
+    --nav-item-color-hover: var(--cc-p12, #c6d6dc);
+    --nav-item-color-active: var(--cc-p13, #e6edef);
+    --nav-item-background-hover: var(--cc-p04, #1d2a2f);
+    --nav-item-background-active: var(--cc-p05, #26363e);
+    --nav-indentation-guide-color: color-mix(in srgb, var(--cc-p06, #30464f) 55%, transparent);
+
+    --code-background: var(--cc-p02, #10181b);
+    --code-normal: var(--cc-p11, #a0bac5);
+    --code-comment: var(--cc-p09, #5f899b);
+    --blockquote-border-color: var(--cc-p06, #30464f);
+    --hr-color: color-mix(in srgb, var(--cc-p06, #30464f) 70%, transparent);
+    --embed-block-shadow-hover: 0 0 0 1px var(--cc-p06, #30464f);
+    --h1-color: var(--cc-p13, #e6edef);
+    --h2-color: var(--cc-p12, #c6d6dc);
+
+    --scrollbar-bg: transparent;
+    --scrollbar-thumb-bg: color-mix(in srgb, var(--cc-p07, #3e5965) 55%, transparent);
+    --scrollbar-active-thumb-bg: var(--cc-p08, #4e707e);
+}
+
+/* Border 1.13.8 upstream changed the default dark underlying selector to
+ * background-tertiary with !important. Match that selector and restore the
+ * historical Abyssal P00 underlying canvas without patching vendor CSS. */
+body.theme-dark.background-underlying-default-dark {
+    --background-underlying: var(--cc-p00, #0a0e10) !important;
+}

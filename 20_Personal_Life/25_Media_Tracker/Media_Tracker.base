@@ -1,0 +1,96 @@
+formulas:
+  packed_ticket: if(categories.containsAny(link("Movies")), html(("<div class='rt-back'>" + "<div class='rt-info'>" + "<div class='rt-row'><span class='rt-label'>Title</span><span class='rt-value rt-title'>{title}</span></div>" + "<div class='rt-row'><span class='rt-label'>Genre</span><span class='rt-value rt-list'>{genres}</span></div>" + "<div class='rt-row'><span class='rt-label'>Runtime</span><span class='rt-value'>{runtime}</span></div>" + "<div class='rt-row'><span class='rt-label'>Year</span><span class='rt-value'>{year}</span></div>" + "<div class='rt-row'><span class='rt-label'>Release</span><span class='rt-value'>{release}</span></div>" + "<div class='rt-row'><span class='rt-label'>Director</span><span class='rt-value rt-list'>{directors}</span></div>" + "<div class='rt-row rt-row-cast'><span class='rt-label'>Cast</span><span class='rt-value rt-list'>{cast}</span></div>" + "</div>" + "<div class='rt-description'><span class='rt-description-text' style='--media-description-scroll-duration:{scrollDuration}s'>{description}</span></div>" + "<div class='rt-back-stub'>" + "<div class='rt-stars' style='--rt-rating:{ratingpct}%'></div>" + "<div class='rt-back-status'>{status}</div>" + "</div>" + "</div>").replace("{title}", file.name.toString()).replace("{genres}", if(genres, genres.map("<span class='rt-chip'>" + value.toString() + "</span>").join(""), "")).replace("{directors}", if(directors, directors.map("<span class='rt-chip'>" + value.toString() + "</span>").join(""), "")).replace("{cast}", if(cast, list(cast).slice(0, 3).map("<span class='rt-chip'>" + value.toString() + "</span>").join(""), "")).replace("{runtime}", if(runtime, runtime.toString() + " min", "")).replace("{year}", if(year, year.toString(), "")).replace("{release}", if(published, published.format("MMM DD, YYYY"), if(year, year.toString(), ""))).replace("{scrollDuration}", if(description, max(20, (description.toString().length / 24).ceil()).toString(), "20")).replace("{description}", if(description, description.toString(), "")).replace("{ratingpct}", if(rating, (rating * 10).round().toString(), "0")).replace("{status}", if(status, status.toString(), "Queue")).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1")), null)
+  front_status: if(categories.containsAny(link("Movies")), if(status, status.toString(), "Queue"), null)
+  front_barcode: if(categories.containsAny(link("Movies")), if(barcode, image(barcode.asFile()), ""), null)
+  front_ids: if(categories.containsAny(link("Movies")), if(imdbId, imdbId.toString().replace("tt", "") + if(tmdbId, "-" + tmdbId.toString(), ""), if(tmdbId, tmdbId.toString(), "")), null)
+  spacer_ticket_1: if(categories.containsAny(link("Movies")), "", null)
+  spacer_ticket_2: if(categories.containsAny(link("Movies")), "", null)
+  spacer_ticket_3: if(categories.containsAny(link("Movies")), "", null)
+  spacer_ticket_4: if(categories.containsAny(link("Movies")), "", null)
+  spacer_ticket_5: if(categories.containsAny(link("Movies")), "", null)
+  packed_tv: if(categories.containsAny(link("TV Series")), html(("<article class='tv-back'>" + "<header class='tv-back-header'>" + "<span class='tv-back-kicker'>TV SERIES</span>" + "<h3 class='tv-back-title'>{title}</h3>" + "<p class='tv-back-years'>{years}<span aria-hidden='true'> · </span>{airing}</p>" + "</header>" + "<div class='tv-meta'>" + "<div class='tv-meta-row'><span class='tv-meta-label'>Genre</span><span class='tv-meta-value tv-meta-list'>{genres}</span></div>" + "<div class='tv-meta-row'><span class='tv-meta-label'>Run</span><span class='tv-meta-value'>{run}</span></div>" + "<div class='tv-meta-row'><span class='tv-meta-label'>Episode</span><span class='tv-meta-value'>{runtime}</span></div>" + "<div class='tv-meta-row'><span class='tv-meta-label'>Network</span><span class='tv-meta-value tv-meta-list'>{networks}</span></div>" + "<div class='tv-meta-row'><span class='tv-meta-label'>Creator</span><span class='tv-meta-value tv-meta-list'>{creators}</span></div>" + "<div class='tv-meta-row tv-meta-row-cast'><span class='tv-meta-label'>Cast</span><span class='tv-meta-value tv-meta-list'>{cast}</span></div>" + "</div>" + "<div class='tv-back-description'><span class='tv-back-description-text' style='--media-description-scroll-duration:{scrollDuration}s'>{description}</span></div>" + "<footer class='tv-back-footer'>" + "<span class='tv-stars' style='--tv-rating:{ratingpct}%' aria-label='{ratinglabel}'></span>" + "<span class='tv-watch-status'>{status}</span>" + "</footer>" + "</article>").replace("{title}", escapeHTML(file.basename.toString())).replace("{years}", if(published, published.format("YYYY") + if(airing_status == "Ended", if(ended, "–" + ended.format("YYYY"), ""), if(airing_status == "Canceled", if(ended, "–" + ended.format("YYYY"), ""), "–")), if(year, year.toString(), ""))).replace("{airing}", escapeHTML(if(airing_status, airing_status.toString(), "Unknown"))).replace("{genres}", if(genres, list(genres).slice(0, 3).map("<span>" + escapeHTML(value.toString()) + "</span>").join(""), "—")).replace("{run}", if(seasons, seasons.toString() + " season" + if(seasons == 1, "", "s") + if(episodes, " · " + episodes.toString() + " eps", ""), if(episodes, episodes.toString() + " episodes", "—"))).replace("{runtime}", if(runtime, runtime.toString() + " min / ep", "—")).replace("{networks}", if(networks, list(networks).slice(0, 2).map("<span>" + escapeHTML(value.toString()) + "</span>").join(""), "—")).replace("{creators}", if(creators, list(creators).slice(0, 2).map("<span>" + escapeHTML(value.toString()) + "</span>").join(""), "—")).replace("{cast}", if(cast, list(cast).slice(0, 3).map("<span>" + escapeHTML(value.toString()) + "</span>").join(""), "—")).replace("{scrollDuration}", if(description, max(20, (description.toString().length / 24).ceil()).toString(), "20")).replace("{description}", escapeHTML(if(description, description.toString(), "No synopsis yet."))).replace("{ratingpct}", if(rating, (rating * 10).round().toString(), "0")).replace("{ratinglabel}", escapeHTML(if(rating, "Rating " + rating.toString() + " out of 10", "Not rated"))).replace("{status}", escapeHTML(if(status, status.toString(), "Queue"))).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1")), null)
+properties:
+  genres:
+    displayName: Genres
+  directors:
+    displayName: Directors
+  creators:
+    displayName: Creators
+  published:
+    displayName: Published
+  ended:
+    displayName: Last aired
+  airing_status:
+    displayName: Airing status
+views:
+  - type: cards
+    name: Media Library
+    filters:
+      and:
+        - categories.containsAny(link("Movies"), link("TV Series"))
+    groupBy:
+      property: categories
+      direction: ASC
+    order:
+      - formula.spacer_ticket_5
+      - formula.front_status
+      - formula.packed_ticket
+      - formula.front_barcode
+      - formula.front_ids
+      - formula.packed_tv
+    sort:
+      - property: file.name
+        direction: DESC
+    image: note.cover
+    imageAspectRatio: 0.95
+    cardSize: 260
+  - type: table
+    name: Movies Data
+    filters:
+      and:
+        - categories.containsAny(link("Movies"))
+    order:
+      - file.name
+      - cover
+      - backdrop
+      - genres
+      - directors
+      - cast
+      - year
+      - runtime
+      - rating
+      - published
+      - status
+      - description
+  - type: table
+    name: TV Series Data
+    filters:
+      and:
+        - categories.containsAny(link("TV Series"))
+    order:
+      - file.name
+      - cover
+      - backdrop
+      - genres
+      - creators
+      - directors
+      - writers
+      - cast
+      - networks
+      - year
+      - runtime
+      - seasons
+      - episodes
+      - rating
+      - status
+      - airing_status
+      - published
+      - ended
+      - last
+      - description
+      - tagline
+      - language
+      - created
+      - imdbId
+      - tmdbId
+      - via

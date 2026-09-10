@@ -1,0 +1,13 @@
+{
+  "cssTheme": "Border",
+  "enabledCssSnippets": [
+    "01_Core_System",
+    "02_Homepage",
+    "03_Bases",
+    "04_Content_Interface_And_Plugins",
+    "05_Style_Setting"
+  ],
+  "interfaceFontFamily": "JetBrainsMonoNL Nerd Font",
+  "textFontFamily": "JetBrainsMonoNL Nerd Font",
+  "monospaceFontFamily": "JetBrainsMonoNL Nerd Font"
+}

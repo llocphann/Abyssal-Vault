@@ -1,0 +1,102 @@
+filters:
+  and:
+    - file.inFolder("20_Personal_Life/22_Finance/Records")
+properties:
+  file.name:
+    displayName: Note
+  Date:
+    displayName: Date
+  Type:
+    displayName: Type
+  Description:
+    displayName: Description
+  Amount:
+    displayName: Amount
+  Currency:
+    displayName: Currency
+  Account:
+    displayName: Account
+  AccountType:
+    displayName: Account type
+  OpeningBalance:
+    displayName: Opening balance
+  OpeningDate:
+    displayName: Opening date
+  IncludeInNetWorth:
+    displayName: Net worth
+  ToAccount:
+    displayName: To account
+  Category:
+    displayName: Category
+  Fixed:
+    displayName: Fixed
+  Name:
+    displayName: Name
+  Frequency:
+    displayName: Frequency
+  DueDay:
+    displayName: Due day
+  Active:
+    displayName: Active
+views:
+  - type: table
+    name: Transactions
+    filters:
+      and:
+        - RecordType == "FinanceTransaction"
+    order:
+      - Date
+      - Description
+      - Category
+      - Type
+      - Amount
+      - Currency
+      - Account
+      - ToAccount
+      - Fixed
+      - file.name
+    summaries:
+      Amount: Sum
+    columnSize:
+      note.Currency: 92
+      note.Account: 143
+      note.ToAccount: 126
+      note.Fixed: 89
+  - type: table
+    name: Accounts
+    filters:
+      and:
+        - RecordType == "FinanceAccount"
+    order:
+      - Account
+      - AccountType
+      - Currency
+      - OpeningBalance
+      - OpeningDate
+      - IncludeInNetWorth
+      - Active
+      - file.name
+  - type: cards
+    name: Account cards
+    filters:
+      and:
+        - RecordType == "FinanceAccount"
+  - type: table
+    name: Subscription
+    filters:
+      and:
+        - RecordType == "FinanceCommitment"
+    order:
+      - Name
+      - Amount
+      - Currency
+      - Account
+      - Category
+      - Frequency
+      - DueDay
+      - StartDate
+      - EndDate
+      - Active
+      - file.name
+    summaries:
+      Amount: Sum

@@ -1,0 +1,27 @@
+---
+id: London_Bridges
+name: London Bridges
+level: intermediate
+force: pull
+mechanic: compound
+equipment: other
+category: strength
+primaryMuscles:
+  - lats
+secondaryMuscles:
+  - biceps
+  - forearms
+  - middle back
+tags:
+  - calisthenics
+preview: "[[London_Bridges-preview.webp]]"
+animation: "[[London_Bridges.gif]]"
+images:
+  - "[[London_Bridges.gif]]"
+---
+
+## How to Perform
+1. Attach a climbing rope to a high beam or cross member. Below it, ensure that the smith machine bar is locked in place with the safeties and cannot move. Alternatively, a secure box could also be utilized.
+2. Stand on the bar, using the rope to balance yourself. This will be your starting position.
+3. Keeping your body straight, lean back and lower your body by slowly going hand over hand with the rope. Continue until you are perpendicular to the ground.
+4. Keeping your body straight, reverse the motion, going hand over hand back to the starting position.

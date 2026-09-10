@@ -1,0 +1,48 @@
+{
+  "id": "places-v1",
+  "name": "Places",
+  "rules": {
+    "type": "group",
+    "operator": "AND",
+    "conditions": [
+      {
+        "type": "filter",
+        "field": "place_type",
+        "operator": "is not empty"
+      },
+      {
+        "type": "group",
+        "operator": "OR",
+        "conditions": [
+          {
+            "type": "filter",
+            "field": "file",
+            "operator": "in folder",
+            "value": "20_Personal_Life/23_Places"
+          },
+          {
+            "type": "filter",
+            "field": "file",
+            "operator": "in folder",
+            "value": "20_Personal_Life/26_Food_&_Drinks/Restaurants"
+          },
+          {
+            "type": "filter",
+            "field": "file",
+            "operator": "in folder",
+            "value": "20_Personal_Life/26_Food_&_Drinks/Cafes"
+          },
+          {
+            "type": "filter",
+            "field": "file",
+            "operator": "in folder",
+            "value": "20_Personal_Life/26_Food_&_Drinks/Bars"
+          }
+        ]
+      }
+    ]
+  },
+  "showProperties": false,
+  "showInlineTitle": false,
+  "showNavigationBar": true
+}
