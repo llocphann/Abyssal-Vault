@@ -1,1 +1,179 @@
-.cv-place-meta-edit{width:100%;padding:0;border:0;background:transparent;color:var(--cvp-text);box-shadow:none;text-align:left;cursor:text}.cv-place-meta-edit.is-empty{color:var(--cvp-muted);font-style:italic}.cv-place-meta-input,.cv-place-meta-select{width:100%;min-width:0;padding:6px 8px;border:1px solid var(--cvp-type-accent,var(--cvp-accent));border-radius:7px;background:var(--background-primary);color:var(--cvp-text)}.cv-place-meta-row.is-editing dd{min-width:0}.cv-place button:focus-visible,.cv-place a:focus-visible,.cv-place input:focus-visible,.cv-place select:focus-visible{outline:2px solid color-mix(in srgb,var(--cvp-type-accent,var(--cvp-accent)) 65%,transparent);outline-offset:2px}
+/* Places paper-note surface + direct metadata editing. */
+.cv-place {
+  --cvp-paper-line: var(--vault-note-paper-line, 30px);
+  --cvp-paper: var(--vault-note-paper, color-mix(in srgb, var(--background-primary) 60%, var(--background-secondary) 40%));
+  --cvp-paper-rule: var(--vault-note-paper-rule, color-mix(in srgb, var(--cvp-type-accent, var(--cvp-accent)) 15%, transparent));
+  --cvp-paper-margin: var(--vault-note-paper-margin-rule, color-mix(in srgb, var(--cvp-type-accent, var(--cvp-accent)) 22%, transparent));
+  --cvp-paper-edge: var(--vault-note-paper-edge, color-mix(in srgb, var(--cvp-border-strong) 72%, transparent));
+}
+
+/* Match the canonical ruled-paper note surface used by Games / Movies / TV. */
+.cv-place-journal {
+  min-width: 0;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.cv-place-section-head--outer {
+  min-height: 0;
+  align-items: end;
+  padding: 0 0 clamp(14px, 2cqi, 24px) !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.cv-place-paper {
+  position: relative;
+  min-height: calc(var(--cvp-paper-line) * 18);
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid var(--cvp-paper-edge);
+  border-radius: 8px;
+  background: var(--vault-note-paper-background,
+    linear-gradient(90deg, transparent 0 44px, var(--cvp-paper-margin) 44px 45px, transparent 45px),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--cvp-paper-line) - 7px),
+      color-mix(in srgb, var(--cvp-paper-rule) 55%, transparent) calc(var(--cvp-paper-line) - 7px) calc(var(--cvp-paper-line) - 5px),
+      transparent calc(var(--cvp-paper-line) - 5px) var(--cvp-paper-line)
+    ),
+    var(--cvp-paper));
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--cvp-shadow) 64%, transparent), 0 3px 10px color-mix(in srgb, var(--cvp-shadow) 44%, transparent);
+}
+
+.cv-place-paper-circles {
+  position: absolute;
+  z-index: 4;
+  top: calc(var(--cvp-paper-line) * 2.4);
+  bottom: calc(var(--cvp-paper-line) * 1.2);
+  left: 12px;
+  width: 22px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 11px,
+      color-mix(in srgb, var(--cvp-bg) 96%, transparent) 0 5px,
+      color-mix(in srgb, var(--cvp-paper-edge) 78%, transparent) 5.5px 6.5px,
+      transparent 7px)
+    center top / 22px calc(var(--cvp-paper-line) * 3) repeat-y;
+  opacity: .9;
+}
+
+.cv-place-paper .cv-place-section-head,
+.cv-place-paper .cv-place-note-render {
+  position: relative;
+  z-index: 6;
+}
+
+.cv-place-paper .cv-place-section-head--paper {
+  min-height: calc(var(--cvp-paper-line) * 2);
+  align-items: center;
+  padding: 0 clamp(18px, 3cqi, 32px) 0 clamp(54px, 5cqi, 66px) !important;
+  border-bottom: 2px solid color-mix(in srgb, var(--cvp-type-accent, var(--cvp-accent)) 34%, var(--cvp-border-strong) 66%) !important;
+  background: transparent !important;
+}
+
+.cv-place-paper .cv-place-note-render {
+  min-height: calc(var(--cvp-paper-line) * 16);
+  padding: clamp(24px, 3.4cqi, 42px) clamp(20px, 3cqi, 36px) clamp(32px, 4cqi, 48px) clamp(54px, 5cqi, 66px) !important;
+  background: transparent !important;
+}
+
+/* Keep metadata labels and values on the same visual baseline. */
+.cv-place-meta-row {
+  align-items: center !important;
+}
+
+.cv-place-meta-row dt,
+.cv-place-meta-row dd {
+  align-self: center;
+  min-height: 28px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.cv-place-meta-row dt {
+  display: flex;
+  align-items: center;
+}
+
+/* Metadata values become quiet text-like controls; values always start at the left edge of their column. */
+.cv-place-meta-row dd {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start !important;
+  text-align: left !important;
+}
+
+.cv-place-meta-row dd > * {
+  text-align: left !important;
+}
+
+.cv-place-meta-edit {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: 100%;
+  min-width: 0;
+  min-height: 26px;
+  margin: -2px -4px;
+  padding: 2px 4px;
+  overflow: hidden;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--cvp-muted);
+  cursor: text;
+  text-align: left !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: border-color .14s var(--cvp-ease), color .14s var(--cvp-ease), background .14s var(--cvp-ease);
+}
+
+.cv-place-meta-edit:hover,
+.cv-place-meta-edit:focus-visible {
+  border-bottom-color: color-mix(in srgb, var(--cvp-type-accent, var(--cvp-accent)) 52%, transparent);
+  background: transparent;
+  color: var(--cvp-text);
+}
+
+.cv-place-meta-edit.is-empty {
+  color: var(--cvp-faint);
+  font-style: italic;
+}
+
+.cv-place-meta-input,
+.cv-place-meta-select {
+  width: 100%;
+  min-width: 0;
+  min-height: 29px;
+  margin: -3px -5px;
+  padding: 3px 5px;
+  border: 1px solid var(--cvp-border-strong);
+  border-radius: 5px;
+  background: var(--cvp-surface-3);
+  color: var(--cvp-text);
+  box-shadow: none;
+  font-size: .76rem;
+  line-height: 1.35;
+  text-align: left !important;
+}
+
+.cv-place-meta-row.is-editing dd {
+  overflow: visible;
+}
+
+@container (max-width: 500px) {
+  .cv-place-paper .cv-place-note-render {
+    min-height: calc(var(--cvp-paper-line) * 12);
+    padding-left: 48px !important;
+  }
+
+  .cv-place-paper .cv-place-section-head--paper {
+    padding-left: 48px !important;
+  }
+}

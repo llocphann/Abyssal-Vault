@@ -1,3 +1,185 @@
-.cv-place-local-map{position:relative;margin:14px;overflow:hidden;border:1px solid var(--cvp-border);border-radius:12px;background:var(--cvp-surface-2)}
-.cv-place-local-map-embed{min-height:240px}.cv-place-local-map-embed .bases-view{min-height:240px}.cv-place-map-caption{position:absolute;left:12px;top:10px;z-index:3;padding:4px 7px;border-radius:6px;background:color-mix(in srgb,var(--cvp-bg) 80%,transparent)}
-.cv-place-map-readout{position:absolute;left:12px;right:12px;bottom:12px;z-index:3;display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--cvp-border);border-radius:8px;background:color-mix(in srgb,var(--cvp-bg) 86%,transparent);font-size:.72rem}.cv-place-map-readout code{color:var(--cvp-muted)}.cv-place-map-credit{margin:0 18px 16px;color:var(--cvp-muted);font-size:.64rem}
+/* Native per-note Liberty map used by the Places Location card. */
+.cv-place-local-map {
+  --bases-map-embed-height: 240px;
+  position: relative;
+  isolation: isolate;
+  width: calc(100% - 28px);
+  min-height: 240px;
+  margin: 14px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--cvp-type-accent, var(--cvp-accent)) 26%, var(--cvp-border-strong) 74%);
+  border-radius: var(--cvp-radius);
+  background: var(--cvp-surface-2);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cvp-text) 3%, transparent), 0 8px 24px var(--cvp-shadow-soft);
+}
+
+.cv-place-local-map::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 7;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 28px color-mix(in srgb, var(--cvp-bg) 24%, transparent);
+}
+
+.cv-place-local-map-embed,
+.cv-place-local-map-embed > span {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 240px;
+}
+
+.cv-place-local-map-embed :is(.internal-embed, .markdown-embed, .bases-embed) {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 240px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.cv-place-local-map-embed :is(.markdown-embed-title, .internal-embed-title, .embed-title, .bases-toolbar, .bases-header) {
+  display: none !important;
+}
+
+.cv-place-local-map-embed .bases-view[data-view-type="map"],
+.cv-place-local-map-embed .bases-map-container,
+.cv-place-local-map-embed .bases-map {
+  width: 100% !important;
+  min-width: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.cv-place-local-map-embed .bases-map-container,
+.cv-place-local-map-embed .bases-map {
+  min-height: 240px !important;
+  height: 240px !important;
+}
+
+.cv-place-local-map-embed .bases-map-container {
+  overflow: hidden;
+}
+
+/* Keep the native MapLibre map north-up, like the Map Base; no extra compass overlay. */
+.cv-place-local-map .cv-place-map-caption,
+.cv-place-local-map .cv-place-map-readout {
+  position: absolute;
+  z-index: 8;
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--cvp-border-strong) 72%, transparent);
+  background: color-mix(in srgb, var(--cvp-bg) 78%, transparent);
+  box-shadow: 0 3px 12px var(--cvp-shadow-soft);
+  backdrop-filter: blur(7px);
+}
+
+.cv-place-local-map .cv-place-map-caption {
+  left: 10px;
+  top: 10px;
+  padding: 5px 7px;
+  border-radius: 7px;
+  color: color-mix(in srgb, var(--cvp-type-accent, var(--cvp-accent-soft)) 78%, var(--cvp-text) 22%);
+  font-size: .58rem;
+  line-height: 1;
+  letter-spacing: .1em;
+}
+
+.cv-place-map-readout {
+  left: 10px;
+  bottom: 10px;
+  display: grid;
+  gap: 2px;
+  max-width: 42%;
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 8px;
+}
+
+.cv-place-map-readout strong,
+.cv-place-map-readout code {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cv-place-map-readout strong {
+  color: var(--cvp-text);
+  font-size: .69rem;
+  line-height: 1.2;
+  font-weight: 720;
+}
+
+.cv-place-map-readout code {
+  padding: 0;
+  background: none;
+  color: var(--cvp-faint);
+  font-family: var(--font-monospace);
+  font-size: .58rem;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Local Index popup: title only, compact enough not to cover the mini map. */
+.cv-place-local-map-embed .bases-map-popup {
+  min-width: 0 !important;
+  max-width: 150px !important;
+}
+
+.cv-place-local-map-embed .maplibregl-popup-content {
+  padding: 0 !important;
+  border-radius: 6px !important;
+}
+
+.cv-place-local-map-embed .bases-map-popup-title {
+  max-width: 150px;
+  padding: 4px 7px !important;
+  font-size: .66rem !important;
+  line-height: 1.15 !important;
+}
+
+.cv-place-local-map-embed .bases-map-popup-title a {
+  display: block;
+  max-width: 136px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cv-place-local-map-embed .bases-map-popup-properties {
+  display: none !important;
+}
+
+.cv-place-local-map:hover {
+  border-color: color-mix(in srgb, var(--cvp-type-accent, var(--cvp-accent)) 50%, var(--cvp-border-strong) 50%);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cvp-text) 3%, transparent), 0 11px 28px var(--cvp-shadow-soft);
+}
+
+@container (max-width: 500px) {
+  .cv-place-local-map {
+    --bases-map-embed-height: 220px;
+    min-height: 220px;
+  }
+
+  .cv-place-local-map-embed,
+  .cv-place-local-map-embed > span,
+  .cv-place-local-map-embed :is(.internal-embed, .markdown-embed, .bases-embed),
+  .cv-place-local-map-embed .bases-map-container,
+  .cv-place-local-map-embed .bases-map {
+    min-height: 220px !important;
+  }
+
+  .cv-place-local-map-embed .bases-map-container,
+  .cv-place-local-map-embed .bases-map {
+    height: 220px !important;
+  }
+
+  .cv-place-map-readout {
+    max-width: 46%;
+  }
+}

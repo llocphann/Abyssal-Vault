@@ -37,6 +37,6 @@ On first startup, Abyssal-Vault creates a private `settings.local.md` from this 
 
 Use `settings.local.md` for personal values such as API keys, city, account IDs, local machine paths, preferred currency, and start date. That file is ignored by Git and must never be committed.
 
-`settings.md` is also ignored by Git and may be generated as a compatibility mirror for older vault scripts/plugins that still read that path.
+`settings.md` is also ignored by Git and is generated as a compatibility mirror for vault scripts/plugins that still read that path, including Places Weather.
 
 No recovery key or authentication token is required or stored by this template.
