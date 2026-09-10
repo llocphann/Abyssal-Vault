@@ -1,31 +1,60 @@
 # Places
 
-Places is split into three cooperating pieces:
+Places is split into two runtime-facing pieces plus one startup synchronization layer:
 
 1. `20_Personal_Life/23_Places/Map.base` — the global Bases map.
 2. `places-v1` in Custom Views — the detail UI for individual Place notes.
-3. `.obsidian/plugins/places-weather/` — the bundled Places runtime.
+3. `90_System/91_Templates/Sync_Places_Custom_View.md` — the Templater startup task that assembles the modular Places source into Custom Views and boots the shared weather runtime.
+
+There is no separate Places Weather plugin.
 
 ## Required plugins
 
 - **Maps** (`maps`) provides the `type: map` Bases view used by `Map.base` and `Local.base`.
-- **Custom Views** (`custom-views`) renders the Places detail view.
-- **Places Weather** (`places-weather`) is bundled with the vault and initializes the Places runtime.
-- **Templater** (`templater-obsidian`) is still used for normal note/folder templates, but Places initialization does not depend on Templater startup templates.
+- **Custom Views** (`custom-views`) renders the Places detail view and executes its JavaScript.
+- **Templater** (`templater-obsidian`) runs `Sync_Places_Custom_View.md` at startup so the serialized Custom Views state stays synchronized with the modular source in this directory.
+
+The repository configures `Sync_Places_Custom_View.md` in Templater's `startup_templates`. Templater must be allowed to run startup templates for this synchronization path to execute.
 
 ## Runtime initialization
 
-When `places-weather` loads, it performs the runtime work required by Places:
+At Obsidian startup, `Sync_Places_Custom_View.md` waits for Custom Views, then:
 
-1. Check whether Maps is registered and loaded.
-2. If Maps is missing, install the pinned `obsidianmd/obsidian-maps` `0.2.2` release through Obsidian's community-plugin manager.
-3. Refresh/load plugin manifests and enable/load Maps so the `type: map` Bases view is available in the current session.
-4. Rebuild `places-v1` from the modular HTML/CSS/JS source in this directory and synchronize it into Custom Views.
-5. Hydrate weather placeholders when a valid OpenWeatherMap key is configured.
+1. Reads `view.json`, `template.html`, and the modular CSS/JS files from this directory.
+2. Reassembles `places-v1` and writes it into Custom Views settings only when the generated view differs or is not first in the view list.
+3. Calls `refreshAllViews()` after a synchronization change.
+4. Executes `weather.js` once with a lightweight bootstrap context so the shared weather runtime can observe `Map.base` popups before any Place note has been opened.
 
-This intentionally avoids Templater startup execution. Templater's startup-template toggle is device-local, so it is not a reliable dependency for functionality that must work on a fresh template clone.
+`Places/weather.js` owns a singleton in-memory runtime on the active Obsidian window. The same runtime serves both the Weather card in a Place Custom View and the weather face inside `Map.base` popups.
 
-If automatic Maps installation is blocked, install/enable **Maps** from Settings → Community plugins and reopen `Map.base`.
+## Weather architecture
+
+Weather is transient data. It is never written into Place frontmatter, Bases data, Custom Views source files, or browser storage.
+
+The runtime:
+
+- reads OpenWeatherMap configuration from `90_System/93_Configuration/settings.md`;
+- queries current weather by each Place note's coordinates;
+- caches successful responses in memory for 15 minutes;
+- deduplicates concurrent requests for the same coordinates and unit system;
+- invalidates its cache on the next request after `settings.md` changes;
+- hydrates `Map.base` weather placeholders through a document observer;
+- lets the Weather card force-refresh on demand.
+
+The map itself does not require weather to function. Missing coordinates, a missing/invalid API key, or a failed network request only affects the weather presentation.
+
+## Settings and API keys
+
+Weather reads:
+
+- `openweathermap_key` — canonical OpenWeatherMap API credential for Abyssal-Vault;
+- `openweathermap_apikey` — accepted compatibility alias;
+- `openweathermap_unit` — `metric`, `imperial`, or `standard`;
+- `openweathermap_city` — fallback location for weather views that are not tied to Place coordinates.
+
+`settings.md` is the tracked configuration file and ships with placeholder values. Do not commit or publish a customized copy containing a real API key or credential.
+
+The API key is not copied into Place notes, map formulas, logs, or persistent weather cache by the Places runtime.
 
 ## Place data
 
@@ -39,23 +68,8 @@ If automatic Maps installation is blocked, install/enable **Maps** from Settings
 
 Place notes use `90_System/91_Templates/Place_Template.md`. Coordinates are stored as `latitude, longitude`.
 
-## Settings and API keys
-
-Weather uses OpenWeatherMap Current Weather Data. Places Weather reads:
-
-- `openweathermap_key`
-- `openweathermap_unit`
-
-from `90_System/93_Configuration/settings.md`.
-
-`settings.md` is intentionally the tracked configuration filename in Abyssal-Vault and ships with placeholders. There is no `settings.example.md`, `settings.local.md`, or `Bootstrap_Settings.md` indirection.
-
-Because `settings.md` is tracked, do not commit/publish a customized copy containing a real API key or credential.
-
-The map itself does not require an OpenWeatherMap key. Without a key, markers still work and weather is shown as unavailable.
-
-Weather responses are cached in memory for 15 minutes and are not written into Place frontmatter.
+`Map.base` renders weather placeholders only. `Places/weather.js` hydrates those placeholders lazily when the popup exists, so opening the map does not issue one weather request per marker.
 
 ## Custom View source
 
-The editable source for `places-v1` lives in this directory. The bundled `places-weather` runtime reads `view.json`, `template.html`, and the modular CSS/JS files and synchronizes the assembled view into Custom Views after Obsidian's layout is ready.
+The editable source for `places-v1` lives in this directory. Treat these files as the source of truth. `.obsidian/plugins/custom-views/data.json` is serialized plugin state and is regenerated by the startup synchronization path rather than edited manually for Places changes.
