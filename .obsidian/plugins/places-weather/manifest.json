@@ -1,9 +1,9 @@
 {
   "id": "places-weather",
   "name": "Places Weather",
-  "version": "1.0.0",
-  "minAppVersion": "1.8.0",
-  "description": "Local OpenWeatherMap runtime for Places notes and Map Base cards.",
+  "version": "1.1.0",
+  "minAppVersion": "1.13.1",
+  "description": "Places runtime for Maps dependency loading, Custom Views sync, and OpenWeatherMap hydration.",
   "author": "llocphann",
   "isDesktopOnly": true
 }

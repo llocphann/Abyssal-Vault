@@ -66,12 +66,7 @@
   "syntax_highlighting": true,
   "syntax_highlighting_mobile": true,
   "enabled_templates_hotkeys": [],
-  "startup_templates": [
-    "90_System/91_Templates/Bootstrap_Settings.md",
-    "90_System/91_Templates/Bootstrap_Maps_Plugin.md",
-    "90_System/91_Templates/Check_Required_Plugins.md",
-    "90_System/91_Templates/Sync_Places_Custom_View.md"
-  ],
+  "startup_templates": [],
   "intellisense_render": "1",
   "ignore_folders_on_creation": [],
   "enable_ribbon_icon": true
