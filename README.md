@@ -7,6 +7,7 @@ Abyssal-Vault is a reusable Obsidian vault template derived from the author's wo
 - A current Obsidian desktop release.
 - **Obsidian 1.13.1 or newer** for the current Maps plugin used by Bases map views.
 - Community plugins must be enabled/trusted when opening the vault.
+- Internet access on the first startup if the official Maps runtime is not already present locally.
 
 ## Vault structure
 
@@ -25,13 +26,14 @@ Unlike the earlier migration-only version of this repository, `90_System/92_Scri
 
 ## First start
 
-Open the repository folder as an Obsidian vault and enable the bundled community plugins you want to use. Templater startup tasks then perform three template-maintenance actions:
+Open the repository folder as an Obsidian vault and enable/trust the bundled community plugins. Templater startup tasks then perform four template-maintenance actions:
 
 1. `Bootstrap_Settings.md` creates local settings files for machine-specific values and secrets.
-2. `Check_Required_Plugins.md` warns when a required Places/Map dependency is missing.
-3. `Sync_Places_Custom_View.md` synchronizes the modular Places implementation into the Custom Views plugin configuration.
+2. `Bootstrap_Maps_Plugin.md` restores the pinned official Maps `0.2.2` runtime when a fresh clone does not contain it. All downloaded assets are SHA-256 verified before being written.
+3. `Check_Required_Plugins.md` warns when a required Places/Map dependency is still missing.
+4. `Sync_Places_Custom_View.md` synchronizes the modular Places implementation into the Custom Views plugin configuration.
 
-If a startup task has just generated local configuration or you have installed a missing plugin, reload Obsidian once.
+If Maps was restored during first startup, reload Obsidian once so the plugin manager can load it. After that, `Map.base` works from the normal enabled-plugin configuration.
 
 ## Settings and secrets
 
@@ -50,15 +52,21 @@ Both runtime files are ignored by Git. Put real values such as OpenWeatherMap, T
 
 After editing `settings.local.md`, reload Obsidian so the compatibility mirror is refreshed.
 
+### Why the settings bootstrap exists
+
+Some vault integrations still read the historical path `90_System/93_Configuration/settings.md`. Committing that file would make it easy to accidentally commit a real API key later. The bootstrap keeps a public example in Git, creates a private local settings file for the user, and mirrors it into an ignored compatibility path for legacy scripts/plugins. This preserves existing vault behavior without turning runtime secrets into tracked files.
+
 ## Places and Map.base
 
 The Places system uses `20_Personal_Life/23_Places/Map.base` as its global map and `90_System/91_Templates/Place_Template.md` for individual Place notes.
 
 ### Maps plugin
 
-`Map.base` uses the `type: map` Bases view supplied by **Maps by Obsidian** (`maps`). The source vault currently uses Maps `0.2.2`.
+`Map.base` uses the `type: map` Bases view supplied by **Maps by Obsidian** (`maps`). The source vault uses Maps `0.2.2`.
 
-If the template reports that Maps is missing, install **Maps** from Obsidian's Community Plugins browser, enable it, and reload Obsidian. Merely having `"maps"` in `.obsidian/community-plugins.json` does not provide the plugin runtime when `.obsidian/plugins/maps/main.js` is absent.
+A fresh template clone may contain the enabled-plugin entry without the large compiled Maps runtime. `Bootstrap_Maps_Plugin.md` repairs that state by downloading the three official `0.2.2` release assets (`main.js`, `manifest.json`, and `styles.css`) from `obsidianmd/obsidian-maps`, verifying their pinned SHA-256 digests, and writing them to `.obsidian/plugins/maps/`. It does not download arbitrary latest code and does not use any API token.
+
+If automatic restoration fails because GitHub is unreachable, install **Maps** from Obsidian's Community Plugins browser as the fallback, enable it, and reload Obsidian.
 
 ### Indexed Place folders
 
