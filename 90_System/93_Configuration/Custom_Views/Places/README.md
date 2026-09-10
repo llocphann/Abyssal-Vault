@@ -13,7 +13,7 @@ Places is split into three cooperating pieces:
 - **Templater** (`templater-obsidian`) synchronizes the modular Places source into Custom Views at startup.
 - **Places Weather** (`places-weather`) is bundled with this vault and hydrates weather placeholders.
 
-If `Map.base` opens without a map view, install/enable **Maps by Obsidian** from Community Plugins and reload Obsidian.
+A fresh clone may not yet contain the large compiled Maps runtime. `90_System/91_Templates/Bootstrap_Maps_Plugin.md` restores the official Maps `0.2.2` release assets from `obsidianmd/obsidian-maps` and verifies pinned SHA-256 digests before writing them to `.obsidian/plugins/maps/`. Reload Obsidian once after the first successful restore. If the bootstrap cannot reach GitHub, install/enable **Maps by Obsidian** from Community Plugins as the fallback.
 
 ## Place data
 
