@@ -1,39 +1,34 @@
 ## **Daily Schedule**
 
-| Time              | Sunday                                               |
-|:----------------- |:---------------------------------------------------- |
-| 5:00 - 5:15       | Wake up                                              |
-| 5:15 - 5:30       | Prepare water & equipment <br>Get changed            | 
-| **5:30 - 6:45**   | **Calisthenics**                                     |
-| **6:45 - 7:00**   | **Cardio**                                           |
-| 7:00 - 7:30       | Tidy up the room                                     |
-| 6:00 - 6:30       | Breakfast                                            |
-| 6:30 - 7:00       | Personal hygiene                                     |
-| **07:30 - 11:00** | **Offline Study**                                    |
-| 11:00 - 12:00     | Lunch                                                |
-| 12:00 - 13:00     | Relax                                                |
-| **13:00 - 17:00** | **Offline Study**                                    |
-| 17:00 - 17:30     | Dinner                                               |
-| 17:30 - 18:00     | Relax                                                |
-| **18:00 - 21:00** | **Teaching at the Center**                           |
-| 21:15 - 23:30     | Journal & Body Tracking                              |
-| 21:30 - 21:45     | Personal hygiene                                     |
-| 22:00             | Prepare for tomorrow <br>Sleep on time <br>No phone. |
+| Time          | Sunday |
+|:------------- |:------ |
+| 08:00 - 08:30 | Wake up and slow morning |
+| 08:30 - 09:30 | Breakfast |
+| 09:30 - 11:00 | Reading / reflection |
+| 11:00 - 12:00 | Light household tasks |
+| 12:00 - 13:00 | Lunch |
+| 13:00 - 15:00 | Rest / leisure |
+| 15:00 - 16:30 | Weekly review and next-week planning |
+| 16:30 - 17:30 | Prepare workspace / meals / essentials |
+| **17:30 - 18:00** | **Calisthenics** |
+| **18:00 - 18:30** | **Cardio** |
+| 19:00 - 20:00 | Dinner |
+| 20:00 - 21:30 | Relaxing hobby |
+| 21:30 - 22:00 | Prepare for Monday |
+| 22:00 - 23:00 | Wind down |
+| 23:00 | Sleep |
 
 ## **Calisthenics**
 
 | Exercise | Equipment | Set - reps | Rest |
 |:-------- |:--------- |:---------- |:---- |
-| Rest     | N/a       | N/a        | N/a  |
-| Rest     | N/a       | N/a        | N/a  |
-| Rest     | N/a       | N/a        | N/a  |
-| Rest     | N/a       | N/a        | N/a  |
+| Full-body Mobility | None | 15 min | — |
+| Easy Squat | Bodyweight | 2 x 10 | 45s |
+| Wall Push-up | Wall | 2 x 12 | 45s |
+| Dead Bug | Bodyweight | 2 x 8 / side | 45s |
 
 ## **Cardio**
 
-| Exercise | Equipment | Set - reps | Rest |     |
-|:-------- |:--------- |:---------- |:---- | --- |
-| Rest     | N/a       | N/a        | N/a  |     |
-| Rest     | N/a       | N/a        | N/a  |     |
-| Rest     | N/a       | N/a        | N/a  |     |
-| Rest     | N/a       | N/a        | N/a  |     | 
+| Exercise | Equipment | Duration | Intensity |
+|:-------- |:--------- |:-------- |:--------- |
+| Easy Walk | None | 20 min | Recovery |

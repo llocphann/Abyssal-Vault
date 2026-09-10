@@ -1,39 +1,32 @@
 ## **Daily Schedule**
 
-| Time              | Saturday                                            |
-|:----------------- |:--------------------------------------------------- |
-| 5:00 - 5:15       | Wake up                                             |
-| 5:15 - 5:30       | Prepare water and equipment, get changed            |
-| **5:30 - 6:45**   | **Calisthenics**                                    |
-| **6:45 - 7:00**   | **Cardio**                                          |
-| 7:00 - 7:30       | Tidy up the room                                    |
-| 7:30 - 8:00       | Breakfast                                           |
-| 8:05 - 8:30       | Personal hygiene                                    |
-| **08:30 - 11:00** | **Reading - Topic Vocabulary**                      |
-| 11:00 - 12:00     | Lunch<br>                                           |
-| 12:00 - 12:30     | Relax                                               |
-| **12:30 - 15:30** | **Listening**                                       | 
-| **15:30 - 17:00** | **Tutoring**                                        |
-| 17:00 - 17:30     | Dinner                                              |
-| 17:30 - 18:00     | Relax                                               |
-| **18:00 - 21:00** | **Teaching at the Center**                          |
-| 21:15 - 23:30     | Journal & Body Tracking                             |
-| 21:30 - 21:45     | Personal hygiene                                    |
-| 22:00             | Prepare for tomorrow<br>Sleep on time.<br>No phone. |
+| Time          | Saturday |
+|:------------- |:-------- |
+| 08:00 - 08:30 | Wake up and morning routine |
+| 08:30 - 09:00 | Breakfast |
+| 09:00 - 10:30 | Cleaning and household tasks |
+| 10:30 - 12:00 | Personal project / hobby |
+| 12:00 - 13:00 | Lunch |
+| 13:00 - 15:00 | Rest / leisure |
+| 15:00 - 17:00 | Errands, outing, or social time |
+| **17:00 - 17:45** | **Calisthenics** |
+| **17:45 - 18:30** | **Cardio** |
+| 19:00 - 20:00 | Dinner |
+| 20:00 - 22:30 | Leisure / friends / entertainment |
+| 22:30 - 23:30 | Wind down |
+| 23:30 | Sleep |
 
 ## **Calisthenics**
 
 | Exercise | Equipment | Set - reps | Rest |
-| :------- | :-------- | :--------- | :--- |
-| Rest     | N/a       | N/a        | N/a  |
-| Rest     | N/a       | N/a        | N/a  |
-| Rest     | N/a       | N/a        | N/a  |
-| Rest     | N/a       | N/a        | N/a  |
+|:-------- |:--------- |:---------- |:---- |
+| Walking Lunge | Bodyweight | 3 x 10 / leg | 60s |
+| Knee Push-up | Bodyweight | 3 x 12 | 60s |
+| Band Row | Resistance band | 3 x 12 | 60s |
+| Plank | Bodyweight | 3 x 30s | 45s |
 
 ## **Cardio**
 
-| Exercise     | Equipment | Set - reps | Rest                      |
-| :----------- | :-------- | :--------- | :------------------------ |
-| Skipping     |           | 45s        |                           |
-| Plank        |           | 45s        |                           |
-| Boxing Steps |           | 45s        | 60s rest after each round |
+| Exercise | Equipment | Duration | Intensity |
+|:-------- |:--------- |:-------- |:--------- |
+| Outdoor Walk / Hike | None | 30 min | Easy |
