@@ -5,72 +5,62 @@ Abyssal-Vault is a reusable Obsidian vault template derived from the author's wo
 ## Requirements
 
 - A current Obsidian desktop release.
-- **Obsidian 1.13.1 or newer** for the current Maps plugin used by Bases map views.
-- Community plugins must be enabled/trusted when opening the vault.
-- Internet access on the first startup if the official Maps runtime is not already present locally.
+- **Obsidian 1.13.1 or newer** for the Maps plugin used by Bases map views.
+- Community plugins must be enabled/trusted.
+- Internet access when a missing community plugin needs to be installed.
 
 ## Vault structure
 
-The template keeps the numbered top-level layout used by the source vault:
-
-- `00_Capture` — capture workflows such as Journal, Cornell notes, and Zettelkasten notes.
+- `00_Capture` — Journal, Cornell, Zettelkasten and capture workflows.
 - `10_Projects` — project space.
-- `20_Personal_Life` — reusable trackers and personal-life systems, including Books, Media, Places, Food & Drinks, Games, Finance, and Bodybuilding references.
+- `20_Personal_Life` — Books, Media, Places, Food & Drinks, Games, Finance, Bodybuilding and other reusable systems.
 - `40_Academics` — academic/study space.
 - `60_Digital_Library` — digital library space.
 - `70_Interests_&_Research` — research and interest notes.
-- `90_System` — templates, scripts, configuration, media assets, schedules, and homepage infrastructure.
+- `90_System` — templates, scripts, configuration, media assets, schedules and homepage infrastructure.
 - `99_Archives` — archive space.
 
-Unlike the earlier migration-only version of this repository, `90_System/92_Scripts`, `90_System/93_Configuration`, and `90_System/95_Media_Assets` are real distributed parts of the template, not placeholders.
+`90_System/92_Scripts`, `90_System/93_Configuration`, and `90_System/95_Media_Assets` are distributed implementation directories, not placeholders.
 
 ## First start
 
-Open the repository folder as an Obsidian vault and enable/trust the bundled community plugins. Templater startup tasks then perform four template-maintenance actions:
+Open the repository as an Obsidian vault and enable/trust community plugins.
 
-1. `Bootstrap_Settings.md` creates local settings files for machine-specific values and secrets.
-2. `Bootstrap_Maps_Plugin.md` restores the pinned official Maps `0.2.2` runtime when a fresh clone does not contain it. All downloaded assets are SHA-256 verified before being written.
-3. `Check_Required_Plugins.md` warns when a required Places/Map dependency is still missing.
-4. `Sync_Places_Custom_View.md` synchronizes the modular Places implementation into the Custom Views plugin configuration.
+Places does **not** depend on Templater startup templates. The bundled local plugin `.obsidian/plugins/places-weather/` initializes the Places runtime when Obsidian loads it:
 
-If Maps was restored during first startup, reload Obsidian once so the plugin manager can load it. After that, `Map.base` works from the normal enabled-plugin configuration.
+1. It ensures **Maps** (`maps`) is installed, registered, enabled and loaded. If Maps is missing, it installs the pinned `obsidianmd/obsidian-maps` `0.2.2` release through Obsidian's own community-plugin manager.
+2. It synchronizes the modular `places-v1` source from `90_System/93_Configuration/Custom_Views/Places` into the Custom Views plugin.
+3. It hydrates live weather for Place views and Map popups when an OpenWeatherMap key is configured.
 
-## Settings and secrets
+If automatic Maps installation is blocked, install/enable **Maps** from Settings → Community plugins and reopen `Map.base`.
 
-The repository commits only:
+## Settings
 
-`90_System/93_Configuration/settings.example.md`
+Vault-wide configuration lives at:
 
-This file contains public defaults/placeholders and must not contain a real API key, account identifier, or local machine path.
+`90_System/93_Configuration/settings.md`
 
-At startup, `Bootstrap_Settings.md` creates:
+The template tracks this file directly so scripts and plugins use the same path as the source vault. The committed version contains placeholders only.
 
-- `90_System/93_Configuration/settings.local.md` — the editable local configuration.
-- `90_System/93_Configuration/settings.md` — an ignored compatibility mirror used by existing scripts/plugins.
+There is no `settings.example.md`, `settings.local.md`, or `Bootstrap_Settings.md` layer.
 
-Both runtime files are ignored by Git. Put real values such as OpenWeatherMap, TMDB, Spoonacular, RAWG, Steam credentials/IDs, local Heroic paths, location, currency preferences, and other machine/user-specific values in `settings.local.md`, not in `settings.example.md`.
+Because `settings.md` is tracked, replacing placeholders with real API keys or account credentials creates normal Git changes. **Before publishing or pushing a customized copy, reset/remove real secrets from this file.**
 
-After editing `settings.local.md`, reload Obsidian so the compatibility mirror is refreshed.
+Settings used by the vault include OpenWeatherMap, TMDB, Spoonacular, RAWG, Steam, Heroic/GOG paths, currency preferences and other vault-wide defaults.
 
-### Why the settings bootstrap exists
+## Places and `Map.base`
 
-Some vault integrations still read the historical path `90_System/93_Configuration/settings.md`. Committing that file would make it easy to accidentally commit a real API key later. The bootstrap keeps a public example in Git, creates a private local settings file for the user, and mirrors it into an ignored compatibility path for legacy scripts/plugins. This preserves existing vault behavior without turning runtime secrets into tracked files.
+The global map is:
 
-## Places and Map.base
+`20_Personal_Life/23_Places/Map.base`
 
-The Places system uses `20_Personal_Life/23_Places/Map.base` as its global map and `90_System/91_Templates/Place_Template.md` for individual Place notes.
+It uses the `type: map` Bases view supplied by **Maps by Obsidian** (`maps`). The source vault uses Maps `0.2.2`.
 
-### Maps plugin
+The previous Abyssal-Vault implementation only wrote Maps files from a Templater startup template. That was unreliable because Templater's `Enable startup templates` toggle is device-local and because writing plugin files after Obsidian has scanned manifests does not by itself register the `type: map` view in the running plugin manager.
 
-`Map.base` uses the `type: map` Bases view supplied by **Maps by Obsidian** (`maps`). The source vault uses Maps `0.2.2`.
+The current bundled Places runtime instead uses Obsidian's plugin manager to install Maps when necessary, refresh/load plugin manifests, and enable/load Maps in the current session.
 
-A fresh template clone may contain the enabled-plugin entry without the large compiled Maps runtime. `Bootstrap_Maps_Plugin.md` repairs that state by downloading the three official `0.2.2` release assets (`main.js`, `manifest.json`, and `styles.css`) from `obsidianmd/obsidian-maps`, verifying their pinned SHA-256 digests, and writing them to `.obsidian/plugins/maps/`. It does not download arbitrary latest code and does not use any API token.
-
-If automatic restoration fails because GitHub is unreachable, install **Maps** from Obsidian's Community Plugins browser as the fallback, enable it, and reload Obsidian.
-
-### Indexed Place folders
-
-The map indexes notes with a non-empty `place_type` from:
+`Map.base` indexes Place notes from:
 
 - `20_Personal_Life/23_Places/Tourist`
 - `20_Personal_Life/23_Places/Misc`
@@ -78,24 +68,22 @@ The map indexes notes with a non-empty `place_type` from:
 - `20_Personal_Life/26_Food_&_Drinks/Cafes`
 - `20_Personal_Life/26_Food_&_Drinks/Bars`
 
-These folders are retained in the template so Templater's folder-template mappings work immediately. A public sample Place is included so `Map.base` has a marker to render before you add your own locations.
+A public sample Place is included so the map has a valid marker immediately.
 
 ### Weather
 
-`.obsidian/plugins/places-weather/` provides the same local weather runtime used by the source vault. It hydrates current conditions in individual Place views and Map popups.
+`.obsidian/plugins/places-weather/` reads `openweathermap_key` and `openweathermap_unit` directly from `90_System/93_Configuration/settings.md`.
 
-Weather reads `openweathermap_key` and `openweathermap_unit` from the ignored runtime `settings.md`. The key is therefore not committed to the repository. `Map.base` itself still works without a weather key; only live weather remains unavailable until one is configured.
+The map does **not** require an OpenWeatherMap key to render markers. Without a key, only live weather is unavailable.
 
 Detailed Places architecture is documented in `90_System/93_Configuration/Custom_Views/Places/README.md`.
 
 ## Templater folder mappings
 
-Folder mappings are kept only for templates that are actually distributed. The Book Tracker mapping targets `20_Personal_Life/24_Book_Tracker/Books`, and obsolete mappings to removed Vocabulary/Onion templates have been removed.
+Templater remains responsible for normal folder-template mappings. Its `startup_templates` list is intentionally empty; Places runtime initialization does not rely on Templater startup execution.
+
+The Book Tracker targets `20_Personal_Life/24_Book_Tracker/Books`, and stale Vocabulary/Onion mappings have been removed.
 
 ## Reusable content
 
-Existing reusable Book, Media, Game, recipe, exercise, and other curated records are intentionally allowed to remain in the template. They are not treated as secrets. Before publishing changes, the important privacy boundary is that credentials, API keys, account IDs intended to remain private, and machine-local paths stay in ignored local settings rather than committed configuration.
-
-## Updating the template
-
-This repository is now maintained directly as a distributable vault. The old `./scripts/migrate-from-obsidian-vault.sh` migration workflow is no longer the documented update path; make template-safe changes directly and keep local/private settings outside Git.
+Book, Media, Game, recipe, exercise and other curated records may remain in the template. They are not treated as secrets. The release privacy boundary is credentials/API keys/tokens, account identifiers intended to stay private, and machine-local authentication data.
