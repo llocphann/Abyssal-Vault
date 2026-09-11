@@ -4,12 +4,29 @@
     "type": "split",
     "children": [
       {
-        "id": "3677bd8ac49bbbc2",
+        "id": "0238c24fb91420f2",
         "type": "tabs",
         "children": [
           {
-            "id": "3de6aadc2d5e9e09",
+            "id": "553b2508d1df16bc",
             "type": "leaf",
+            "pinned": true,
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "90_System/93_Configuration/settings.md",
+                "mode": "preview",
+                "source": false
+              },
+              "pinned": true,
+              "icon": "lucide-file",
+              "title": "settings"
+            }
+          },
+          {
+            "id": "d56d09ddef2f565a",
+            "type": "leaf",
+            "pinned": true,
             "state": {
               "type": "markdown",
               "state": {
@@ -17,11 +34,13 @@
                 "mode": "preview",
                 "source": false
               },
+              "pinned": true,
               "icon": "lucide-file",
               "title": "Homepage"
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -139,7 +158,7 @@
       {
         "id": "faa38c380235c599",
         "type": "tabs",
-        "dimension": 23.524720893141946,
+        "dimension": 23.824701195219124,
         "children": [
           {
             "id": "21fab2252cb21bfd",
@@ -244,26 +263,9 @@
         ]
       },
       {
-        "id": "af65bb7ac822414a",
-        "type": "tabs",
-        "dimension": 51.674641148325364,
-        "children": [
-          {
-            "id": "ddb492e143439b97",
-            "type": "leaf",
-            "state": {
-              "type": "planner-timeline",
-              "state": {},
-              "icon": "calendar-with-checkmark",
-              "title": "Timeline"
-            }
-          }
-        ]
-      },
-      {
         "id": "4b266b3d65ff2f45",
         "type": "tabs",
-        "dimension": 24.800637958532697,
+        "dimension": 22.948207171314742,
         "children": [
           {
             "id": "53afeb1e7e8c6603",
@@ -273,6 +275,23 @@
               "state": {},
               "icon": "lucide-git-fork",
               "title": "Graph view"
+            }
+          }
+        ]
+      },
+      {
+        "id": "21a8f80e28189dff",
+        "type": "tabs",
+        "dimension": 53.22709163346613,
+        "children": [
+          {
+            "id": "ddb492e143439b97",
+            "type": "leaf",
+            "state": {
+              "type": "planner-timeline",
+              "state": {},
+              "icon": "calendar-with-checkmark",
+              "title": "Timeline"
             }
           }
         ]
@@ -299,45 +318,50 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "c081451803d30e39",
+  "active": "d56d09ddef2f565a",
   "lastOpenFiles": [
-    "README.md",
+    "90_System/93_Configuration/settings.md",
+    "__morphic_bases_demand_normalization_v1_candidate__/Bases.md",
+    "__morphic_bases_demand_normalization_v1_candidate__/Reset.md",
+    "__morphic_bases_demand_normalization_v1_candidate__",
+    "__morphic_bases_demand_normalization_v1_base__/Bases.md",
+    "__morphic_bases_demand_normalization_v1_base__/Reset.md",
     "90_System/98_Homepage/Homepage.md",
-    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
-    "20_Personal_Life/25_Media_Tracker/Movies/Train to Busan.md",
-    "20_Personal_Life/24_Book_Tracker/Books/A_Clash_of_Kings.md",
-    "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
-    "__morphic_competitive_bench__/Body.md",
-    "__morphic_competitive_bench__/Metadata.md",
-    "__morphic_competitive_bench__/Noop.md",
-    "__morphic_competitive_bench__/Nav-A.md",
-    "__morphic_competitive_bench__/Nav-B.md",
-    "__morphic_competitive_bench__/Warm.md",
-    "__morphic_competitive_bench__/Reset.md",
-    "__morphic_competitive_bench__/First.md",
+    "__morphic_bases_demand_normalization_v1_base__",
+    "__morphic_file_open_settled_fallback_v1_candidate__/Body.md",
+    "__morphic_file_open_settled_fallback_v1_candidate__/Bases.md",
+    "__morphic_file_open_settled_fallback_v1_candidate__/Reset.md",
+    "__morphic_file_open_settled_fallback_v1_candidate__/First.md",
+    "__morphic_file_open_settled_fallback_v1_candidate__",
+    "__morphic_file_open_settled_fallback_v1_base__/Body.md",
+    "__morphic_file_open_settled_fallback_v1_base__/Bases.md",
+    "__morphic_file_open_settled_fallback_v1_base__/Reset.md",
+    "__morphic_file_open_settled_fallback_v1_base__/First.md",
+    "__morphic_file_open_settled_fallback_v1_base__",
+    "__morphic_post_open_resolve_split_v1__/Bases.md",
+    "__morphic_post_open_resolve_split_v1__/Reset.md",
+    "__morphic_post_open_resolve_split_v1__/First.md",
+    "__morphic_post_open_resolve_split_v1__",
+    "__morphic_cv_navigation_event_gap_v2__/Bases.md",
+    "__morphic_cv_navigation_event_gap_v2__/Reset.md",
+    "__morphic_cv_navigation_event_gap_v2__/First.md",
+    "__morphic_cv_navigation_event_gap_v2__",
+    "__morphic_cv_navigation_event_gap_v1__/Bases.md",
+    "__morphic_cv_navigation_event_gap_v1__/Reset.md",
+    "__morphic_cv_navigation_event_gap_v1__/First.md",
+    "__morphic_cv_navigation_event_gap_v1__",
+    "__morphic_navigation_owner_settle_gap_v1__/Bases.md",
+    "__morphic_navigation_owner_settle_gap_v1__/Reset.md",
+    "__morphic_navigation_owner_settle_gap_v1__/First.md",
+    "__morphic_navigation_owner_settle_gap_v1__",
+    "__morphic_navigation_targeted_wallclock_v1__base",
+    "__morphic_navigation_targeted_wallclock_v1__m1a",
     "__morphic_competitive_bench__/Canvas-100.canvas",
     "__morphic_competitive_bench__/Canvas-50.canvas",
     "__morphic_competitive_bench__/Canvas-10.canvas",
     "__morphic_competitive_bench__/Canvas-1.canvas",
-    "__morphic_competitive_bench__/Resource.md",
-    "__morphic_competitive_bench__/Current-C.md",
-    "__morphic_competitive_bench__/Current-B.md",
-    "__morphic_competitive_bench__/Current-A.md",
-    "__morphic_competitive_bench__/Canvas-Target.md",
-    "__morphic_competitive_bench__/Filter.md",
-    "__morphic_competitive_bench__/Bases.md",
-    "__morphic_competitive_bench__/Loop.md",
-    "__morphic_competitive_bench__/Expression.md",
-    "__morphic_competitive_bench__/Linked-Source.md",
-    "__morphic_competitive_bench__/Linked.md",
-    "__morphic_competitive_bench__",
-    "20_Personal_Life/23_Places/Map.base",
-    "20_Personal_Life/24_Book_Tracker/Books/A_Dance_with_Dragons.md",
-    "90_System/97_Daily_Schedule/01_Monday.md",
-    "90_System/93_Configuration/settings.example.md",
-    "20_Personal_Life/33_Bodybuilding/Bodybuilding.base",
-    "20_Personal_Life/26_Food_&_Drinks/FoodnDrinks.base",
-    "20_Personal_Life/27_Game_Tracker/Game_Collection.base",
+    "__morphic_canvas_error_probe__/Probe.canvas",
+    "__morphic_canvas_readiness_probe__/Probe.canvas",
     "90_System/95_Media_Assets/Recipes/themealdb-53238-cover.jpg",
     "90_System/95_Media_Assets/Recipes/spoonacular-991010-cover.jpg",
     "90_System/95_Media_Assets/Recipes/spoonacular-664828-cover.jpg",
@@ -345,11 +369,8 @@
     "90_System/95_Media_Assets/Recipes/spoonacular-649225-cover.jpg",
     "90_System/95_Media_Assets/Recipes/spoonacular-638746-cover.jpg",
     "90_System/95_Media_Assets/Recipes/spoonacular-632797-cover.jpg",
-    "90_System/95_Media_Assets/Recipes/Illustrations",
-    "90_System/95_Media_Assets/Recipes",
     "90_System/95_Media_Assets/TV_Series/47665-backdrop.jpg",
     "90_System/95_Media_Assets/TV_Series/65733-backdrop.jpg",
-    "90_System/95_Media_Assets/TV_Series/65733-cover.jpg",
-    "90_System/95_Media_Assets/Icons"
+    "90_System/95_Media_Assets/TV_Series/65733-cover.jpg"
   ]
 }
