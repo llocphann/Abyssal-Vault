@@ -27,6 +27,91 @@ NegativeFormat: standard
 WeekStartsOn: monday
 FiscalYearStartMonth: 1
 Budgets: {}
+globe_size: 500x500
+globe_style: abyssal
+globe_monochrome_color: "#10181b"
+location_pins: line
+globe_source_folders:
+  - 20_Personal_Life/23_Places
+  - 20_Personal_Life/26_Food_&_Drinks/Restaurants
+  - 20_Personal_Life/26_Food_&_Drinks/Cafes
+  - 20_Personal_Life/26_Food_&_Drinks/Bars
+globe_display_min: 250
+globe_display_max: 2000
+globe_render_min: 500
+globe_render_max: 2000
+globe_min_zoom: 0.72
+globe_max_zoom: 32
+globe_default_zoom: 0.92
+globe_base_scale: 0.84
+globe_texture_width: 4096
+globe_texture_height: 4096
+_settings_layout_v1:
+  version: 1
+  tabs:
+    tab-globe-widget:
+      label: Globe Widget
+      eyebrow: Custom
+      description: Settings for globe
+  tabOrder:
+    - tab-globe-widget
+  headings:
+    heading-globe-general:
+      label: Globe General
+      note: ""
+    heading-zoom:
+      label: Zoom
+      note: ""
+  headingTabs:
+    heading-globe-general: tab-globe-widget
+    heading-zoom: tab-globe-widget
+  headingOrder:
+    advanced:
+      - technical
+      - globe
+      - custom
+    tab-globe-widget:
+      - heading-globe-general
+      - heading-zoom
+  settingPlacement:
+    globe_source_folders:
+      heading: globe
+    globe_max_zoom:
+      heading: heading-zoom
+    globe_monochrome_color:
+      heading: globe
+    globe_texture_height:
+      heading: heading-globe-general
+    globe_texture_width:
+      heading: heading-globe-general
+    globe_default_zoom:
+      heading: globe
+    globe_base_scale:
+      heading: heading-globe-general
+    globe_min_zoom:
+      heading: heading-zoom
+  settingOrder:
+    heading:globe:
+      - globe_source_folders
+      - globe_default_zoom
+      - globe_size
+      - globe_monochrome_color
+      - globe_style
+      - location_pins
+      - globe_display_min
+      - globe_display_max
+      - globe_render_min
+      - globe_render_max
+    tab:finance:root: []
+    tab:advanced:root: []
+    tab:tab-globe-widget:root: []
+    heading:heading-zoom:
+      - globe_min_zoom
+      - globe_max_zoom
+    heading:heading-globe-general:
+      - globe_texture_height
+      - globe_texture_width
+      - globe_base_scale
 ---
 
 # Vault settings
@@ -58,3 +143,10 @@ copy of this repository.**
 - `NegativeFormat` may be `standard` or `accounting`.
 - `FiscalYearStartMonth` accepts `1` through `12`.
 - `Budgets` is an optional mapping of category names to amounts in `BookCurrency`.
+
+## Homepage globe
+
+- `globe_source_folders` lists the Abyssal-Vault folders scanned for Place notes with coordinates.
+- `globe_size`, `globe_style`, `globe_monochrome_color`, and `location_pins` control the globe appearance.
+- `globe_min_zoom`, `globe_max_zoom`, `globe_default_zoom`, and `globe_base_scale` control navigation and scale.
+- `globe_display_*`, `globe_render_*`, and `globe_texture_*` control display and render limits.

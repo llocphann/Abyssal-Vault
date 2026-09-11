@@ -24,7 +24,9 @@ dv.view("90_System/92_Scripts/Dataview/homepage/info-headers")
 >>>
 >>>> [!blank|wide-5] 
 >>>> ```dataviewjs
->>>> dv.view("90_System/92_Scripts/Dataview/homepage/dashboard-calendar") 
+>>>> await dv.view("90_System/92_Scripts/Dataview/homepage/globe-settings-init");
+>>>> await dv.view("90_System/92_Scripts/Dataview/homepage/globe-widget");
+>>>> await dv.view("90_System/92_Scripts/Dataview/homepage/globe-vector-map-overlay");
 >>>> ```
 >> 
 >> ```dataviewjs

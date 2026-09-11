@@ -1,0 +1,60 @@
+<div class="cv-settings" data-role="settings-root">
+  <header class="cv-settings-topbar">
+    <div class="cv-settings-heading">
+      <span class="cv-settings-kicker">Vault configuration</span>
+      <div class="cv-settings-title-row">
+        <h1>Settings</h1>
+        <span class="cv-settings-autosave"><i aria-hidden="true"></i> Auto-save</span>
+      </div>
+      <p>Manage vault-wide defaults, integrations and local preferences from one place.</p>
+    </div>
+
+    <div class="cv-settings-toolbar">
+      <label class="cv-settings-search">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path></svg>
+        <input data-role="settings-search" type="search" placeholder="Search settings…" autocomplete="off" spellcheck="false">
+        <kbd>/</kbd>
+      </label>
+      <div class="cv-settings-summary" aria-live="polite">
+        <span><strong data-role="settings-count">0</strong> settings</span>
+        <span><strong data-role="settings-secret-count">0</strong> protected</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="cv-settings-shell">
+    <aside class="cv-settings-sidebar">
+      <nav class="cv-settings-nav" data-role="settings-nav"></nav>
+      <div class="cv-settings-sidebar-footer">
+        <button class="cv-settings-sidebar-action is-primary" data-role="settings-add-tab" type="button">+ Add Tabs</button>
+        <button class="cv-settings-sidebar-action" data-role="settings-keys-toggle" type="button" aria-pressed="false">Show property keys</button>
+      </div>
+    </aside>
+
+    <main class="cv-settings-main">
+      <header class="cv-settings-panel-head">
+        <div>
+          <span class="cv-settings-panel-eyebrow" data-role="settings-panel-eyebrow">General</span>
+          <h2 data-role="settings-panel-title">General</h2>
+          <p data-role="settings-panel-description"></p>
+        </div>
+        <div class="cv-settings-panel-actions">
+          <button class="cv-settings-panel-action" data-role="settings-edit-tab" type="button" hidden>Edit tab</button>
+          <button class="cv-settings-panel-action" data-role="settings-add-heading" type="button">+ Add heading</button>
+          <button class="cv-settings-panel-action" data-role="settings-add-setting" type="button">+ Add setting</button>
+          <span class="cv-settings-panel-count" data-role="settings-panel-count"></span>
+        </div>
+      </header>
+
+      <div class="cv-settings-groups" data-role="settings-groups"></div>
+      <div class="cv-settings-empty" data-role="settings-empty" hidden>No matching settings.</div>
+    </main>
+  </div>
+
+  <footer class="cv-settings-footer">
+    <span class="cv-settings-save-state"><i aria-hidden="true"></i><span data-role="settings-save-state" aria-live="polite">Saved</span></span>
+    <span>Changes are written to frontmatter immediately.</span>
+  </footer>
+
+  <div class="cv-settings-source" aria-hidden="true">{{file.content}}</div>
+</div>
