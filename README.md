@@ -134,6 +134,24 @@ Do not commit real API keys, tokens, credentials, or private configuration.
 
 Detailed architecture documentation, subsystem guides, configuration references, data-flow explanations, and maintenance notes are available in the [Abyssal Vault Documentation](docs/README.md).
 
+---
+
+<div align="center">
+
+## ☕ Support Abyssal Vault
+
+If Abyssal Vault has been useful to you, inspired your own setup, or simply saved you some time, you can support its continued development here.
+
+<a href="https://www.buymeacoffee.com/llocphann">
+  <img src="https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=%E2%98%95&slug=llocphann&button_colour=6f5bd3&font_colour=ffffff&font_family=Inter&outline_colour=000000&coffee_colour=FFDD00" alt="Buy Me a Coffee" height="48">
+</a>
+
+<sub>Your support helps me keep refining the vault, custom views, automation, and documentation.</sub>
+
+</div>
+
+---
+
 ## License
 
 See [LICENSE](LICENSE).
