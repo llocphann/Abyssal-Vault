@@ -1,0 +1,526 @@
+/* ========================================================================== */
+/* Abyssal Vault — Configuration + final runtime overrides                    */
+/* ========================================================================== */
+
+/*******************************************************************************
+ * ABYSSAL CARBON CYAN → OBSIDIAN/BORDER SEMANTIC BRIDGE
+ *******************************************************************************/
+body.theme-dark {
+  --accent-dark-h:196.667;--accent-dark-s:49.219%;--accent-dark-l:75.098%;--accent-h:var(--accent-dark-h);--accent-s:var(--accent-dark-s);--accent-l:var(--accent-dark-l);
+  --background-underlying:var(--cc-p00,#0a0e10);--background-underlying-dark:var(--cc-p00,#0a0e10);--workspace-background-translucent:var(--cc-p00,#0a0e10);
+  --background-primary:var(--cc-p01,#0c1113);--background-mod-left-split-dark:var(--cc-p01,#0c1113);--background-mod-left-split:var(--cc-p01,#0c1113);--background-mod-root-split-dark:var(--cc-p01,#0c1113);--background-mod-root-split:var(--cc-p01,#0c1113);--background-mod-right-split-dark:var(--cc-p01,#0c1113);--background-mod-right-split:var(--cc-p01,#0c1113);
+  --background-primary-alt:var(--cc-p02,#10181b);--background-secondary:var(--cc-p02,#10181b);--background-secondary-alt:var(--cc-p03,#162024);--background-tertiary:var(--cc-p03,#162024);
+  --background-modifier-hover:var(--cc-p04,#1d2a2f);--background-modifier-active-hover:var(--cc-p05,#26363e);--background-modifier-form-field:var(--cc-p02,#10181b);--background-modifier-form-field-highlighted:var(--cc-p03,#162024);--background-modifier-border-muted:color-mix(in srgb,var(--cc-p06,#30464f) 24%,transparent);--background-modifier-border:color-mix(in srgb,var(--cc-p06,#30464f) 48%,transparent);--background-modifier-border-hover:color-mix(in srgb,var(--cc-p07,#3e5965) 70%,transparent);--background-modifier-border-focus:var(--cc-p07,#3e5965);
+  --text-normal:var(--cc-p12,#c6d6dc);--text-muted:var(--cc-p11,#a0bac5);--text-faint:var(--cc-p09,#5f899b);--text-accent:var(--cc-accent,#a0cddf);--text-accent-hover:color-mix(in srgb,var(--cc-accent,#a0cddf) 70%,var(--cc-p13,#e6edef) 30%);--text-on-accent:var(--cc-p00,#0a0e10);--text-selection:color-mix(in srgb,var(--cc-accent,#a0cddf) 24%,transparent);--text-highlight-bg:var(--cc-p04,#1d2a2f);--text-highlight-bg-active:var(--cc-p05,#26363e);--caret-color:var(--cc-accent,#a0cddf);
+  --interactive-normal:var(--cc-p02,#10181b);--interactive-hover:var(--cc-p04,#1d2a2f);--interactive-accent:var(--cc-accent,#a0cddf);--interactive-accent-hover:color-mix(in srgb,var(--cc-accent,#a0cddf) 78%,var(--cc-p13,#e6edef) 22%);
+  --titlebar-background:var(--cc-p00,#0a0e10);--titlebar-background-focused:var(--cc-p00,#0a0e10);--tab-container-background:var(--cc-p00,#0a0e10);--tab-background-active:var(--cc-p01,#0c1113);--background-activated-tab-header-dark:var(--cc-p01,#0c1113);--ribbon-background:var(--cc-p01,#0c1113);
+  --tab-text-color:var(--cc-p10,#7da0b0);--tab-text-color-active-current:var(--cc-p12,#c6d6dc);--tab-text-color-focused:var(--cc-p11,#a0bac5);--tab-text-color-focused-active-current:var(--cc-p13,#e6edef);--nav-item-color:var(--cc-p10,#7da0b0);--nav-item-color-hover:var(--cc-p12,#c6d6dc);--nav-item-color-active:var(--cc-p13,#e6edef);--nav-item-background-hover:var(--cc-p04,#1d2a2f);--nav-item-background-active:var(--cc-p05,#26363e);--nav-indentation-guide-color:color-mix(in srgb,var(--cc-p06,#30464f) 55%,transparent);
+  --code-background:var(--cc-p02,#10181b);--code-normal:var(--cc-p11,#a0bac5);--code-comment:var(--cc-p09,#5f899b);--blockquote-border-color:var(--cc-p06,#30464f);--hr-color:color-mix(in srgb,var(--cc-p06,#30464f) 70%,transparent);--embed-block-shadow-hover:0 0 0 1px var(--cc-p06,#30464f);--h1-color:var(--cc-p13,#e6edef);--h2-color:var(--cc-p12,#c6d6dc);--scrollbar-bg:transparent;--scrollbar-thumb-bg:color-mix(in srgb,var(--cc-p07,#3e5965) 55%,transparent);--scrollbar-active-thumb-bg:var(--cc-p08,#4e707e);
+}
+body.theme-dark.background-underlying-default-dark{--background-underlying:var(--cc-p00,#0a0e10)!important}
+
+/*******************************************************************************
+ * FINAL TABLE SEMANTIC DELTA
+ *******************************************************************************/
+:root{--table-padding-y:.5rem;--table-padding-x:.75rem;--table-font:.93rem;--table-header-font:.86rem;--av-table-stripe-strength:28%;--av-table-radius-fallback:10px}
+:is(.theme-dark,.theme-light){--table-header-bg:var(--background-secondary-alt,var(--background-secondary));--table-header-text:var(--text-normal);--table-row-odd:var(--background-secondary);--table-row-even:color-mix(in srgb,var(--background-secondary-alt,var(--background-secondary)) var(--av-table-stripe-strength),var(--background-secondary));--table-hover:var(--background-modifier-hover);--table-selected:var(--background-modifier-active-hover,var(--background-modifier-hover));--table-divider:var(--background-modifier-border-muted,var(--background-modifier-border));--table-divider-strong:var(--background-modifier-border);--av-table-surface:var(--background-secondary);--av-table-header-surface:var(--background-secondary-alt,var(--background-secondary));--av-table-row-odd:var(--table-row-odd);--av-table-row-even:var(--table-row-even);--av-table-row-hover:var(--table-hover);--av-table-text:var(--text-normal);--av-table-muted:var(--text-muted);--av-table-accent:var(--text-accent,var(--interactive-accent));--av-table-border:var(--table-border-color,var(--background-modifier-border));--av-table-divider:var(--table-divider);--av-table-header-divider:var(--table-header-border-color,var(--table-divider-strong));--av-table-code-bg:var(--background-modifier-form-field,var(--background-secondary-alt));--av-table-code-border:var(--background-modifier-border-muted,var(--background-modifier-border))}.theme-dark{--av-table-radius:var(--card-border-radius-dark,var(--lake-radius,var(--av-table-radius-fallback)))}.theme-light{--av-table-radius:var(--card-border-radius-light,var(--lake-radius,8px))}
+
+/*******************************************************************************
+ * HOMEPAGE — scoped component retained in the final late-load bundle
+ *******************************************************************************/
+.home-dashboard{--hd-accent:var(--interactive-accent);--hd-accent-text:var(--text-on-accent);--hd-warn:var(--text-warning,var(--highlight));--hd-term-bg:var(--background-primary);--hd-term-bar:var(--background-secondary);--hd-fg:var(--text-normal);--hd-dim:var(--text-muted);--hd-faint:var(--text-faint);--hd-border:var(--background-modifier-border);--hd-lift:color-mix(in srgb,var(--hd-fg) 5%,var(--hd-term-bg));--hd-hover:var(--background-modifier-hover);--hd-heat-0:color-mix(in srgb,var(--cc-p02,#10181b) 45%,var(--hd-term-bg));--hd-radius:6px;--hd-gap:14px}.home-dashboard .inline-title,.home-dashboard .metadata-container,.home-dashboard .frontmatter{display:none!important}.home-dashboard .markdown-preview-sizer,.home-dashboard.markdown-source-view.mod-cm6 .cm-sizer{--file-line-width:min(1560px,96%);max-width:min(1560px,96%)!important;margin-inline:auto}.home-dashboard .hd-root{font-family:var(--font-monospace);border-radius:12px;overflow:hidden;margin:10px 0;color:var(--hd-fg)}.home-dashboard .hd-term-bar{text-align:center;font-size:.72em;letter-spacing:.08em;color:var(--hd-faint);background:var(--hd-term-bar);border-bottom:1px solid var(--hd-border);padding:8px 14px}.home-dashboard .hd-term-status{display:flex;justify-content:space-between;font-size:.72em;letter-spacing:.06em;color:var(--hd-faint);background:var(--hd-term-bar);border-top:1px solid var(--hd-border);padding:6px 14px;margin-top:28px}.home-dashboard .hd-header{margin:20px 24px}.home-dashboard .hd-ff{display:flex;align-items:center;gap:clamp(24px,4vw,48px)}.home-dashboard .hd-ff-logo{flex-shrink:0;filter:drop-shadow(0 0 12px color-mix(in srgb,var(--hd-accent) 45%,transparent))}.home-dashboard .hd-ff-logo svg{width:clamp(130px,11vw,170px);height:auto;display:block}.home-dashboard .hd-ff-logo line{stroke:color-mix(in srgb,var(--hd-faint) 60%,var(--hd-term-bg));stroke-width:1.1}.home-dashboard .hd-ff-logo circle{fill:var(--hd-accent)}.home-dashboard .hd-ff-info{min-width:0}.home-dashboard .hd-ff-row{display:flex;align-items:baseline;font-size:.88em;line-height:1.75}.home-dashboard .hd-ff-key{color:var(--hd-accent);font-weight:700;width:10ch;flex-shrink:0;letter-spacing:.04em}.home-dashboard .hd-ff-val{color:var(--hd-fg);min-width:0}.home-dashboard .hd-cursor{display:inline-block;width:8px;height:1em;margin-left:7px;vertical-align:text-bottom;background:var(--hd-fg);animation:hd-blink 1.1s steps(1) infinite}@keyframes hd-blink{50%{opacity:0}}.home-dashboard .hd-ff-palette{display:flex;gap:4px;margin-top:10px}.home-dashboard .hd-ff-swatch{width:16px;height:10px;border-radius:2px}.home-dashboard .hd-heat{margin-inline:auto;align-self:center;flex-shrink:0;margin-right:35px}.home-dashboard .hd-heat-label{display:flex;align-items:baseline;gap:8px;font-size:.88em;margin-bottom:11px}.home-dashboard .hd-heat-label .hd-ff-key{width:auto}.home-dashboard .hd-heat-sub{color:var(--hd-faint);font-size:.88em}.home-dashboard .hd-heat-grid{display:flex;gap:4px}.home-dashboard .hd-heat-col{display:flex;flex-direction:column;gap:4px}.home-dashboard .hd-heat-cell{width:15px;height:15px;border-radius:3px;background:var(--hd-heat-0)}.home-dashboard .hd-heat-cell.future{visibility:hidden}.home-dashboard .hd-heat-cell.l1{background:color-mix(in srgb,var(--hd-accent) 28%,var(--hd-heat-0))}.home-dashboard .hd-heat-cell.l2{background:color-mix(in srgb,var(--hd-accent) 50%,var(--hd-heat-0))}.home-dashboard .hd-heat-cell.l3{background:color-mix(in srgb,var(--hd-accent) 75%,var(--hd-heat-0))}.home-dashboard .hd-heat-cell.l4{background:var(--hd-accent)}.home-dashboard .hd-heat-legend{display:flex;align-items:center;gap:4px;margin-top:9px;justify-content:flex-end;font-size:.7em;color:var(--hd-faint)}.home-dashboard .hd-heat-legend span{padding:0 2px}@media(max-width:1200px){.home-dashboard .hd-heat{display:none}}.home-dashboard .hd-actions{display:flex;flex-wrap:wrap;gap:15px;margin:0 10px}.home-dashboard a.hd-btn{display:inline-flex;align-items:center;padding:7px 14px;border-radius:5px;font-size:.85em;font-weight:600;text-decoration:none;color:var(--hd-dim);background:var(--hd-lift);border:1px solid var(--hd-border);transition:color .12s ease,border-color .12s ease,background .12s ease,filter .12s ease}.home-dashboard a.hd-btn:hover{color:var(--hd-fg);border-color:var(--hd-faint);background:color-mix(in srgb,var(--hd-fg) 10%,var(--hd-term-bg))}.home-dashboard a.hd-btn--primary{color:var(--hd-accent-text);background:var(--hd-accent);border-color:var(--hd-accent)}.home-dashboard a.hd-btn--primary:hover{color:var(--hd-accent-text);background:var(--hd-accent);filter:brightness(.5)}.home-dashboard .hd-grid{display:grid;grid-template-columns:repeat(6,1fr);grid-template-areas:"main1 main1 main1 main1 side1 side1" "main2 main2 main2 main2 side1 side1" "main3 main3 main3 main3 side2 side2" "main4 main4 main4 main4 side2 side2" "bottom1 bottom1 bottom1 bottom2 bottom2 bottom2";gap:20px var(--hd-gap);align-items:start;margin:6px 24px 0}.home-dashboard .hd-a-main1{grid-area:main1}.home-dashboard .hd-a-main2{grid-area:main2}.home-dashboard .hd-a-main3{grid-area:main3}.home-dashboard .hd-a-main4{grid-area:main4}.home-dashboard .hd-a-side1{grid-area:side1}.home-dashboard .hd-a-side2{grid-area:side2}.home-dashboard .hd-a-bottom1{grid-area:bottom1}.home-dashboard .hd-a-bottom2{grid-area:bottom2}.home-dashboard .hd-card{position:relative;min-width:0;background:transparent;border:1px dashed var(--hd-border);border-radius:var(--hd-radius);padding:20px 16px 14px;transition:border-color .15s ease}.home-dashboard .hd-card:hover{border-color:var(--hd-faint)}.home-dashboard .hd-card--wide{grid-column:1/-1}.home-dashboard .hd-card-title{position:absolute;top:-.85em;left:10px;display:inline-flex;align-items:center;gap:6px;font-size:.72em;font-weight:600;text-transform:lowercase;letter-spacing:.09em;color:var(--hd-dim);background:var(--hd-term-bg);padding:0 7px;margin:0;border:none}.home-dashboard .hd-card--accent{border-color:color-mix(in srgb,var(--hd-accent) 45%,var(--hd-border))}.home-dashboard .hd-card--accent .hd-card-title{color:var(--hd-accent)}.home-dashboard .hd-card--accent .hd-list li{padding:7px 0;font-size:1em}.home-dashboard .hd-card--accent .hd-kicker{display:inline-block;min-width:58px;color:var(--hd-accent);font-weight:700}.home-dashboard .hd-list{list-style:none;margin:0;padding:0}.home-dashboard .hd-list li{display:flex;align-items:baseline;gap:8px;padding:4px 0;line-height:1.4}.home-dashboard .hd-list li+li{border-top:1px dashed color-mix(in srgb,var(--hd-border) 60%,transparent)}.home-dashboard a.hd-link{color:var(--hd-fg);text-decoration:none;border-bottom:1px solid transparent;transition:color .1s ease,border-color .1s ease}.home-dashboard a.hd-link:hover{color:var(--hd-accent);border-color:var(--hd-accent)}.home-dashboard .hd-meta{color:var(--hd-faint);font-size:.76em;margin-left:auto;white-space:nowrap}.home-dashboard .hd-kicker{font-size:.72em;text-transform:lowercase;letter-spacing:.06em;color:var(--hd-faint)}.home-dashboard .hd-kicker--warn{color:var(--hd-warn)!important}.home-dashboard .hd-empty{color:var(--hd-faint);font-size:.85em;padding:4px 0}.home-dashboard .hd-badge{font-size:.68em;font-weight:700;text-transform:lowercase;letter-spacing:.05em;padding:2px 7px;border-radius:4px;margin-left:auto;white-space:nowrap}.home-dashboard .hd-badge--shelved{color:var(--hd-faint);background:color-mix(in srgb,var(--hd-faint) 14%,transparent)}.home-dashboard .hd-badge--consuming{color:var(--hd-accent);background:color-mix(in srgb,var(--hd-accent) 15%,transparent)}.home-dashboard .hd-cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.home-dashboard .hd-cal-month{font-weight:700;font-size:.88em;text-transform:lowercase;letter-spacing:.04em}.home-dashboard .hd-cal-arrow{cursor:pointer;color:var(--hd-faint);user-select:none;padding:0 9px;border-radius:4px;font-size:1.1em;line-height:1.4;transition:color .12s ease,background .12s ease}.home-dashboard .hd-cal-arrow:hover{color:var(--hd-fg);background:var(--hd-hover)}.home-dashboard .hd-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}.home-dashboard .hd-cal-dow{text-align:center;padding:2px 0 6px;font-size:.66em;font-weight:700;letter-spacing:.04em;color:var(--hd-faint);text-transform:lowercase}.home-dashboard .hd-cal-cell{position:relative;display:flex;align-items:center;justify-content:center;aspect-ratio:1;border-radius:4px;font-size:.8em;color:var(--hd-faint);text-decoration:none;transition:background .1s ease,color .1s ease}.home-dashboard .hd-cal-cell--pad{pointer-events:none}.home-dashboard a.hd-cal-cell:hover{background:var(--hd-hover);color:var(--hd-fg)}.home-dashboard a.hd-cal-cell.has-note{color:var(--hd-fg);font-weight:600}.home-dashboard .hd-cal-dot{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:9px;height:9px;border-radius:50%;background:var(--hd-accent)}.home-dashboard a.hd-cal-cell.is-today{background:var(--hd-accent);color:var(--hd-accent-text);font-weight:700}.home-dashboard a.hd-cal-cell.is-today .hd-cal-dot{background:var(--hd-accent-text)}.home-dashboard .hd-quote{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin:0 24px 24px;padding-top:14px;border-top:1px dashed var(--hd-border);font-size:.84em;font-style:normal;color:var(--hd-dim)}.home-dashboard .hd-quote-dot{color:var(--hd-warn);font-size:.8em}.home-dashboard .hd-quote-label{color:var(--hd-fg);font-weight:700}.home-dashboard .hd-quote cite{color:var(--hd-faint);font-style:normal}@media(max-width:1000px){.home-dashboard .hd-grid{grid-template-columns:1fr;grid-template-areas:none}.home-dashboard .hd-grid .hd-card{grid-area:auto}.home-dashboard .hd-card--spot .hd-player{flex-direction:row;align-items:center}.home-dashboard .hd-card--spot img.hd-player-art{width:52px;max-width:52px}.home-dashboard .hd-card--spot .hd-player-ctrls{justify-content:flex-start}}@media(max-width:500px){.home-dashboard .hd-header{margin:22px 16px 18px}.home-dashboard .hd-actions{margin:0 16px 20px}.home-dashboard .hd-grid{margin:6px 16px 0}.home-dashboard .hd-quote{margin:0 16px 20px}.home-dashboard .hd-actions a.hd-btn{flex:1 1 auto;justify-content:center}.home-dashboard .hd-ff{flex-direction:column;align-items:flex-start;gap:18px}}
+
+/*******************************************************************************
+ * MARKDOWN TABLE V2 — final late-load override
+ *******************************************************************************/
+.markdown-rendered .el-table table,.markdown-source-view.mod-cm6 .cm-table-widget table{overflow:visible;border-collapse:separate;border-spacing:0;background:var(--av-table-surface,var(--background-secondary));color:var(--av-table-text,var(--text-normal));border:1px solid var(--table-border-color,var(--av-table-border,var(--background-modifier-border)));border-radius:var(--av-table-radius,var(--lake-radius,10px));box-shadow:none;transition:none}.markdown-rendered .el-table table:hover,.markdown-source-view.mod-cm6 .cm-table-widget table:hover{border-color:var(--table-border-color,var(--av-table-border,var(--background-modifier-border)));box-shadow:none}.markdown-rendered .el-table thead,.markdown-source-view.mod-cm6 .cm-table-widget thead,.markdown-rendered .el-table thead tr,.markdown-source-view.mod-cm6 .cm-table-widget thead tr{background:transparent;border:0}.markdown-rendered .el-table th,.markdown-source-view.mod-cm6 .cm-table-widget th{background:var(--av-table-header-surface,var(--background-secondary-alt,var(--background-secondary)));color:var(--table-header-text,var(--text-normal));font-size:var(--table-header-font,.86rem);font-weight:600;line-height:1.35;letter-spacing:.01em;text-transform:none;border:0;border-bottom:1px solid var(--table-header-border-color,var(--av-table-header-divider,var(--background-modifier-border)))}.markdown-rendered .el-table :is(th,td){padding-block:var(--table-padding-y,.5rem);padding-inline:var(--table-padding-x,.75rem)}.markdown-source-view.mod-cm6 .cm-table-widget :is(th,td){padding:0}.markdown-source-view.mod-cm6 .cm-table-widget .table-cell-wrapper{padding-block:var(--table-padding-y,.5rem);padding-inline:var(--table-padding-x,.75rem)}.markdown-rendered .el-table tbody tr,.markdown-source-view.mod-cm6 .cm-table-widget tbody tr{transform:none;box-shadow:none;transition:none}.markdown-rendered .el-table tbody tr:nth-child(odd),.markdown-source-view.mod-cm6 .cm-table-widget tbody tr:nth-child(odd){background:var(--av-table-row-odd,var(--background-secondary))}.markdown-rendered .el-table tbody tr:nth-child(even),.markdown-source-view.mod-cm6 .cm-table-widget tbody tr:nth-child(even){background:var(--av-table-row-even,var(--background-secondary))}.markdown-rendered .el-table tbody tr:hover,.markdown-source-view.mod-cm6 .cm-table-widget tbody tr:hover{background:var(--av-table-row-hover,var(--background-modifier-hover));transform:none;box-shadow:none}.markdown-rendered .el-table td,.markdown-source-view.mod-cm6 .cm-table-widget td{background:transparent;color:var(--av-table-text,var(--text-normal));font-size:var(--table-font,.93rem);line-height:1.45;border:0;border-bottom:1px solid var(--table-border-color,var(--av-table-divider,var(--background-modifier-border-muted,var(--background-modifier-border))));transition:none}.markdown-rendered .el-table tbody tr:last-child td,.markdown-source-view.mod-cm6 .cm-table-widget tbody tr:last-child td{border-bottom:0}.markdown-rendered .el-table tbody td:first-child,.markdown-source-view.mod-cm6 .cm-table-widget tbody td:first-child{font-weight:inherit;color:var(--av-table-text,var(--text-normal));white-space:normal}.markdown-rendered .el-table tbody tr:hover td,.markdown-source-view.mod-cm6 .cm-table-widget tbody tr:hover td{color:var(--av-table-text,var(--text-normal))}.markdown-rendered .el-table thead tr:first-child th:first-child,.markdown-source-view.mod-cm6 .cm-table-widget thead tr:first-child th:first-child{border-start-start-radius:max(0px,calc(var(--av-table-radius,10px) - 1px))}.markdown-rendered .el-table thead tr:first-child th:last-child,.markdown-source-view.mod-cm6 .cm-table-widget thead tr:first-child th:last-child{border-start-end-radius:max(0px,calc(var(--av-table-radius,10px) - 1px))}.markdown-rendered .el-table tbody tr:last-child td:first-child,.markdown-source-view.mod-cm6 .cm-table-widget tbody tr:last-child td:first-child{border-end-start-radius:max(0px,calc(var(--av-table-radius,10px) - 1px))}.markdown-rendered .el-table tbody tr:last-child td:last-child,.markdown-source-view.mod-cm6 .cm-table-widget tbody tr:last-child td:last-child{border-end-end-radius:max(0px,calc(var(--av-table-radius,10px) - 1px))}.markdown-rendered .el-table table a,.markdown-source-view.mod-cm6 .cm-table-widget table a{color:var(--av-table-accent,var(--text-accent,var(--interactive-accent)));text-decoration:none;text-shadow:none;transition:none}.markdown-rendered .el-table table a:hover,.markdown-source-view.mod-cm6 .cm-table-widget table a:hover{color:var(--text-accent-hover,var(--av-table-accent,var(--text-accent,var(--interactive-accent))));text-shadow:none}.markdown-rendered .el-table table strong,.markdown-source-view.mod-cm6 .cm-table-widget table strong{color:var(--text-normal);font-weight:700}.markdown-rendered .el-table table code,.markdown-source-view.mod-cm6 .cm-table-widget table code{padding:.12rem .35rem;border:1px solid var(--av-table-code-border,var(--background-modifier-border-muted,var(--background-modifier-border)));border-radius:var(--radius-s,6px);background:var(--av-table-code-bg,var(--background-modifier-form-field,var(--background-secondary-alt)));color:var(--code-normal,var(--text-normal));font-size:.88em}.markdown-rendered .el-table .table-wrapper{border-radius:var(--av-table-radius,var(--lake-radius,10px));scrollbar-width:auto}.markdown-rendered .el-table .table-wrapper::-webkit-scrollbar{width:auto;height:auto}.markdown-rendered .el-table .table-wrapper::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb-bg,var(--background-modifier-border));border-radius:var(--radius-s,4px)}.markdown-rendered .el-table .table-wrapper::-webkit-scrollbar-thumb:hover{background:var(--scrollbar-active-thumb-bg,var(--background-modifier-border-hover,var(--background-modifier-border)))}.markdown-rendered .el-table .table-wrapper::-webkit-scrollbar-track{background:transparent}.markdown-rendered table.table-view-table{overflow:visible;background:transparent;color:inherit;border:0;border-radius:0;box-shadow:none;transition:none}.markdown-rendered table.table-view-table :is(thead,thead tr){background:transparent}.markdown-rendered table.table-view-table th{background:transparent;color:var(--text-normal);font-size:larger;font-weight:700;letter-spacing:normal;text-transform:none;border-top:0;border-inline:0;border-bottom:1px solid var(--background-modifier-border)}.markdown-rendered table.table-view-table tbody tr,.markdown-rendered table.table-view-table tbody tr:nth-child(odd),.markdown-rendered table.table-view-table tbody tr:nth-child(even){background:transparent;transform:none;box-shadow:none;transition:none}.markdown-rendered table.table-view-table tbody tr:hover{background:var(--table-row-background-hover,var(--background-modifier-hover));transform:none;box-shadow:none}.markdown-rendered table.table-view-table td{background:transparent;color:inherit;border:0}.markdown-rendered table.table-view-table tbody td:first-child{color:inherit;font-weight:400;white-space:normal}.markdown-rendered table.table-view-table:hover{border-color:transparent;box-shadow:none}.markdown-rendered table.table-view-table a{color:var(--link-color,var(--text-accent));text-shadow:none}@media(prefers-reduced-motion:reduce){.markdown-rendered .el-table table,.markdown-source-view.mod-cm6 .cm-table-widget table,.markdown-rendered .el-table tbody tr,.markdown-source-view.mod-cm6 .cm-table-widget tbody tr{transition:none;animation:none}}
+
+/* ========================================================================== */
+/* STYLE SETTINGS REGISTRY — intentionally last                               */
+/* ========================================================================== */
+/* @settings
+name: Abyssal Vault
+id: abyssal-vault
+settings:
+  - id: theme-palette-title
+    title: Theme Palette
+    description: Carbon Cyan palette for the Abyssal Vault dark theme. These tokens drive the Obsidian/Border semantic color bridge below, so Border updates can no longer wipe the vault palette.
+    type: heading
+    level: 1
+    collapsed: false
+  - id: cc-p00
+    title: P00 — Deepest Background
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#0a0e10'
+  - id: cc-p01
+    title: P01 — Pane Background
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#0c1113'
+  - id: cc-p02
+    title: P02 — Secondary Surface
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#10181b'
+  - id: cc-p03
+    title: P03 — Raised Surface
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#162024'
+  - id: cc-p04
+    title: P04 — Hover Surface
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#1d2a2f'
+  - id: cc-p05
+    title: P05 — Active Surface
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#26363e'
+  - id: cc-p06
+    title: P06 — Strong Border
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#30464f'
+  - id: cc-p07
+    title: P07 — Subtle UI
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#3e5965'
+  - id: cc-p08
+    title: P08 — Disabled UI
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#4e707e'
+  - id: cc-p09
+    title: P09 — Faint Text
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#5f899b'
+  - id: cc-p10
+    title: P10 — Secondary UI Text
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#7da0b0'
+  - id: cc-p11
+    title: P11 — Muted Text
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#a0bac5'
+  - id: cc-p12
+    title: P12 — Main Text
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#c6d6dc'
+  - id: cc-p13
+    title: P13 — Strongest Text
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#e6edef'
+  - id: cc-accent-heading
+    title: Accent
+    type: heading
+    level: 2
+    collapsed: false
+  - id: cc-accent
+    title: Cyan Accent
+    type: variable-color
+    format: hex
+    opacity: false
+    default: '#a0cddf'
+
+  - id: startup-progress-title
+    title: Startup Progress Bar
+    type: heading
+    level: 1
+    collapsed: true
+  - id: startup-progress-style
+    title: Loading Animation Style
+    description: Choose the startup loading animation
+    type: class-select
+    allowEmpty: false
+    default: pb-loader-default
+    options:
+      - label: Default
+        value: pb-loader-default
+      - label: Dots
+        value: pb-loader-dots
+      - label: Animated Face
+        value: pb-loader-face
+      - label: Retro Cassette
+        value: pb-loader-cassette
+      - label: Loading Letters
+        value: pb-loader-letters
+
+  - id: geometry-title
+    title: Geometry
+    description: Non-color geometry shared by the custom snippets. Theme colors are controlled by Theme Palette.
+    type: heading
+    level: 1
+    collapsed: true
+  - id: callout-corner-radius
+    title: Callout Corner Radius
+    description: Corner radius for Quote/Info/math callouts
+    type: variable-number-slider
+    default: 12
+    min: 0
+    max: 24
+    step: 1
+    format: px
+  - id: lake-radius
+    title: Markdown Table / General Corner Radius
+    type: variable-number-slider
+    default: 12
+    min: 0
+    max: 24
+    step: 1
+    format: px
+  - id: bases-radius
+    title: Bases View Corner Radius
+    type: variable-number-slider
+    default: 12
+    min: 0
+    max: 24
+    step: 1
+    format: px
+
+  - id: column-layout-title
+    title: Column & List Layout
+    description: Multi-column callouts, floating callouts, list columns and list cards. Colors inherit the Abyssal Theme Palette.
+    type: heading
+    level: 1
+    collapsed: true
+  - id: multi-column-title
+    title: Multi Column Callout Settings
+    type: heading
+    level: 2
+    collapsed: true
+  - id: mc-callout-general-title
+    title: MCC -- General
+    type: heading
+    level: 3
+    collapsed: false
+  - id: mcc-img-snw-display
+    title: Hide SNW indicator for images in MC Callout
+    type: variable-select
+    default: none
+    options:
+      - label: Show
+        value: inline
+      - label: Hide
+        value: none
+  - id: mc-callout-width-title
+    title: MCC -- Width
+    type: heading
+    level: 3
+    collapsed: false
+  - id: callout-min-width
+    title: Minimum Sub-Callout Width
+    description: for sub-callout in [!multi-column]. in px units
+    type: variable-number-slider
+    default: 200
+    min: 100
+    max: 500
+    step: 50
+    format: px
+  - id: callout-nowrap-min-width
+    title: Minimum NO-WRAP Sub-Callout Width
+    description: for sub-callout in [!multi-column|no-wrap]. in px units
+    type: variable-number-slider
+    default: 250
+    min: 100
+    max: 500
+    step: 50
+    format: px
+  - id: mc-callout-gap-title
+    title: MCC -- Gap & Margin
+    type: heading
+    level: 3
+    collapsed: false
+  - id: callout-gap
+    title: Sub-Callout Gap (any unit)
+    description: NO spacing between figure and unit
+    type: variable-text
+    default: 1em
+  - id: callout-margin
+    title: Sub-Callout Margin (any unit)
+    description: to allow some spacing for box-shadow
+    type: variable-text
+    default: 0px
+
+  - id: float-callout-title
+    title: Float Callout Settings
+    type: heading
+    level: 2
+    collapsed: true
+  - id: float-callout-general-title
+    title: FC -- General
+    type: heading
+    level: 3
+    collapsed: false
+  - id: float-callout-snw-display
+    title: Hide SNW indicator in Callout Float / Aside
+    type: variable-select
+    default: none
+    options:
+      - label: Show
+        value: inline-block
+      - label: Hide
+        value: none
+  - id: float-width-title
+    title: FC -- Width
+    type: heading
+    level: 3
+    collapsed: false
+  - id: float-small-width
+    title: Floating Callout Width - Small (in px)
+    type: variable-number-slider
+    default: 300
+    min: 200
+    max: 450
+    step: 50
+    format: px
+  - id: float-medium-width
+    title: Floating Callout Width - Medium (in px)
+    type: variable-number-slider
+    default: 400
+    min: 300
+    max: 550
+    step: 50
+    format: px
+  - id: float-large-width
+    title: Floating Callout Width - Large (in px)
+    type: variable-number-slider
+    default: 600
+    min: 500
+    max: 750
+    step: 50
+    format: px
+  - id: float-gap-title
+    title: FC -- Gap & Margin
+    type: heading
+    level: 3
+    collapsed: false
+  - id: float-callout-top-margin
+    title: Adjust top margin for Float Left and Float Right
+    description: Can use em or px unit
+    type: variable-text
+    default: 0em
+  - id: float-left-callout-margin-inline
+    title: Adjust left-right margin for Float Left Callout
+    description: Enter in this order - "left right". Can use em or px unit
+    type: variable-text
+    default: 0px 12px
+  - id: float-right-callout-margin-inline
+    title: Adjust left-right margin for Float Right Callout
+    description: Enter in this order - "left right". Can use em or px unit
+    type: variable-text
+    default: 12px 0px
+
+  - id: mc-list-column-title
+    title: List Column
+    description: using `{.xxx-column-list-xxx}` and `#mcl/list-column`
+    type: heading
+    level: 2
+    collapsed: true
+  - id: list-column-width-title
+    title: Width control for List Column
+    type: heading
+    level: 3
+    collapsed: false
+  - id: list-min-width
+    title: Minimum Column Width (in px)
+    type: variable-number-slider
+    default: 200
+    min: 100
+    max: 500
+    step: 50
+    format: px
+  - id: list-column-deco-title
+    title: Decoratives control for List Column
+    type: heading
+    level: 3
+    collapsed: false
+  - id: col-rule-width
+    title: Ruler (vertical line between columns) width for List Column
+    description: in px unit. Set to 0 to disable ruler
+    type: variable-number-slider
+    default: 1
+    min: 0
+    max: 4
+    step: 1
+    format: px
+
+  - id: mc-list-grid-title
+    title: List Grid and List Card
+    description: using `#mcl/list-grid` and `#mcl/list-card`
+    type: heading
+    level: 2
+    collapsed: true
+  - id: list-grid-card-width-title
+    title: Width control for List Grid and List Card
+    type: heading
+    level: 3
+    collapsed: false
+  - id: list-grid-min-width
+    title: Minimum width for normal List Grid/Card
+    description: For `#mcl-list-grid` or `#mcl-list-card`. Can use em or px unit
+    type: variable-text
+    default: 250px
+  - id: list-grid-wide-min-width
+    title: Minimum width for Wide List Grid/Card
+    description: For `#mcl/list-grid-wide` or `#mcl/list-card-wide`. Can use em or px unit
+    type: variable-text
+    default: 350px
+  - id: list-card-deco-title
+    title: Decoratives control for List Card
+    type: heading
+    level: 3
+    collapsed: false
+  - id: mcl-card-header-border-width
+    title: Bottom border for first header in List Card
+    description: Can use em or px unit. Set to 0 to disable the border
+    type: variable-text
+    default: 1px
+  - id: mcl-card-gap
+    title: Gap between cards for List Card
+    description: Can use em or px unit
+    type: variable-text
+    default: 0.2em
+  - id: mcl-card-border-width
+    title: Border width for each card in List Card
+    description: Can use em or px unit. Set to 0 to disable the border
+    type: variable-text
+    default: 1px
+
+  - id: gradient-callout-title
+    title: Gradient Callout Settings
+    description: Gradient colors inherit the Abyssal Theme Palette; only typography and geometry are configurable here.
+    type: heading
+    level: 2
+    collapsed: true
+  - id: callout-font
+    title: Callout Text Font
+    description: Font used for content in the callout
+    type: variable-text
+    default: 'Sans-serif'
+  - id: callout-title-font-family
+    title: Callout Title Font
+    description: Font used for the title of the callouts
+    type: variable-text
+    default: 'Sans-serif'
+  - id: callout-font-size
+    title: Callout Text Size
+    type: variable-number
+    description: Callout content size in pt
+    default: 10
+    format: pt
+  - id: callout-title-font-size
+    title: Callout Title Size
+    description: Callout title size in pt
+    type: variable-number
+    default: 12
+    format: pt
+  - id: callout-opacity-dim
+    title: Callout Opacity Dimness
+    description: Sets transparency of surrounding callouts when hovering
+    type: variable-number-slider
+    default: 0.3
+    min: 0
+    max: 1
+    step: 0.05
+  - id: callout-title-font-weight
+    title: Callout Title Font Weight
+    description: How bold the title appears
+    type: variable-number-slider
+    default: 700
+    min: 0
+    max: 1000
+    step: 100
+  - id: border-radius
+    title: Callout Radius
+    description: Adjust the radius of the callout
+    type: variable-number
+    default: 10
+    format: px
+
+  - id: image-settings-title
+    title: Image Settings
+    type: heading
+    level: 3
+    collapsed: true
+  - id: image-height
+    title: Image Height
+    description: Callout image height in px
+    type: variable-number
+    default: 75
+    format: px
+  - id: image-width
+    title: Image Width
+    description: Callout image width in px
+    type: variable-number
+    default: 75
+    format: px
+
+  - id: gradient-headers-title
+    title: Gradient Headers
+    type: heading
+    level: 2
+    collapsed: true
+  - id: header-font-family
+    title: Header Font Type
+    description: Font used for text in the header
+    type: variable-text
+    default: 'Trebuchet MS'
+  - id: header-font-size
+    title: Header Font Size
+    type: variable-number
+    default: 22
+    format: pt
+  - id: header-font-weight
+    title: Callout Title Font Weight
+    description: How bold the header appears
+    type: variable-number-slider
+    default: 100
+    min: 0
+    max: 1000
+    step: 100
+  - id: gradient-header-location
+    title: Center Heading
+    description: Moves your headings to the center when toggled
+    type: class-toggle
+  - id: border-settings-title
+    title: Border Settings
+    type: heading
+    level: 3
+    collapsed: true
+  - id: gradient-border
+    title: Enable Borders
+    description: Enables heading borders
+    type: class-toggle
+  - id: header-gradient-border-size
+    title: Border Size
+    type: variable-number
+    default: 2
+    format: px
+  - id: header-gradient-border-radius
+    title: Border Radius
+    type: variable-number
+    default: 10
+    format: px
+*/

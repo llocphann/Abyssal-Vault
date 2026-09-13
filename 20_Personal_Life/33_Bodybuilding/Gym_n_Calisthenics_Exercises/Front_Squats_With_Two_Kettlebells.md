@@ -1,0 +1,25 @@
+---
+id: Front_Squats_With_Two_Kettlebells
+name: Front Squats With Two Kettlebells
+level: intermediate
+force: push
+mechanic: compound
+equipment: kettlebells
+category: strength
+primaryMuscles:
+  - quadriceps
+secondaryMuscles:
+  - calves
+  - glutes
+tags:
+  - calisthenics
+preview: "[[Front_Squats_With_Two_Kettlebells-preview.webp]]"
+animation: "[[Front_Squats_With_Two_Kettlebells.gif]]"
+images:
+  - "[[Front_Squats_With_Two_Kettlebells.gif]]"
+---
+
+## How to Perform
+1. Clean two kettlebells to your shoulders. Clean the kettlebells to your shoulders by extending through the legs and hips as you pull the kettlebells towards your shoulders. Rotate your wrists as you do so.
+2. Looking straight ahead at all times, squat as low as you can and pause at the bottom. As you squat down, push your knees out. You should squat between your legs, keeping an upright torso, with your head and chest up.
+3. Rise back up by driving through your heels and repeat.

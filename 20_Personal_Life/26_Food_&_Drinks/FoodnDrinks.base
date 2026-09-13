@@ -1,0 +1,71 @@
+filters:
+  and:
+    - categories.containsAny(link("Recipes"))
+formulas:
+  total_time: if(prep_time, prep_time, 0) + if(cook_time, cook_time, 0)
+  recipe_art: if(recipe_illustration, html("<span class='rc-art' data-art='{art}' aria-hidden='true'></span>".replace("{art}", escapeHTML(recipe_illustration.toString()))), null)
+  packed_recipe: |-
+    html(("<div class='rc-card-body'>" + "<div class='rc-ribbon' data-category='{category_attr}'><span class='rc-icon rc-icon-category' aria-hidden='true'></span><span>{category_label}</span></div>" + "<div class='rc-favorite' data-active='{favorite}' aria-hidden='true'><span class='rc-icon rc-icon-heart'></span></div>" + "<div class='rc-time'><span class='rc-icon rc-icon-clock' aria-hidden='true'></span><span>{time}</span></div>" + "<h3 class='rc-title' data-length='{title_length}'>{title}</h3>" + "<p class='rc-tagline'>{tagline}</p>" + "<div class='rc-flourish' aria-hidden='true'><span class='rc-icon rc-icon-flourish'></span></div>" + "<footer class='rc-footer'>" + "<span class='rc-stat rc-servings' data-servings='{servings_count}'><span class='rc-icon rc-icon-servings' aria-hidden='true'></span><span>{servings}</span></span>" + "<span class='rc-stat rc-difficulty' data-difficulty='{difficulty_attr}'><span class='rc-icon rc-icon-difficulty' aria-hidden='true'></span><span>{difficulty}</span></span>" + "<span class='rc-bookmark' data-active='{bookmarked}' aria-hidden='true'><span class='rc-icon rc-icon-bookmark'></span></span>" + "</footer>" + "</div>" + "<article class='rc-back' aria-label='Ingredients'>" + "<header class='rc-back-header'><span class='rc-back-icon' aria-hidden='true'></span><h3>Ingredients</h3></header>" + "<div class='rc-ingredients-viewport'>" + "<ul class='rc-ingredients-list' style='--rc-ingredients-scroll-duration:{scroll_duration}s'>{ingredients}</ul>" + "</div>" + "</article>").replace("{category_attr}", escapeHTML(if(recipe_category, recipe_category.toString(), "Recipe"))).replace("{category_label}", escapeHTML(if(recipe_category, recipe_category.toString(), "Recipe"))).replace("{favorite}", if(favorite, "true", "false")).replace("{time}", escapeHTML(if(formula.total_time > 0, formula.total_time.toString() + " min", "Flexible"))).replace("{title}", escapeHTML(file.basename.toString())).replace("{title_length}", if(file.basename.toString().length > 38, "long", if(file.basename.toString().length > 25, "medium", "short"))).replace("{tagline}", escapeHTML(if(tagline, tagline.toString(), if(description, description.toString(), "Made with care")))).replace("{servings}", escapeHTML(if(servings, servings.toString(), "—"))).replace("{servings_count}", if(servings, if(servings >= 7, "7", if(servings >= 6, "6", if(servings >= 5, "5", if(servings >= 4, "4", if(servings >= 3, "3", if(servings >= 2, "2", "1")))))), "1")).replace("{difficulty}", escapeHTML(if(difficulty, difficulty.toString(), "Unrated"))).replace("{difficulty_attr}", escapeHTML(if(difficulty, difficulty.toString(), "Unrated"))).replace("{bookmarked}", if(bookmarked, "true", "false")).replace("{scroll_duration}", if(ingredients, max(18, (ingredients.toString().length / 11).ceil()).toString(), "18")).replace("{ingredients}", if(ingredients, list(ingredients).map("<li>" + escapeHTML(value.toString()) + "</li>").join(""), "<li class='is-empty'>No ingredients recorded yet.</li>"))
+    )
+properties:
+  recipe_category:
+    displayName: Category
+  prep_time:
+    displayName: Prep time
+  cook_time:
+    displayName: Cook time
+  pairs_well_with:
+    displayName: Pairs well with
+  recipe_illustration:
+    displayName: Card illustration
+  recipe_provider:
+    displayName: Recipe provider
+  provider_recipe_id:
+    displayName: Provider recipe ID
+  spoonacular_id:
+    displayName: Spoonacular ID
+  themealdb_id:
+    displayName: TheMealDB ID
+  source_name:
+    displayName: Source
+  source_url:
+    displayName: Source URL
+views:
+  - type: cards
+    name: Recipes
+    order:
+      - formula.packed_recipe
+      - formula.recipe_art
+    image: note.cover
+    imageAspectRatio: 1.35
+    cardSize: 270
+  - type: table
+    name: Edit Data
+    order:
+      - file.name
+      - cover
+      - recipe_illustration
+      - recipe_category
+      - cuisine
+      - tagline
+      - description
+      - servings
+      - prep_time
+      - cook_time
+      - formula.total_time
+      - difficulty
+      - favorite
+      - bookmarked
+      - ingredients
+      - instructions
+      - tips
+      - pairs_well_with
+      - recipe_provider
+      - provider_recipe_id
+      - spoonacular_id
+      - themealdb_id
+      - source_name
+      - source_url
+      - via
+      - created
+      - last

@@ -1,0 +1,22 @@
+filters:
+  and:
+    - file.path == this.file.path
+formulas:
+  marker_icon: if(place_type == "restaurant", "utensils", if(place_type == "cafe", "coffee", if(place_type == "bar", "wine", if(place_type == "tourist", "landmark", "map-pin"))))
+  marker_color: if(place_type == "restaurant", "#d97706", if(place_type == "cafe", "#8b5e3c", if(place_type == "bar", "#7c3aed", if(place_type == "tourist", "#2563eb", "#64748b"))))
+views:
+  - type: map
+    name: Local
+    order:
+      - file.name
+    coordinates: note.coordinates
+    markerIcon: formula.marker_icon
+    markerColor: formula.marker_color
+    defaultZoom: 14
+    minZoom: 3
+    maxZoom: 19
+    mapHeight: 240
+    mapTiles:
+      - https://raw.githubusercontent.com/llocphann/Veil/map-style-host/assets/map-styles/abyssal.json
+    mapTilesDark:
+      - https://raw.githubusercontent.com/llocphann/Veil/map-style-host/assets/map-styles/abyssal.json

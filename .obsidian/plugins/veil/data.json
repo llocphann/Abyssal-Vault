@@ -1,0 +1,38 @@
+{
+  "enabled": true,
+  "wallpaperPath": "90_System/95_Media_Assets/Dashboard/Banner.webp",
+  "wallpaperPoolEnabled": false,
+  "wallpaperPoolIncludeSubfolders": false,
+  "displayMode": "cover",
+  "wallpaperPositionX": 50,
+  "wallpaperPositionY": 50,
+  "wallpaperZoom": 100,
+  "transitionDuration": 320,
+  "opacity": 15,
+  "paneOpacity": 100,
+  "paneContentOpacity": 75,
+  "vignetteMode": "ellipse",
+  "vignetteIntensity": 100,
+  "vignetteRadius": 55,
+  "blurEnabled": false,
+  "blurIntensity": 8,
+  "dimEnabled": false,
+  "dimIntensity": 30,
+  "colorOverlayEnabled": false,
+  "colorOverlayColor": "#7dd3fc",
+  "colorOverlayOpacity": 30,
+  "colorOverlayBlendMode": "color",
+  "effectPreset": "none",
+  "effectIntensity": 35,
+  "pauseWhenHidden": true,
+  "respectReducedMotion": true,
+  "profiles": [],
+  "wallpaperRules": [],
+  "opacityExclusions": [],
+  "wallpaperLibrary": {
+    "favorites": [],
+    "recent": [
+      "90_System/95_Media_Assets/Dashboard/Banner.webp"
+    ]
+  }
+}

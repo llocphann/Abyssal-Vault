@@ -1,0 +1,1095 @@
+.ledge-dock-root {
+  --ledge-item-size: 44px;
+  --ledge-icon-size: 30px;
+  --ledge-current-icon-size: var(--ledge-icon-size);
+  --ledge-gap: 7px;
+  --ledge-padding: 8px;
+  --ledge-radius: 18px;
+  --ledge-trigger-size: 14px;
+  --ledge-trigger-area-opacity: 100%;
+  --ledge-trigger-area-angle: 145deg;
+  --ledge-trigger-area-radius: 0;
+  --ledge-trigger-area-border-width: 1px;
+  --ledge-trigger-area-start: var(--background-primary);
+  --ledge-trigger-area-end: var(--background-primary);
+  --ledge-trigger-area-border-color: var(--background-modifier-border-hover);
+  --ledge-trigger-surface-thickness: 5px;
+  --ledge-trigger-opacity: 72%;
+  --ledge-trigger-angle: 145deg;
+  --ledge-trigger-radius: 12px;
+  --ledge-trigger-border-width: 1px;
+  --ledge-trigger-start: var(--interactive-accent);
+  --ledge-trigger-end: var(--background-secondary);
+  --ledge-trigger-border-color: var(--background-modifier-border-hover);
+  --ledge-motion-duration: 220ms;
+  --ledge-magnification: 1.35;
+  --ledge-neighbor-scale: 1.14;
+  --ledge-surface-opacity: 88%;
+  --ledge-gradient-angle: 145deg;
+  --ledge-surface-start: var(--background-secondary);
+  --ledge-surface-end: var(--background-primary-alt);
+  --ledge-border-color: var(--background-modifier-border-hover);
+  --ledge-accent: var(--interactive-accent);
+  --ledge-nudge-x: 0;
+  --ledge-nudge-y: 0;
+
+  position: fixed;
+  z-index: var(--layer-popover);
+  inset: 0;
+  color: var(--text-normal);
+  font-family: var(--font-interface);
+  pointer-events: none;
+}
+
+.ledge-dock-root[hidden] {
+  display: none;
+}
+
+.ledge-dock-root,
+.ledge-dock-root *,
+.ledge-dock-root *::before,
+.ledge-dock-root *::after {
+  box-sizing: border-box;
+}
+
+.ledge-dock-root .ledge-dock-trigger {
+  position: fixed;
+  z-index: 1;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  border: var(--ledge-trigger-area-border-width) solid
+    color-mix(in srgb, var(--ledge-trigger-area-border-color) 82%, transparent);
+  border-radius: var(--ledge-trigger-area-radius);
+  background:
+    linear-gradient(
+      var(--ledge-trigger-area-angle),
+      color-mix(
+        in srgb,
+        var(--ledge-trigger-area-start) var(--ledge-trigger-area-opacity),
+        transparent
+      ),
+      color-mix(
+        in srgb,
+        var(--ledge-trigger-area-end) var(--ledge-trigger-area-opacity),
+        transparent
+      )
+    );
+  box-shadow: none;
+  color: inherit;
+  font: inherit;
+  pointer-events: auto;
+}
+
+/* stylelint-disable no-descending-specificity -- stateful corner trigger pseudo-elements intentionally share geometry */
+.ledge-dock-trigger::before,
+.ledge-dock-root[data-position*="-"] .ledge-dock-trigger::after {
+  content: "";
+  position: absolute;
+  border: var(--ledge-trigger-border-width) solid
+    color-mix(in srgb, var(--ledge-trigger-border-color) 82%, transparent);
+  background:
+    linear-gradient(
+      var(--ledge-trigger-angle),
+      color-mix(in srgb, var(--ledge-trigger-start) var(--ledge-trigger-opacity), transparent),
+      color-mix(in srgb, var(--ledge-trigger-end) var(--ledge-trigger-opacity), transparent)
+    );
+  box-shadow:
+    inset 0 1px color-mix(in srgb, var(--text-normal) 9%, transparent),
+    0 5px 18px color-mix(in srgb, var(--background-primary) 54%, transparent);
+  backdrop-filter: blur(10px) saturate(1.08);
+  opacity: .72;
+  transition:
+    filter var(--ledge-motion-duration) ease,
+    box-shadow var(--ledge-motion-duration) ease,
+    opacity var(--ledge-motion-duration) ease;
+}
+
+.ledge-dock-trigger:focus-visible {
+  outline: 2px solid var(--ledge-accent);
+  outline-offset: -2px;
+}
+
+.ledge-dock-root.is-trigger-area-background-hidden .ledge-dock-trigger {
+  background: transparent;
+}
+
+.ledge-dock-root.is-trigger-area-border-hidden .ledge-dock-trigger {
+  border-color: transparent;
+}
+
+.ledge-dock-root.is-trigger-hidden .ledge-dock-trigger::before,
+.ledge-dock-root.is-trigger-hidden[data-position*="-"] .ledge-dock-trigger::after {
+  opacity: 0;
+}
+
+.ledge-dock-root.is-trigger-background-hidden .ledge-dock-trigger::before,
+.ledge-dock-root.is-trigger-background-hidden[data-position*="-"] .ledge-dock-trigger::after {
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.ledge-dock-root.is-trigger-border-hidden .ledge-dock-trigger::before,
+.ledge-dock-root.is-trigger-border-hidden[data-position*="-"] .ledge-dock-trigger::after {
+  border-color: transparent;
+}
+
+.ledge-dock-root[data-position="left"] .ledge-dock-trigger::before,
+.ledge-dock-root[data-position="right"] .ledge-dock-trigger::before {
+  top: 10%;
+  bottom: 10%;
+  width: min(100%, var(--ledge-trigger-surface-thickness));
+}
+
+.ledge-dock-root[data-position="left"] .ledge-dock-trigger::before {
+  left: 0;
+  border-left: 0;
+  border-radius: 0 var(--ledge-trigger-radius) var(--ledge-trigger-radius) 0;
+}
+
+.ledge-dock-root[data-position="right"] .ledge-dock-trigger::before {
+  right: 0;
+  border-right: 0;
+  border-radius: var(--ledge-trigger-radius) 0 0 var(--ledge-trigger-radius);
+}
+
+.ledge-dock-root[data-position="top"] .ledge-dock-trigger::before,
+.ledge-dock-root[data-position="bottom"] .ledge-dock-trigger::before {
+  right: 10%;
+  left: 10%;
+  height: min(100%, var(--ledge-trigger-surface-thickness));
+}
+
+.ledge-dock-root[data-position="top"] .ledge-dock-trigger::before {
+  top: 0;
+  border-top: 0;
+  border-radius: 0 0 var(--ledge-trigger-radius) var(--ledge-trigger-radius);
+}
+
+.ledge-dock-root[data-position="bottom"] .ledge-dock-trigger::before {
+  bottom: 0;
+  border-bottom: 0;
+  border-radius: var(--ledge-trigger-radius) var(--ledge-trigger-radius) 0 0;
+}
+
+.ledge-dock-root[data-position*="-"] .ledge-dock-trigger {
+  --ledge-corner-arm-length: 72%;
+  --ledge-corner-mask-thickness: min(100%, var(--ledge-trigger-surface-thickness));
+}
+
+.ledge-dock-root[data-position*="-"] .ledge-dock-trigger::before {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background:
+    linear-gradient(
+      var(--ledge-trigger-angle),
+      color-mix(in srgb, var(--ledge-trigger-start) var(--ledge-trigger-opacity), transparent),
+      color-mix(in srgb, var(--ledge-trigger-end) var(--ledge-trigger-opacity), transparent)
+    );
+  box-shadow: none;
+  filter:
+    drop-shadow(
+      var(--ledge-trigger-border-width) 0 0
+      color-mix(in srgb, var(--ledge-trigger-border-color) 82%, transparent)
+    )
+    drop-shadow(
+      calc(0px - var(--ledge-trigger-border-width)) 0 0
+      color-mix(in srgb, var(--ledge-trigger-border-color) 82%, transparent)
+    )
+    drop-shadow(
+      0 var(--ledge-trigger-border-width) 0
+      color-mix(in srgb, var(--ledge-trigger-border-color) 82%, transparent)
+    )
+    drop-shadow(
+      0 calc(0px - var(--ledge-trigger-border-width)) 0
+      color-mix(in srgb, var(--ledge-trigger-border-color) 82%, transparent)
+    )
+    drop-shadow(0 5px 9px color-mix(in srgb, var(--background-primary) 54%, transparent));
+  mask-repeat: no-repeat;
+}
+
+.ledge-dock-root[data-position*="-"] .ledge-dock-trigger::after {
+  content: none;
+}
+
+.ledge-dock-root[data-position="top-left"] .ledge-dock-trigger::before {
+  mask:
+    linear-gradient(#000 0 0)
+      left 0 top 0 /
+      calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness) / 2)
+      var(--ledge-corner-mask-thickness) no-repeat,
+    radial-gradient(circle, #000 98%, transparent 100%)
+      left calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness)) top 0 /
+      var(--ledge-corner-mask-thickness) var(--ledge-corner-mask-thickness) no-repeat,
+    linear-gradient(#000 0 0)
+      left 0 top 0 /
+      var(--ledge-corner-mask-thickness)
+      calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness) / 2) no-repeat,
+    radial-gradient(circle, #000 98%, transparent 100%)
+      left 0 top calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness)) /
+      var(--ledge-corner-mask-thickness) var(--ledge-corner-mask-thickness) no-repeat;
+}
+
+.ledge-dock-root[data-position="top-right"] .ledge-dock-trigger::before {
+  mask:
+    linear-gradient(#000 0 0)
+      right 0 top 0 /
+      calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness) / 2)
+      var(--ledge-corner-mask-thickness) no-repeat,
+    radial-gradient(circle, #000 98%, transparent 100%)
+      right calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness)) top 0 /
+      var(--ledge-corner-mask-thickness) var(--ledge-corner-mask-thickness) no-repeat,
+    linear-gradient(#000 0 0)
+      right 0 top 0 /
+      var(--ledge-corner-mask-thickness)
+      calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness) / 2) no-repeat,
+    radial-gradient(circle, #000 98%, transparent 100%)
+      right 0 top calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness)) /
+      var(--ledge-corner-mask-thickness) var(--ledge-corner-mask-thickness) no-repeat;
+}
+
+.ledge-dock-root[data-position="bottom-left"] .ledge-dock-trigger::before {
+  mask:
+    linear-gradient(#000 0 0)
+      left 0 bottom 0 /
+      calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness) / 2)
+      var(--ledge-corner-mask-thickness) no-repeat,
+    radial-gradient(circle, #000 98%, transparent 100%)
+      left calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness)) bottom 0 /
+      var(--ledge-corner-mask-thickness) var(--ledge-corner-mask-thickness) no-repeat,
+    linear-gradient(#000 0 0)
+      left 0 bottom 0 /
+      var(--ledge-corner-mask-thickness)
+      calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness) / 2) no-repeat,
+    radial-gradient(circle, #000 98%, transparent 100%)
+      left 0 bottom calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness)) /
+      var(--ledge-corner-mask-thickness) var(--ledge-corner-mask-thickness) no-repeat;
+}
+
+.ledge-dock-root[data-position="bottom-right"] .ledge-dock-trigger::before {
+  mask:
+    linear-gradient(#000 0 0)
+      right 0 bottom 0 /
+      calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness) / 2)
+      var(--ledge-corner-mask-thickness) no-repeat,
+    radial-gradient(circle, #000 98%, transparent 100%)
+      right calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness)) bottom 0 /
+      var(--ledge-corner-mask-thickness) var(--ledge-corner-mask-thickness) no-repeat,
+    linear-gradient(#000 0 0)
+      right 0 bottom 0 /
+      var(--ledge-corner-mask-thickness)
+      calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness) / 2) no-repeat,
+    radial-gradient(circle, #000 98%, transparent 100%)
+      right 0 bottom calc(var(--ledge-corner-arm-length) - var(--ledge-corner-mask-thickness)) /
+      var(--ledge-corner-mask-thickness) var(--ledge-corner-mask-thickness) no-repeat;
+}
+
+.ledge-dock-root.is-trigger-background-hidden[data-position*="-"] .ledge-dock-trigger::before {
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.ledge-dock-root.is-trigger-border-hidden[data-position*="-"] .ledge-dock-trigger::before {
+  filter: drop-shadow(0 5px 9px color-mix(in srgb, var(--background-primary) 54%, transparent));
+}
+
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position*="-"]
+  .ledge-dock-trigger::before,
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position*="-"]
+  .ledge-dock-trigger::after {
+  content: "";
+  border: var(--ledge-trigger-border-width) solid
+    color-mix(in srgb, var(--ledge-trigger-border-color) 82%, transparent);
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+  backdrop-filter: none;
+  mask: none;
+}
+
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position*="-"]
+  .ledge-dock-trigger::before {
+  inset: auto;
+  width: 72%;
+  height: min(100%, var(--ledge-trigger-surface-thickness));
+  border-radius: var(--ledge-trigger-radius);
+}
+
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position*="-"]
+  .ledge-dock-trigger::after {
+  width: min(100%, var(--ledge-trigger-surface-thickness));
+  height: 72%;
+  border-radius: var(--ledge-trigger-radius);
+}
+
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position="top-left"]
+  .ledge-dock-trigger::before,
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position="top-left"]
+  .ledge-dock-trigger::after {
+  top: 0;
+  left: 0;
+}
+
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position="top-right"]
+  .ledge-dock-trigger::before,
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position="top-right"]
+  .ledge-dock-trigger::after {
+  top: 0;
+  right: 0;
+}
+
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position="bottom-left"]
+  .ledge-dock-trigger::before,
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position="bottom-left"]
+  .ledge-dock-trigger::after {
+  bottom: 0;
+  left: 0;
+}
+
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position="bottom-right"]
+  .ledge-dock-trigger::before,
+.ledge-dock-root.is-trigger-background-hidden:not(.is-trigger-border-hidden)[data-position="bottom-right"]
+  .ledge-dock-trigger::after {
+  right: 0;
+  bottom: 0;
+}
+
+.ledge-dock-trigger:hover::before,
+.ledge-dock-trigger:focus-visible::before,
+.ledge-dock-trigger.is-visible::before,
+.ledge-dock-root[data-position*="-"] .ledge-dock-trigger:hover::after,
+.ledge-dock-root[data-position*="-"] .ledge-dock-trigger:focus-visible::after,
+.ledge-dock-root[data-position*="-"] .ledge-dock-trigger.is-visible::after {
+  filter: brightness(1.14);
+  opacity: 1;
+  box-shadow:
+    inset 0 1px color-mix(in srgb, var(--text-normal) 13%, transparent),
+    0 7px 22px color-mix(in srgb, var(--ledge-accent) 24%, transparent);
+}
+
+.ledge-dock-root[data-position*="-"] .ledge-dock-trigger:hover::before,
+.ledge-dock-root[data-position*="-"] .ledge-dock-trigger:focus-visible::before,
+.ledge-dock-root[data-position*="-"] .ledge-dock-trigger.is-visible::before {
+  filter:
+    brightness(1.14)
+    drop-shadow(
+      var(--ledge-trigger-border-width) 0 0
+      color-mix(in srgb, var(--ledge-trigger-border-color) 82%, transparent)
+    )
+    drop-shadow(
+      calc(0px - var(--ledge-trigger-border-width)) 0 0
+      color-mix(in srgb, var(--ledge-trigger-border-color) 82%, transparent)
+    )
+    drop-shadow(
+      0 var(--ledge-trigger-border-width) 0
+      color-mix(in srgb, var(--ledge-trigger-border-color) 82%, transparent)
+    )
+    drop-shadow(
+      0 calc(0px - var(--ledge-trigger-border-width)) 0
+      color-mix(in srgb, var(--ledge-trigger-border-color) 82%, transparent)
+    )
+    drop-shadow(0 7px 11px color-mix(in srgb, var(--ledge-accent) 24%, transparent));
+  box-shadow: none;
+}
+
+.ledge-dock-root.is-trigger-border-hidden[data-position*="-"] .ledge-dock-trigger:hover::before,
+.ledge-dock-root.is-trigger-border-hidden[data-position*="-"] .ledge-dock-trigger:focus-visible::before,
+.ledge-dock-root.is-trigger-border-hidden[data-position*="-"] .ledge-dock-trigger.is-visible::before {
+  filter:
+    brightness(1.14)
+    drop-shadow(0 7px 11px color-mix(in srgb, var(--ledge-accent) 24%, transparent));
+}
+/* stylelint-enable no-descending-specificity */
+
+.ledge-dock-panel {
+  --ledge-arm-thickness: calc(var(--ledge-item-size) + var(--ledge-padding) * 2);
+
+  position: fixed;
+  z-index: 2;
+  isolation: isolate;
+  width: max-content;
+  height: max-content;
+  display: flex;
+  gap: var(--ledge-gap);
+  padding: var(--ledge-padding);
+  border: 1px solid color-mix(in srgb, var(--ledge-border-color) 82%, transparent);
+  border-radius: var(--ledge-radius);
+  background:
+    linear-gradient(
+      var(--ledge-gradient-angle),
+      color-mix(in srgb, var(--ledge-surface-start) var(--ledge-surface-opacity), transparent),
+      color-mix(in srgb, var(--ledge-surface-end) var(--ledge-surface-opacity), transparent)
+    );
+  box-shadow: 0 18px 46px color-mix(in srgb, var(--background-primary) 68%, transparent);
+  backdrop-filter: blur(18px) saturate(1.12);
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: center;
+  transition:
+    opacity var(--ledge-motion-duration) ease,
+    transform var(--ledge-motion-duration) cubic-bezier(.2, .8, .2, 1);
+  user-select: none;
+}
+
+.ledge-dock-panel.is-vertical {
+  flex-direction: column;
+}
+
+.ledge-dock-panel.is-horizontal {
+  flex-direction: row;
+}
+
+.ledge-dock-panel.is-corner {
+  display: grid;
+  grid-template-columns: repeat(var(--ledge-corner-columns), var(--ledge-item-size));
+  grid-template-rows: repeat(var(--ledge-corner-rows), var(--ledge-item-size));
+  gap: var(--ledge-gap);
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.ledge-dock-panel.is-corner::before,
+.ledge-dock-panel.is-corner::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border: 1px solid color-mix(in srgb, var(--ledge-border-color) 82%, transparent);
+  border-radius: var(--ledge-radius);
+  background:
+    linear-gradient(
+      var(--ledge-gradient-angle),
+      color-mix(in srgb, var(--ledge-surface-start) var(--ledge-surface-opacity), transparent),
+      color-mix(in srgb, var(--ledge-surface-end) var(--ledge-surface-opacity), transparent)
+    );
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--background-primary) 60%, transparent);
+  backdrop-filter: blur(18px) saturate(1.12);
+}
+
+.ledge-dock-panel.is-corner::before {
+  width: 100%;
+  height: var(--ledge-arm-thickness);
+}
+
+.ledge-dock-panel.is-corner::after {
+  width: var(--ledge-arm-thickness);
+  height: 100%;
+}
+
+.ledge-dock-root.is-border-hidden .ledge-dock-panel:not(.is-corner),
+.ledge-dock-root.is-border-hidden .ledge-dock-panel.is-corner::before,
+.ledge-dock-root.is-border-hidden .ledge-dock-panel.is-corner::after {
+  border-color: transparent;
+}
+
+.ledge-dock-root.is-background-hidden .ledge-dock-panel:not(.is-corner),
+.ledge-dock-root.is-background-hidden .ledge-dock-panel.is-corner::before,
+.ledge-dock-root.is-background-hidden .ledge-dock-panel.is-corner::after {
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.ledge-dock-root[data-position^="top-"] .ledge-dock-panel::before {
+  top: 0;
+}
+
+.ledge-dock-root[data-position^="bottom-"] .ledge-dock-panel::before {
+  bottom: 0;
+}
+
+.ledge-dock-root[data-position$="-left"] .ledge-dock-panel::after {
+  left: 0;
+}
+
+.ledge-dock-root[data-position$="-right"] .ledge-dock-panel::after {
+  right: 0;
+}
+
+.ledge-dock-panel.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(0, 0) scale(1);
+}
+
+.ledge-dock-root[data-position="left"] {
+  --ledge-nudge-x: 1;
+}
+
+.ledge-dock-root[data-position="right"] {
+  --ledge-nudge-x: -1;
+}
+
+.ledge-dock-root[data-position="top"] {
+  --ledge-nudge-y: 1;
+}
+
+.ledge-dock-root[data-position="bottom"] {
+  --ledge-nudge-y: -1;
+}
+
+.ledge-dock-root[data-position="top-left"] {
+  --ledge-nudge-x: 1;
+  --ledge-nudge-y: 1;
+}
+
+.ledge-dock-root[data-position="top-right"] {
+  --ledge-nudge-x: -1;
+  --ledge-nudge-y: 1;
+}
+
+.ledge-dock-root[data-position="bottom-left"] {
+  --ledge-nudge-x: 1;
+  --ledge-nudge-y: -1;
+}
+
+.ledge-dock-root[data-position="bottom-right"] {
+  --ledge-nudge-x: -1;
+  --ledge-nudge-y: -1;
+}
+
+.ledge-dock-root[data-position="left"] .ledge-dock-panel:not(.is-visible) {
+  transform: translateX(calc(-100% - var(--ledge-trigger-size))) scale(.96);
+}
+
+.ledge-dock-root[data-position="right"] .ledge-dock-panel:not(.is-visible) {
+  transform: translateX(calc(100% + var(--ledge-trigger-size))) scale(.96);
+}
+
+.ledge-dock-root[data-position="top"] .ledge-dock-panel:not(.is-visible) {
+  transform: translateY(calc(-100% - var(--ledge-trigger-size))) scale(.96);
+}
+
+.ledge-dock-root[data-position="bottom"] .ledge-dock-panel:not(.is-visible) {
+  transform: translateY(calc(100% + var(--ledge-trigger-size))) scale(.96);
+}
+
+.ledge-dock-root[data-position="top-left"] .ledge-dock-panel:not(.is-visible) {
+  transform: translate(-104%, -104%) scale(.94);
+}
+
+.ledge-dock-root[data-position="top-right"] .ledge-dock-panel:not(.is-visible) {
+  transform: translate(104%, -104%) scale(.94);
+}
+
+.ledge-dock-root[data-position="bottom-left"] .ledge-dock-panel:not(.is-visible) {
+  transform: translate(-104%, 104%) scale(.94);
+}
+
+.ledge-dock-root[data-position="bottom-right"] .ledge-dock-panel:not(.is-visible) {
+  transform: translate(104%, 104%) scale(.94);
+}
+
+.ledge-dock-item {
+  position: relative;
+  z-index: 1;
+  width: var(--ledge-item-size);
+  height: var(--ledge-item-size);
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 6px;
+  appearance: none;
+  border: 1px solid color-mix(in srgb, var(--ledge-border-color) 82%, transparent);
+  border-radius: min(calc(var(--ledge-radius) * .72), calc(var(--ledge-item-size) * .34));
+  background:
+    linear-gradient(
+      var(--ledge-gradient-angle),
+      var(--ledge-item-gradient-start, color-mix(in srgb, var(--ledge-accent) 17%, var(--background-primary-alt))),
+      var(--ledge-item-gradient-end, var(--background-secondary))
+    );
+  color: var(--ledge-item-icon-color, var(--ledge-accent));
+  box-shadow:
+    inset 0 1px color-mix(in srgb, var(--text-normal) 9%, transparent),
+    0 5px 12px color-mix(in srgb, var(--background-primary) 64%, transparent);
+  cursor: grab;
+  touch-action: none;
+  transition:
+    transform var(--ledge-motion-duration) cubic-bezier(.2, .78, .2, 1),
+    border-color calc(var(--ledge-motion-duration) * .8) ease,
+    box-shadow calc(var(--ledge-motion-duration) * .8) ease,
+    opacity calc(var(--ledge-motion-duration) * .7) ease;
+}
+
+.ledge-dock-item:hover,
+.ledge-dock-item:focus-visible,
+.ledge-dock-item.is-active {
+  border-color: color-mix(in srgb, var(--ledge-accent) 72%, var(--ledge-border-color));
+}
+
+.ledge-dock-item:focus-visible {
+  outline: 2px solid var(--ledge-accent);
+  outline-offset: 2px;
+}
+
+.ledge-dock-item.is-magnified {
+  z-index: 4;
+  transform:
+    translate(
+      calc(var(--ledge-nudge-x) * 8px),
+      calc(var(--ledge-nudge-y) * 8px)
+    )
+    scale(var(--ledge-magnification));
+}
+
+.ledge-dock-item.is-neighbor {
+  z-index: 3;
+  transform:
+    translate(
+      calc(var(--ledge-nudge-x) * 4px),
+      calc(var(--ledge-nudge-y) * 4px)
+    )
+    scale(var(--ledge-neighbor-scale));
+}
+
+.ledge-dock-root.is-magnification-disabled .ledge-dock-item {
+  transform: none;
+}
+
+.ledge-dock-item.is-dragging {
+  z-index: 6;
+  opacity: .5;
+  cursor: grabbing;
+  transform: scale(.92);
+}
+
+.ledge-dock-item.is-active::after {
+  content: "";
+  position: absolute;
+  width: 13px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--ledge-accent);
+}
+
+.ledge-dock-root[data-position="left"] .ledge-dock-item.is-active::after,
+.ledge-dock-root[data-position$="-left"] .ledge-dock-item.is-active::after {
+  left: -7px;
+  width: 3px;
+  height: 13px;
+}
+
+.ledge-dock-root[data-position="right"] .ledge-dock-item.is-active::after,
+.ledge-dock-root[data-position$="-right"] .ledge-dock-item.is-active::after {
+  right: -7px;
+  width: 3px;
+  height: 13px;
+}
+
+.ledge-dock-root[data-position="top"] .ledge-dock-item.is-active::after,
+.ledge-dock-root[data-position^="top-"] .ledge-dock-item.is-active::after {
+  top: -7px;
+}
+
+.ledge-dock-root[data-position="bottom"] .ledge-dock-item.is-active::after,
+.ledge-dock-root[data-position^="bottom-"] .ledge-dock-item.is-active::after {
+  bottom: -7px;
+}
+
+.ledge-dock-item.is-missing-target {
+  border-style: dashed;
+}
+
+.ledge-dock-icon {
+  width: var(--ledge-current-icon-size);
+  height: var(--ledge-current-icon-size);
+  display: grid;
+  place-items: center;
+  color: inherit;
+  pointer-events: none;
+}
+
+.ledge-dock-icon > svg,
+.ledge-dock-icon-image,
+.ledge-dock-icon-mask {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.ledge-dock-icon > svg {
+  stroke-width: 1.8;
+}
+
+.ledge-dock-icon-image {
+  object-fit: contain;
+}
+
+.ledge-dock-icon-mask {
+  background: currentcolor;
+  mask-position: center;
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.ledge-dock-icon.is-missing-icon {
+  color: var(--text-error);
+}
+
+.ledge-dock-label {
+  position: absolute;
+  z-index: 8;
+  width: max-content;
+  max-width: 220px;
+  padding: 6px 9px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-primary-alt);
+  color: var(--text-normal);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--background-primary) 66%, transparent);
+  font-size: var(--font-ui-smaller);
+  font-weight: var(--font-semibold);
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity calc(var(--ledge-motion-duration) * .65) ease,
+    transform calc(var(--ledge-motion-duration) * .75) ease;
+}
+
+.ledge-dock-root[data-position="left"] .ledge-dock-label,
+.ledge-dock-root[data-position$="-left"] .ledge-dock-label {
+  top: 50%;
+  left: calc(100% + 12px);
+  transform: translate(-5px, -50%);
+}
+
+.ledge-dock-root[data-position="right"] .ledge-dock-label,
+.ledge-dock-root[data-position$="-right"] .ledge-dock-label {
+  top: 50%;
+  right: calc(100% + 12px);
+  transform: translate(5px, -50%);
+}
+
+.ledge-dock-root[data-position="top"] .ledge-dock-label {
+  top: calc(100% + 12px);
+  left: 50%;
+  transform: translate(-50%, -5px);
+}
+
+.ledge-dock-root[data-position="bottom"] .ledge-dock-label {
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translate(-50%, 5px);
+}
+
+.ledge-dock-root.is-labels-hidden .ledge-dock-label {
+  display: none;
+}
+
+.ledge-dock-item:hover > .ledge-dock-label,
+.ledge-dock-item:focus-visible > .ledge-dock-label {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+.ledge-dock-root[data-position="top"] .ledge-dock-item:hover > .ledge-dock-label,
+.ledge-dock-root[data-position="top"] .ledge-dock-item:focus-visible > .ledge-dock-label,
+.ledge-dock-root[data-position="bottom"] .ledge-dock-item:hover > .ledge-dock-label,
+.ledge-dock-root[data-position="bottom"] .ledge-dock-item:focus-visible > .ledge-dock-label {
+  transform: translate(-50%, 0);
+}
+
+.ledge-dock-root:not(.is-auto-hide) .ledge-dock-trigger {
+  display: none;
+}
+
+.ledge-settings-tabs-setting {
+  padding-top: 0;
+  border: 0;
+}
+
+.ledge-settings-tabs-setting .setting-item-info {
+  display: none;
+}
+
+.ledge-settings-tabs-setting .setting-item-control {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.ledge-settings-tabs {
+  width: 100%;
+  display: flex;
+  gap: var(--size-4-1);
+  padding: var(--size-4-1);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-secondary);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.ledge-settings-tab {
+  min-width: max-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--size-4-1);
+  padding: var(--size-4-2) var(--size-4-3);
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-muted);
+  box-shadow: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ledge-settings-tab:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.ledge-settings-tab[aria-selected="true"] {
+  border-color: color-mix(in srgb, var(--interactive-accent) 48%, transparent);
+  background: color-mix(in srgb, var(--interactive-accent) 14%, transparent);
+  color: var(--text-accent);
+}
+
+.ledge-settings-tab:focus-visible {
+  outline: 2px solid var(--interactive-accent);
+  outline-offset: -2px;
+}
+
+.ledge-settings-tab-icon,
+.ledge-settings-tab-icon > svg {
+  width: var(--icon-s);
+  height: var(--icon-s);
+  display: block;
+}
+
+.ledge-settings-panel-items > .setting-items {
+  background: transparent;
+}
+
+.ledge-settings-panel-items {
+  display: grid;
+  gap: var(--size-4-4);
+  margin: var(--size-4-3) 0 var(--size-4-6);
+}
+
+.ledge-items-accordion-setting {
+  display: block;
+  padding: 0;
+  border: 0;
+}
+
+.ledge-items-accordion-setting > .setting-item-control {
+  width: 100%;
+  display: block;
+}
+
+.ledge-items-accordion {
+  width: 100%;
+  display: grid;
+  gap: var(--size-4-2);
+}
+
+.ledge-item-accordion {
+  padding: 0;
+  overflow: hidden;
+}
+
+.ledge-item-accordion > .setting-item {
+  padding: var(--size-4-3);
+  border: 0;
+  cursor: pointer;
+}
+
+.ledge-item-accordion-details {
+  padding: 0 var(--size-4-3) var(--size-4-2);
+}
+
+.ledge-item-accordion-details[hidden] {
+  display: none;
+}
+
+.ledge-item-row-state {
+  min-width: max-content;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.ledge-item-row-warning,
+.ledge-item-row-warning > svg {
+  width: var(--icon-s);
+  height: var(--icon-s);
+  color: var(--text-warning);
+}
+
+.ledge-item-delete-button {
+  color: var(--text-error);
+}
+
+.ledge-items-empty-state {
+  padding: var(--size-4-4);
+  border: 1px dashed var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.ledge-delete-confirmation-actions .setting-item-info {
+  display: none;
+}
+
+.ledge-settings-item {
+  padding: var(--size-4-2) var(--size-4-4);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  background: var(--background-secondary);
+}
+
+.ledge-settings-item-header {
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ledge-item-accordion:not(.is-expanded) > .ledge-settings-item-header {
+  border-bottom-color: transparent;
+}
+
+.ledge-settings-panel-items .setting-item {
+  padding-right: 0;
+}
+
+.ledge-settings-panel-items .setting-item-control input[type="text"] {
+  width: min(320px, 46vw);
+}
+
+.ledge-target-path-control .search-input-container {
+  width: min(320px, 46vw);
+}
+
+.ledge-target-suggestion-path {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.ledge-item-row-marker,
+.ledge-item-row-decorator {
+  display: none;
+}
+
+.ledge-item-order-controls {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 2px;
+  margin-left: var(--size-4-1);
+}
+
+.ledge-item-drag-handle {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.ledge-item-drag-handle:active {
+  cursor: grabbing;
+}
+
+.ledge-settings-panel-items .setting-item.is-ledge-item-dragging {
+  opacity: 0.55;
+}
+
+.ledge-settings-panel-items .setting-item.is-ledge-item-drop-before {
+  box-shadow: inset 0 2px 0 var(--interactive-accent);
+}
+
+.ledge-settings-panel-items .setting-item.is-ledge-item-drop-after {
+  box-shadow: inset 0 -2px 0 var(--interactive-accent);
+}
+
+.ledge-item-order-button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.ledge-settings-root:not([data-ledge-settings-tab="layout"]) .ledge-settings-panel-layout,
+.ledge-settings-root:not([data-ledge-settings-tab="behavior"]) .ledge-settings-panel-behavior,
+.ledge-settings-root:not([data-ledge-settings-tab="visibility"]) .ledge-settings-panel-visibility,
+.ledge-settings-root:not([data-ledge-settings-tab="trigger"]) .ledge-settings-panel-trigger,
+.ledge-settings-root:not([data-ledge-settings-tab="appearance"]) .ledge-settings-panel-appearance,
+.ledge-settings-root:not([data-ledge-settings-tab="data"]) .ledge-settings-panel-data,
+.ledge-settings-root:not([data-ledge-settings-tab="about"]) .ledge-settings-panel-about {
+  display: none;
+}
+
+.ledge-support-link {
+  --ledge-support-background: #fd0;
+  --ledge-support-foreground: #000;
+
+  box-sizing: border-box;
+  width: max-content;
+  max-width: none;
+  min-width: max-content;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: var(--size-4-2);
+  padding: var(--size-4-2) var(--size-4-3);
+  border: 1px solid var(--ledge-support-foreground);
+  border-radius: var(--button-radius, 5px);
+  color: var(--ledge-support-foreground);
+  background: var(--ledge-support-background);
+  background-image: none;
+  box-shadow: var(--input-shadow);
+  font-size: var(--font-ui-small);
+  font-weight: var(--font-semibold);
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.ledge-support-link:hover,
+.ledge-support-link:focus-visible {
+  color: var(--ledge-support-foreground);
+  background: color-mix(in srgb, var(--ledge-support-background) 86%, #fff);
+  text-decoration: none;
+}
+
+.ledge-support-link:focus-visible {
+  outline: 2px solid var(--ledge-support-foreground);
+  outline-offset: 2px;
+}
+
+.ledge-support-link:active {
+  transform: translateY(1px);
+}
+
+.ledge-support-link-icon,
+.ledge-support-link-icon > svg {
+  flex: 0 0 auto;
+  width: var(--icon-s);
+  height: var(--icon-s);
+  display: block;
+}
+
+.ledge-support-link-label {
+  flex: 0 0 auto;
+  display: block;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ledge-dock-trigger,
+  .ledge-dock-panel,
+  .ledge-dock-item,
+  .ledge-dock-label {
+    transition-duration: .01ms;
+  }
+}

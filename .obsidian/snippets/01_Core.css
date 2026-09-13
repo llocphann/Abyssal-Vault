@@ -1,0 +1,1419 @@
+/*******************************************************************************
+ *                      ROOT VARIABLES & COLOR PALETTE
+ *******************************************************************************/
+
+/* ---------- Gradient Palette (Light -> Dark) + Semantic Colors ---------- */
+:root {
+    /* Carbon Cyan canonical palette — darkest to lightest. */
+    --cc-p00: #0a0e10;
+    --cc-p01: #0c1113;
+    --cc-p02: #10181b;
+    --cc-p03: #162024;
+    --cc-p04: #1d2a2f;
+    --cc-p05: #26363e;
+    --cc-p06: #30464f;
+    --cc-p07: #3e5965;
+    --cc-p08: #4e707e;
+    --cc-p09: #5f899b;
+    --cc-p10: #7da0b0;
+    --cc-p11: #a0bac5;
+    --cc-p12: #c6d6dc;
+    --cc-p13: #e6edef;
+    --cc-accent: #a0cddf;
+
+    --ice-blue: var(--cc-p13); /* Default Prefix: None */
+    --sky-blue: var(--cc-p12); /* Default Prefix: None */
+    --powder-blue: var(--cc-p11); /* Default Prefix: None */
+    --light-cyan: var(--cc-p10); /* Default Prefix: None */
+    --soft-cyan: var(--cc-p10); /* Default Prefix: None */
+    --seafoam: var(--cc-p09); /* Default Prefix: None */
+
+    --mint: var(--cc-p09); /* Default Prefix: 00 */
+    --cyan: var(--cc-p08); /* Default Prefix: 01 */
+    --cool-cyan: var(--cc-p08); /* Default Prefix: None */
+    --light-blue: var(--cc-p07); /* Default Prefix: 02 */
+    --teal: var(--cc-p07); /* Default Prefix: 03 */
+
+    --deep-teal: var(--cc-p06); /* Default Prefix: None */
+    --dark-teal: var(--cc-p06); /* Default Prefix: 04 */
+    --pine: var(--cc-p05); /* Default Prefix: 05 */
+    --deep-pine: var(--cc-p05); /* Default Prefix: 06 */
+    --forest-teal: var(--cc-p04); /* Default Prefix: 07 */
+    --deep-sea: var(--cc-p03); /* Default for Prefix: 08 */
+    --charcoal-teal: var(--cc-p02); /* Default Prefix: 90 */
+    --cool-gray: var(--cc-p01); /* Default Prefix: 99 */
+
+    --border-theme-base: var(--cc-p00);
+    --border-theme-pane: var(--cc-p01);
+    --border-theme-grid: var(--cc-p03);
+    --border-theme-mark: var(--cc-p04);
+    --border-theme-yellow: var(--cc-p06);
+    --border-theme-text: var(--cc-p10);
+    --border-theme-accent: var(--cc-accent);
+    --border-theme-muted: var(--cc-p11);
+
+    /* ==========================================================
+     * Semantic Colors
+     * ========================================================== */
+    --default-text-color: var(--cc-p12);
+    --highlight: var(--cc-accent);
+    --shadow: var(--cc-p00);
+}
+
+/* ---------- Shared Carbon Cyan component color aliases ---------- */
+:root {
+--table-header-bg:var(--lake-surface-3);
+--table-header-text:var(--lake-accent-soft);
+--table-row-odd:var(--lake-surface);
+--table-row-even:var(--lake-surface-2);
+--table-hover:var(--lake-surface-4);
+--table-selected:var(--lake-active);
+--table-divider:var(--lake-border);
+--table-divider-strong:var(--lake-border-2);
+
+--bright-accent: var(--cc-accent);
+
+}
+
+:is(.theme-dark, .theme-light) {
+    --vault-note-paper-line: 30px;
+    --vault-note-paper-margin-x: 44px;
+    --vault-note-paper: color-mix(in srgb, var(--cc-p02, var(--background-primary)) 86%, var(--cc-p03, var(--background-secondary)) 14%);
+    --vault-note-paper-rule: color-mix(in srgb, var(--cc-p07, var(--interactive-accent)) 30%, transparent);
+    --vault-note-paper-margin-rule: color-mix(in srgb, var(--cc-accent, var(--interactive-accent)) 24%, transparent);
+    --vault-note-paper-edge: color-mix(in srgb, var(--cc-p06, var(--background-modifier-border)) 72%, transparent);
+    --vault-note-paper-stain: color-mix(in srgb, var(--cc-p08, var(--text-muted)) 13%, transparent);
+    --vault-note-paper-pencil: color-mix(in srgb, var(--cc-p09, var(--text-muted)) 6%, transparent);
+    --vault-note-paper-tape: color-mix(in oklch, var(--cc-p05, var(--background-secondary)) 82%, var(--cc-p06, var(--interactive-accent)) 18%);
+    --vault-note-paper-tape-edge: color-mix(in oklch, var(--cc-p08, var(--text-muted)) 58%, transparent);
+    --vault-note-paper-background:
+        radial-gradient(
+            ellipse 24% 10% at 88% 84%,
+            transparent 0 71%,
+            var(--vault-note-paper-stain) 73% 78%,
+            transparent 80%
+        ),
+        repeating-linear-gradient(
+            167deg,
+            transparent 0 9px,
+            var(--vault-note-paper-pencil) 10px,
+            transparent 11px 17px
+        ),
+        linear-gradient(
+            90deg,
+            transparent 0 var(--vault-note-paper-margin-x),
+            var(--vault-note-paper-margin-rule) var(--vault-note-paper-margin-x) calc(var(--vault-note-paper-margin-x) + 1px),
+            transparent calc(var(--vault-note-paper-margin-x) + 1px)
+        ),
+        repeating-linear-gradient(
+            to bottom,
+            transparent 0 calc(var(--vault-note-paper-line) - 7px),
+            color-mix(in srgb, var(--vault-note-paper-rule) 55%, transparent) calc(var(--vault-note-paper-line) - 7px) calc(var(--vault-note-paper-line) - 5px),
+            transparent calc(var(--vault-note-paper-line) - 5px) var(--vault-note-paper-line)
+        ),
+        var(--vault-note-paper);
+}
+
+/* ---------- Dark theme: Obsidian Lake surfaces + bases ---------- */
+.theme-dark {
+--lake-bg:var(--cc-p02);
+--lake-surface:var(--cc-p03);
+--lake-surface-2:var(--cc-p04);
+--lake-surface-3:var(--cc-p05);
+--lake-surface-4:var(--cc-p06);
+--lake-active:var(--cc-p07);
+--lake-accent:var(--cc-accent);
+--lake-accent-soft:color-mix(in srgb, var(--cc-accent) 70%, var(--cc-p12) 30%);
+--lake-text:var(--cc-p12);
+--lake-text-soft:var(--cc-p10);
+--lake-border:color-mix(in srgb, var(--cc-p06) 38%, transparent);
+--lake-border-2:color-mix(in srgb, var(--cc-p06) 62%, transparent);
+--lake-border-3:color-mix(in srgb, var(--cc-p07) 78%, transparent);
+--lake-shadow:0 10px 30px color-mix(in srgb, var(--cc-p00) 76%, transparent);
+--bases-bg:var(--cc-p02);
+--bases-bg-alt:var(--cc-p03);
+--bases-header:var(--cc-p04);
+--bases-hover:var(--cc-p04);
+--bases-active:var(--cc-p05);
+--bases-border:color-mix(in srgb, var(--cc-p06) 64%, transparent);
+--bases-border-2:var(--cc-p06);
+--bases-text:var(--cc-p12);
+--bases-text-soft:var(--cc-p10);
+--bases-heading:var(--cc-p13);
+--bases-accent:var(--cc-accent);
+}
+
+.theme-dark {
+--abstract-color:var(--cyan);
+}
+
+.theme-dark {
+--problem-color:var(--color-red-rgb);
+--question-color:var(--color-green-rgb);
+--theorem-color:var(--color-yellow-rgb);
+--example-color:var(--color-orange-rgb);
+--definition-color:var(--color-cyan-rgb);
+--corollary-color:var(--color-purple-rgb);
+--proposition-color:var(--color-cyan-rgb);
+--lemma-color:var(--color-blue-rgb);
+--proof-color:var(--color-green-rgb);
+--remark-color:var(--color-yellow-rgb);
+--note-color:var(--color-cyan-rgb);
+--summary-color:var(--color-blue-rgb);
+--key-color:var(--color-yellow-rgb);
+--algorithm-color:var(--color-cyan-rgb);
+--exercise-color:var(--color-orange-rgb);
+--warning-color:var(--color-orange-rgb);
+--important-color:var(--color-red-rgb);
+}
+
+.theme-dark {
+    --contrast-color: var(--highlight);
+    --bg-contrast-amount: 15%;
+    --fg-contrast-amount: 40%;
+    --medium-contrast-amount: 20%;
+    --active-contrast-amount: 10%;
+}
+
+.theme-light {
+--lake-bg:var(--background-primary);
+--lake-surface:var(--background-primary);
+--lake-surface-2:var(--background-secondary);
+--lake-surface-3:var(--background-secondary-alt, var(--background-secondary));
+--lake-surface-4:var(--background-modifier-hover);
+--lake-active:var(--background-modifier-active-hover, var(--background-modifier-hover));
+--lake-accent:var(--interactive-accent);
+--lake-accent-soft:var(--interactive-accent-hover, var(--interactive-accent));
+--lake-text:var(--text-normal);
+--lake-text-soft:var(--text-muted);
+--lake-border:var(--background-modifier-border);
+--lake-border-2:var(--background-modifier-border-hover, var(--background-modifier-border));
+--lake-border-3:var(--background-modifier-border-focus, var(--background-modifier-border));
+--lake-shadow:0 6px 18px color-mix(in srgb, var(--text-normal) 10%, transparent);
+--bases-bg:var(--background-primary);
+--bases-bg-alt:var(--background-secondary);
+--bases-header:var(--background-secondary);
+--bases-hover:var(--background-modifier-hover);
+--bases-active:var(--background-modifier-active-hover, var(--background-modifier-hover));
+--bases-border:var(--background-modifier-border);
+--bases-border-2:var(--background-modifier-border-hover, var(--background-modifier-border));
+--bases-text:var(--text-normal);
+--bases-text-soft:var(--text-muted);
+--bases-heading:var(--interactive-accent);
+--bases-accent:var(--interactive-accent);
+}
+
+.theme-light {
+    --contrast-color: var(--text-normal);
+    --default-text-color: var(--text-normal);
+    --bg-contrast-amount: 70%;
+    --fg-contrast-amount: 30%;
+    --medium-contrast-amount: 60%;
+    --active-contrast-amount: 30%;
+
+    --soft-cyan: var(--color-yellow);
+    --seafoam: var(--color-green);
+    --mint: var(--color-green);
+    --cyan: var(--color-cyan);
+    --cool-cyan: var(--color-cyan);
+    --light-blue: var(--color-blue);
+}
+
+/*******************************************************************************
+ *                         CALLOUT COLOR MAPPINGS
+ *******************************************************************************/
+
+.callout[data-callout="problem"]{--callout-color:var(--problem-color);}
+.callout[data-callout="question"]{--callout-color:var(--question-color);}
+.callout[data-callout="theorem"]{--callout-color:var(--theorem-color);}
+.callout[data-callout="example"]{--callout-color:var(--example-color);}
+.callout[data-callout="definition"]{--callout-color:var(--definition-color);}
+.callout[data-callout="corollary"]{--callout-color:var(--corollary-color);}
+.callout[data-callout="proposition"]{--callout-color:var(--proposition-color);}
+.callout[data-callout="lemma"]{--callout-color:var(--lemma-color);}
+.callout[data-callout="proof"]{--callout-color:var(--proof-color);}
+.callout[data-callout="remark"]{--callout-color:var(--remark-color);}
+.callout[data-callout="note"]{--callout-color:var(--note-color);}
+.callout[data-callout="summary"]{--callout-color:var(--summary-color);}
+.callout[data-callout="key"]{--callout-color:var(--key-color);}
+.callout[data-callout="algorithm"]{--callout-color:var(--algorithm-color);}
+.callout[data-callout="exercise"]{--callout-color:var(--exercise-color);}
+.callout[data-callout="warning"]{--callout-color:var(--warning-color);}
+.callout[data-callout="important"]{--callout-color:var(--important-color);}
+
+/*******************************************************************************
+ *                         MARKDOWN TABLE COLORS
+ *******************************************************************************/
+
+.markdown-rendered table,
+.markdown-source-view.mod-cm6 .cm-table-widget table {
+  background: var(--lake-surface);
+  color: var(--lake-text);
+  border-color: var(--lake-border);
+}
+.markdown-rendered thead,
+.markdown-source-view.mod-cm6 thead { background: var(--table-header-bg); }
+.markdown-rendered th,
+.markdown-source-view.mod-cm6 th {
+  color: var(--table-header-text);
+  border-color: var(--table-divider-strong);
+}
+.markdown-rendered tbody tr:nth-child(odd),
+.markdown-source-view.mod-cm6 tbody tr:nth-child(odd) { background: var(--table-row-odd); }
+.markdown-rendered tbody tr:nth-child(even),
+.markdown-source-view.mod-cm6 tbody tr:nth-child(even) { background: var(--table-row-even); }
+.markdown-rendered tbody tr:hover,
+.markdown-source-view.mod-cm6 tbody tr:hover { background: var(--table-hover); }
+.markdown-rendered td,
+.markdown-source-view.mod-cm6 td {
+  color: var(--lake-text);
+  border-color: var(--table-divider);
+}
+.markdown-rendered table a,
+.markdown-source-view.mod-cm6 table a { color: var(--lake-accent); }
+.markdown-rendered table strong,
+.markdown-source-view.mod-cm6 table strong { color: var(--cc-p13); }
+.markdown-rendered table code,
+.markdown-source-view.mod-cm6 table code {
+  background: var(--cc-p05);
+  color: var(--cc-accent);
+  border-color: var(--cc-p06);
+}
+
+/*******************************************************************************
+ *                         MARKDOWN TEXT COLORS
+ *******************************************************************************/
+
+.markdown-rendered strong { color: var(--cc-p13); }
+.markdown-rendered em { color: var(--cc-accent); }
+.markdown-rendered code {
+  background: var(--cc-p05);
+  border-color: var(--cc-p06);
+  color: var(--cc-accent);
+}
+
+/*******************************************************************************
+ *              COLORED SIDEBAR ITEMS (FOLDER-PREFIX COLOR CODING)
+ *******************************************************************************/
+
+/* ------------------------------- 00 Prefix -------------------------------- */
+.nav-folder-title[data-path^="00"] {
+    color: var(--mint);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--mint) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--mint) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--mint) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(in srgb, var(--mint) 60%, transparent);
+}
+.nav-folder-title[data-path^="00"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--mint) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="00"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--mint) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="00"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--mint) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--mint) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--mint) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--mint) var(--active-contrast-amount),
+        transparent
+    );
+}
+
+/* ------------------------------- 01 Prefix -------------------------------- */
+.nav-folder-title[data-path^="10"] {
+    color: var(--cyan);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--cyan) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--cyan) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--cyan) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(in srgb, var(--cyan) 60%, transparent);
+}
+.nav-folder-title[data-path^="10"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--cyan) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="10"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--cyan) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="10"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--cyan) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--cyan) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--cyan) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--cyan) var(--active-contrast-amount),
+        transparent
+    );
+}
+
+/* ------------------------------- 02 Prefix -------------------------------- */
+.nav-folder-title[data-path^="20"] {
+    color: var(--light-blue);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--light-blue) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--light-blue) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--light-blue) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--light-blue) 60%,
+        transparent
+    );
+}
+.nav-folder-title[data-path^="20"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--light-blue) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="20"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--light-blue) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="20"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--light-blue) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--light-blue) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--light-blue) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--light-blue) var(--active-contrast-amount),
+        transparent
+    );
+}
+
+/* ------------------------------- 03 Prefix -------------------------------- */
+.nav-folder-title[data-path^="30"] {
+    color: var(--teal);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--teal) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--teal) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--teal) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(in srgb, var(--teal) 60%, transparent);
+}
+.nav-folder-title[data-path^="30"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--teal) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="30"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--teal) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="30"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--teal) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--teal) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--teal) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--teal) var(--active-contrast-amount),
+        transparent
+    );
+}
+
+/* ------------------------------- 04 Prefix -------------------------------- */
+.nav-folder-title[data-path^="40"] {
+    color: var(--dark-teal);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--dark-teal) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--dark-teal) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--dark-teal) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--dark-teal) 60%,
+        transparent
+    );
+}
+.nav-folder-title[data-path^="40"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--dark-teal) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="40"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--dark-teal) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="40"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--dark-teal) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--dark-teal) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--dark-teal) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--dark-teal) var(--active-contrast-amount),
+        transparent
+    );
+}
+
+/* ------------------------------- 05 Prefix -------------------------------- */
+.nav-folder-title[data-path^="50"] {
+    color: var(--pine);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--pine) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--pine) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--pine) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(in srgb, var(--pine) 60%, transparent);
+}
+.nav-folder-title[data-path^="50"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--pine) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="50"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--pine) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="50"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--pine) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--pine) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--pine) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--pine) var(--active-contrast-amount),
+        transparent
+    );
+}
+
+/* ------------------------------- 06 Prefix -------------------------------- */
+.nav-folder-title[data-path^="60"] {
+    color: var(--deep-pine);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--deep-pine) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--deep-pine) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--deep-pine) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--deep-pine) 60%,
+        transparent
+    );
+}
+.nav-folder-title[data-path^="60"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--deep-pine) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="60"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--deep-pine) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="60"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--deep-pine) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--deep-pine) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--deep-pine) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--deep-pine) var(--active-contrast-amount),
+        transparent
+    );
+}
+
+/* ------------------------------- 07 Prefix -------------------------------- */
+.nav-folder-title[data-path^="70"] {
+    color: var(--forest-teal);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--forest-teal) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--forest-teal) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--forest-teal) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--forest-teal) 60%,
+        transparent
+    );
+}
+.nav-folder-title[data-path^="70"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--forest-teal) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="70"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--forest-teal) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="70"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--forest-teal) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--forest-teal) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--forest-teal) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--forest-teal) var(--active-contrast-amount),
+        transparent
+    );
+}
+/* ------------------------------- 08 Prefix -------------------------------- */
+.nav-folder-title[data-path^="80"] {
+    color: var(--deep-sea);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--deep-sea) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--deep-sea) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--deep-sea) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--deep-sea) 60%,
+        transparent
+    );
+}
+.nav-folder-title[data-path^="80"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--deep-sea) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="80"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--deep-sea) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="80"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--deep-sea) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--deep-sea) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--deep-sea) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--deep-sea) var(--active-contrast-amount),
+        transparent
+    );
+}
+
+/* ------------------------------- 90 Prefix -------------------------------- */
+.nav-folder-title[data-path^="90"] {
+    color: var(--charcoal-teal);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--charcoal-teal) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--charcoal-teal) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--charcoal-teal) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--charcoal-teal) 60%,
+        transparent
+    );
+}
+.nav-folder-title[data-path^="90"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--charcoal-teal) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="90"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--charcoal-teal) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="90"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--charcoal-teal) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--charcoal-teal) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--charcoal-teal) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--charcoal-teal) var(--active-contrast-amount),
+        transparent
+    );
+}
+
+/* ------------------------------- 99 Prefix -------------------------------- */
+.nav-folder-title[data-path^="99"] {
+    color: var(--cool-gray);
+    --nav-item-color-hover: color-mix(
+        in srgb,
+        var(--cool-gray) var(--fg-contrast-amount),
+        var(--contrast-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        var(--cool-gray) var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--cool-gray) 40%,
+        transparent
+    );
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--cool-gray) 60%,
+        transparent
+    );
+}
+.nav-folder-title[data-path^="99"]:hover {
+    --nav-collapse-icon-color: color-mix(
+        in srgb,
+        var(--cool-gray) 60%,
+        var(--contrast-color)
+    );
+}
+.tree-item-children .nav-folder:has(.nav-folder-title[data-path^="99"]) {
+    --nav-indentation-guide-color: color-mix(
+        in srgb,
+        var(--cool-gray) var(--medium-contrast-amount),
+        transparent
+    );
+}
+.tree-item-children
+    .nav-folder:has(.nav-folder-title[data-path^="99"])
+    .nav-file-title {
+    color: color-mix(
+        in srgb,
+        var(--cool-gray) var(--medium-contrast-amount),
+        var(--default-text-color)
+    );
+    --nav-item-background-hover: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--cool-gray) 50%, var(--highlight))
+            var(--bg-contrast-amount),
+        transparent
+    );
+    --background-modifier-border-focus: color-mix(
+        in srgb,
+        var(--cool-gray) 40%,
+        transparent
+    );
+    --nav-item-background-active: color-mix(
+        in srgb,
+        var(--cool-gray) var(--active-contrast-amount),
+        transparent
+    );
+}
+
+/*******************************************************************************
+ *                         THIRD-PARTY PLUGIN SAFETY
+ *******************************************************************************/
+
+body:is(.pb-loader-dots,.pb-loader-face,.pb-loader-cassette,.pb-loader-letters)>div.progress-bar-container{
+position:absolute!important;
+inset:0!important;
+width:100vw!important;
+height:100vh!important;
+margin:0!important;
+padding:0!important;
+border:0!important;
+background:var(--background-primary)!important;
+z-index:10000!important;
+display:flex!important;
+flex-direction:column!important;
+align-items:center!important;
+justify-content:center!important;
+}
+
+body:is(.pb-loader-dots,.pb-loader-face,.pb-loader-cassette,.pb-loader-letters)>div.progress-bar-container>div.progress-bar{
+position:relative!important;
+display:block!important;
+min-width:0!important;
+max-width:none!important;
+padding:0!important;
+margin:0!important;
+inset:auto!important;
+background:transparent!important;
+border:0!important;
+overflow:visible!important;
+transition:none!important;
+color:transparent!important;
+}
+
+body:is(.pb-loader-dots,.pb-loader-face,.pb-loader-cassette,.pb-loader-letters)>div.progress-bar-container>div.progress-bar>*{
+display:none!important;
+}
+
+body.pb-loader-dots>div.progress-bar-container>div.progress-bar{
+width:2.5em!important;
+height:2.5em!important;
+font-size:16px!important;
+transform:rotate(165deg)!important;
+}
+
+body.pb-loader-dots>div.progress-bar-container>div.progress-bar::before,
+body.pb-loader-dots>div.progress-bar-container>div.progress-bar::after{
+content:""!important;
+position:absolute!important;
+top:50%!important;
+left:50%!important;
+display:block!important;
+width:.5em!important;
+height:.5em!important;
+box-sizing:content-box!important;
+border-radius:.25em!important;
+background:transparent!important;
+transform:translate(-50%,-50%)!important;
+}
+
+body.pb-loader-dots>div.progress-bar-container>div.progress-bar::before{
+animation:startupDotsHorizontal 2s cubic-bezier(.42,0,.22,1) infinite!important;
+}
+
+body.pb-loader-dots>div.progress-bar-container>div.progress-bar::after{
+animation:startupDotsVertical 2s cubic-bezier(.42,0,.22,1) infinite!important;
+}
+
+@keyframes startupDotsHorizontal{
+0%,100%{width:.5em;box-shadow:1em -.5em color-mix(in srgb,var(--highlight) 82%,transparent),-1em .5em color-mix(in srgb,var(--cyan) 82%,transparent)}
+17.5%,52.5%{width:1.35em}
+35%{width:2.5em;box-shadow:0 -.5em color-mix(in srgb,var(--highlight) 82%,transparent),0 .5em color-mix(in srgb,var(--cyan) 82%,transparent)}
+70%,87.5%{width:.5em;box-shadow:-1em -.5em color-mix(in srgb,var(--highlight) 82%,transparent),1em .5em color-mix(in srgb,var(--cyan) 82%,transparent)}
+}
+
+@keyframes startupDotsVertical{
+0%,100%{height:.5em;box-shadow:.5em 1em color-mix(in srgb,var(--teal) 82%,transparent),-.5em -1em color-mix(in srgb,var(--mint) 82%,transparent)}
+17.5%,52.5%{height:1.35em}
+35%{height:2.5em;box-shadow:.5em 0 color-mix(in srgb,var(--teal) 82%,transparent),-.5em 0 color-mix(in srgb,var(--mint) 82%,transparent)}
+70%,87.5%{height:.5em;box-shadow:.5em -1em color-mix(in srgb,var(--teal) 82%,transparent),-.5em 1em color-mix(in srgb,var(--mint) 82%,transparent)}
+}
+
+/* Animated Face */
+body.pb-loader-face>div.progress-bar-container>div.progress-bar{
+width:200px!important;
+height:237.5px!important;
+transform:none!important;
+}
+
+body.pb-loader-face>div.progress-bar-container>div.progress-bar::before{
+content:""!important;
+position:absolute!important;
+inset:0!important;
+display:block!important;
+background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMjAgMzgwIj4KPHN0eWxlPgouZSwuZWwsLm1sLC5tciwubiwucHthbmltYXRpb246ZXllcyAxcyAuM3MgZm9yd2FyZHN9Ci5lbCwucHthbmltYXRpb24tZHVyYXRpb246NHM7YW5pbWF0aW9uLWRlbGF5OjEuM3M7YW5pbWF0aW9uLWl0ZXJhdGlvbi1jb3VudDppbmZpbml0ZX0KLmVse2FuaW1hdGlvbi1uYW1lOmxpZH0ubWx7YW5pbWF0aW9uLW5hbWU6bW91dGhMZWZ0fS5tcnthbmltYXRpb24tbmFtZTptb3V0aFJpZ2h0fS5ue2FuaW1hdGlvbi1uYW1lOm5vc2V9LnB7YW5pbWF0aW9uLW5hbWU6cHVwaWx9CkBrZXlmcmFtZXMgbGlkezAlLDQwJSw0NSUsMTAwJXt0cmFuc2Zvcm06dHJhbnNsYXRlWSgwKX00Mi41JXt0cmFuc2Zvcm06dHJhbnNsYXRlWSgxNy41cHgpfX0KQGtleWZyYW1lcyBleWVze2Zyb217dHJhbnNmb3JtOnRyYW5zbGF0ZVkoMTEyLjVweCl9dG97dHJhbnNmb3JtOnRyYW5zbGF0ZVkoMTVweCl9fQpAa2V5ZnJhbWVzIHB1cGlsezAlLDM3LjUlLDQwJSw0NSUsODcuNSUsMTAwJXtzdHJva2UtZGFzaG9mZnNldDowO3RyYW5zZm9ybTp0cmFuc2xhdGUoMCwwKX0xMi41JSwyNSUsNjIuNSUsNzUle3RyYW5zZm9ybTp0cmFuc2xhdGUoLTM1cHgsMCl9NDIuNSV7c3Ryb2tlLWRhc2hvZmZzZXQ6MzU7dHJhbnNmb3JtOnRyYW5zbGF0ZSgwLDE3LjVweCl9fQpAa2V5ZnJhbWVzIG1vdXRoTGVmdHtmcm9tLDUwJXtzdHJva2UtZGFzaG9mZnNldDotMTAyfXRve3N0cm9rZS1kYXNob2Zmc2V0OjB9fQpAa2V5ZnJhbWVzIG1vdXRoUmlnaHR7ZnJvbSw1MCV7c3Ryb2tlLWRhc2hvZmZzZXQ6MTAyfXRve3N0cm9rZS1kYXNob2Zmc2V0OjB9fQpAa2V5ZnJhbWVzIG5vc2V7ZnJvbXt0cmFuc2Zvcm06dHJhbnNsYXRlKDAsMCl9dG97dHJhbnNmb3JtOnRyYW5zbGF0ZSgwLDIyLjVweCl9fQpAbWVkaWEocHJlZmVycy1yZWR1Y2VkLW1vdGlvbjpyZWR1Y2Upey5le2FuaW1hdGlvbjpub25lO3RyYW5zZm9ybTp0cmFuc2xhdGVZKDE1cHgpfS5lbCwucHthbmltYXRpb246bm9uZX0ubWwsLm1ye2FuaW1hdGlvbjpub25lO3N0cm9rZS1kYXNob2Zmc2V0OjB9Lm57YW5pbWF0aW9uOm5vbmU7dHJhbnNmb3JtOnRyYW5zbGF0ZSgwLDIyLjVweCl9fQo8L3N0eWxlPgo8ZyBmaWxsPSJub25lIiBzdHJva2U9IiM4ZGM0ZDYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgc3Ryb2tlLXdpZHRoPSIyNSI+CjxnIGNsYXNzPSJlIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgwIDExMi41KSI+CjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDE1KSI+PHBvbHlsaW5lIGNsYXNzPSJlbCIgcG9pbnRzPSIzNywwIDAsMTIwIDc1LDEyMCIvPjxwb2x5bGluZSBjbGFzcz0icCIgcG9pbnRzPSI1NSwxMjAgNTUsMTU1IiBzdHJva2UtZGFzaGFycmF5PSIzNSAzNSIvPjwvZz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMjMwKSI+PHBvbHlsaW5lIGNsYXNzPSJlbCIgcG9pbnRzPSIzNywwIDAsMTIwIDc1LDEyMCIvPjxwb2x5bGluZSBjbGFzcz0icCIgcG9pbnRzPSI1NSwxMjAgNTUsMTU1IiBzdHJva2UtZGFzaGFycmF5PSIzNSAzNSIvPjwvZz4KPC9nPgo8cmVjdCBjbGFzcz0ibiIgeD0iMTMyLjUiIHk9IjExMi41IiB3aWR0aD0iNTUiIGhlaWdodD0iMTU1IiByeD0iNCIgcnk9IjQiLz4KPGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNjUgMzM0KSIgc3Ryb2tlLWRhc2hhcnJheT0iMTAyIDEwMiI+PHBhdGggY2xhc3M9Im1sIiBkPSJNMCAzMEMwIDMwIDQwIDAgOTUgMCIvPjxwYXRoIGNsYXNzPSJtciIgZD0iTTk1IDBDMTUwIDAgMTkwIDMwIDE5MCAzMCIvPjwvZz4KPC9nPgo8L3N2Zz4=") center/contain no-repeat!important;
+}
+
+body.pb-loader-face>div.progress-bar-container>div.progress-bar::after{
+content:none!important;
+display:none!important;
+}
+
+/* Retro Cassette */
+body.pb-loader-cassette>div.progress-bar-container>div.progress-bar{
+width:300px!important;
+height:200px!important;
+transform:none!important;
+}
+
+body.pb-loader-cassette>div.progress-bar-container>div.progress-bar::before{
+content:""!important;
+position:absolute!important;
+inset:0!important;
+display:block!important;
+background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMjAwIiBvdmVyZmxvdz0idmlzaWJsZSI+CjxzdHlsZT4KLnd7dHJhbnNmb3JtLWJveDpmaWxsLWJveDt0cmFuc2Zvcm0tb3JpZ2luOmNlbnRlcjthbmltYXRpb246cnVuIDJzIGxpbmVhciBpbmZpbml0ZX0KQGtleWZyYW1lcyBydW57dG97dHJhbnNmb3JtOnJvdGF0ZSgzNjBkZWcpfX0KQG1lZGlhKHByZWZlcnMtcmVkdWNlZC1tb3Rpb246cmVkdWNlKXsud3thbmltYXRpb246bm9uZX19Cjwvc3R5bGU+CjxkZWZzPgo8ZmlsdGVyIGlkPSJjcyIgeD0iLTEwJSIgeT0iLTEwJSIgd2lkdGg9IjEyMCUiIGhlaWdodD0iMTMwJSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4KPGZlRHJvcFNoYWRvdyBpbj0iU291cmNlR3JhcGhpYyIgZHg9IjAiIGR5PSIyIiBzdGREZXZpYXRpb249IjIiIGZsb29kLWNvbG9yPSIjMDAwIiBmbG9vZC1vcGFjaXR5PSIuNCIgcmVzdWx0PSJhIi8+CjxmZURyb3BTaGFkb3cgaW49IlNvdXJjZUdyYXBoaWMiIGR4PSIwIiBkeT0iNyIgc3RkRGV2aWF0aW9uPSI2LjUiIGZsb29kLWNvbG9yPSIjMDAwIiBmbG9vZC1vcGFjaXR5PSIuMyIgcmVzdWx0PSJiIi8+CjxmZU1lcmdlPjxmZU1lcmdlTm9kZSBpbj0iYSIvPjxmZU1lcmdlTm9kZSBpbj0iYiIvPjxmZU1lcmdlTm9kZSBpbj0iU291cmNlR3JhcGhpYyIvPjwvZmVNZXJnZT4KPC9maWx0ZXI+CjxmaWx0ZXIgaWQ9ImRzIiB4PSItMjAlIiB5PSItMzAlIiB3aWR0aD0iMTYwJSIgaGVpZ2h0PSIxODAlIiBjb2xvci1pbnRlcnBvbGF0aW9uLWZpbHRlcnM9InNSR0IiPjxmZURyb3BTaGFkb3cgZHg9IjQiIGR5PSI0IiBzdGREZXZpYXRpb249IjciIGZsb29kLWNvbG9yPSIjMDAwIiBmbG9vZC1vcGFjaXR5PSIxIi8+PC9maWx0ZXI+CjwvZGVmcz4KPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIyMDAiIHJ4PSI4IiBmaWxsPSIjMjUyNTI1IiBmaWx0ZXI9InVybCgjY3MpIi8+CjxwYXRoIGQ9Ik04IDE5OC41SDI5MiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utb3BhY2l0eT0iLjIiIHN0cm9rZS13aWR0aD0iMyIvPgo8cGF0aCBkPSJNNDYuMzc1IDM2SDI1My4zNzVMMjY0Ljg3NSA0Ny41VjE1MUgzNC44NzVWNDcuNVoiIGZpbGw9IiNmZmZkZDAiLz4KPHBhdGggZD0iTTQ3LjY3NSA1MkgyNDcuNjc1TTQ3LjY3NSA2OUgyNDcuNjc1IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMSIvPgo8cmVjdCB4PSIzNS44MzUiIHk9Ijc4IiB3aWR0aD0iMjI4IiBoZWlnaHQ9IjUwIiBmaWxsPSIjZjJiYzAwIi8+CjxyZWN0IHg9IjgzLjgzNSIgeT0iNzgiIHdpZHRoPSIxMjgiIGhlaWdodD0iMzIiIHJ4PSIxNSIgZmlsbD0iIzE3MTcxNyIvPgo8cmVjdCB4PSIxMjMuMDM1IiB5PSI3OCIgd2lkdGg9IjQ4IiBoZWlnaHQ9IjI0IiBmaWxsPSIjMjUyNTI1Ii8+CjxnIGNsYXNzPSJ3Ij48Y2lyY2xlIGN4PSI5OC42MzUiIGN5PSI5My44NCIgcj0iMTQuNiIgZmlsbD0iIzE3MTcxNyIgc3Ryb2tlPSIjZmZmIiBzdHJva2Utd2lkdGg9IjQuNCIvPjxjaXJjbGUgY3g9Ijk4LjYzNSIgY3k9IjkzLjg0IiByPSIxMS40IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIi8+PC9nPgo8ZyBjbGFzcz0idyI+PGNpcmNsZSBjeD0iMTk2LjIzNSIgY3k9IjkzLjg0IiByPSIxNC42IiBmaWxsPSIjMTcxNzE3IiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iNC40Ii8+PGNpcmNsZSBjeD0iMTk2LjIzNSIgY3k9IjkzLjg0IiByPSIxMS40IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iNCAzIi8+PC9nPgo8dGV4dCB4PSIyMzUuODM1IiB5PSIxMDkiIGZpbGw9IiMxMTEiIGZvbnQtZmFtaWx5PSJBcmlhbCxzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2Ij45MDwvdGV4dD4KPHBhdGggZD0iTTM0Ljg3NSAxMzQuNEgyNjQuODc1VjE0OC40QTQgNCAwIDAgMSAyNjAuODc1IDE1Mi40SDM4Ljg3NUE0IDQgMCAwIDEgMzQuODc1IDE0OC40WiIgZmlsbD0iI2YxNWEyNSIvPgo8dGV4dCB4PSIxNDkuODc1IiB5PSIxNDYuNSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iIzExMSIgZm9udC1mYW1pbHk9IkFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iOCI+MiYjMjE1OzMwbWluPC90ZXh0Pgo8ZyBmaWx0ZXI9InVybCgjZHMpIj4KPHBhdGggZD0iTTg4LjYgMTUxSDIwOC42TDIyMy42IDIwMUg3My42WiIgZmlsbD0iIzI1MjUyNSIvPgo8ZyBmaWxsPSIjYmViZWJlIj4KPGNpcmNsZSBjeD0iMTAxLjYiIGN5PSIxODciIHI9IjQiLz48cmVjdCB4PSIxMjEuNiIgeT0iMTc1IiB3aWR0aD0iOCIgaGVpZ2h0PSI4IiByeD0iMiIvPgo8cmVjdCB4PSIxNjQuOCIgeT0iMTc1LjgiIHdpZHRoPSI4IiBoZWlnaHQ9IjgiIHJ4PSIyIi8+PGNpcmNsZSBjeD0iMTkyLjgiIGN5PSIxODcuOCIgcj0iNCIvPgo8L2c+CjwvZz4KPGcgZmlsbD0ibGlnaHRncmV5IiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMSI+CjxjaXJjbGUgY3g9IjE0IiBjeT0iMTQiIHI9IjUuNSIvPjxlbGxpcHNlIGN4PSIyODYuMzkiIGN5PSIxNCIgcng9IjUuMDk0IiByeT0iNS41Ii8+CjxjaXJjbGUgY3g9IjE0IiBjeT0iMTg2LjIiIHI9IjUuNSIvPjxjaXJjbGUgY3g9IjI4Ny42IiBjeT0iMTg2LjIiIHI9IjUuNSIvPjxjaXJjbGUgY3g9IjE0Ny42IiBjeT0iMTY1IiByPSI1LjUiLz4KPC9nPgo8ZyBmaWxsPSJub25lIiBzdHJva2U9IiMxMTEiIHN0cm9rZS13aWR0aD0iMSI+CjxwYXRoIGQ9Ik0xMSAxNEgxN00xNCAxMVYxN00yODMuMzkgMTRIMjg5LjM5TTI4Ni4zOSAxMVYxN00xMSAxODYuMkgxN00xNCAxODMuMlYxODkuMk0yODQuNiAxODYuMkgyOTAuNk0yODcuNiAxODMuMlYxODkuMk0xNDQuNiAxNjVIMTUwLjZNMTQ3LjYgMTYyVjE2OCIvPgo8L2c+Cjwvc3ZnPg==") center/contain no-repeat!important;
+}
+
+body.pb-loader-cassette>div.progress-bar-container>div.progress-bar::after{
+content:none!important;
+display:none!important;
+}
+
+/* Loading Letters */
+body.pb-loader-letters>div.progress-bar-container>div.progress-bar{
+width:177px!important;
+height:24px!important;
+transform:none!important;
+}
+
+body.pb-loader-letters>div.progress-bar-container>div.progress-bar::before{
+content:""!important;
+position:absolute!important;
+inset:0!important;
+display:block!important;
+background:url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxNzcgMjQiPgo8c3R5bGU+CnRzcGFue29wYWNpdHk6MDthbmltYXRpb246cGFzcyAycyBlYXNlLWluLW91dCBpbmZpbml0ZX0KLmx7YW5pbWF0aW9uLWRlbGF5Oi4yc30ub3thbmltYXRpb24tZGVsYXk6LjRzfS5he2FuaW1hdGlvbi1kZWxheTouNnN9LmR7YW5pbWF0aW9uLWRlbGF5Oi44c30uaXthbmltYXRpb24tZGVsYXk6MXN9Lm57YW5pbWF0aW9uLWRlbGF5OjEuMnN9Lmd7YW5pbWF0aW9uLWRlbGF5OjEuNHN9LmQxe2FuaW1hdGlvbi1uYW1lOnBhc3MxO2FuaW1hdGlvbi1kZWxheToxLjZzfS5kMnthbmltYXRpb24tbmFtZTpwYXNzMTthbmltYXRpb24tZGVsYXk6MnN9CkBrZXlmcmFtZXMgcGFzc3swJSwxMDAle29wYWNpdHk6MX01MCV7b3BhY2l0eTowfX0KQGtleWZyYW1lcyBwYXNzMXswJSwxMDAle29wYWNpdHk6MX01MCV7b3BhY2l0eTowfX0KQG1lZGlhKHByZWZlcnMtcmVkdWNlZC1tb3Rpb246cmVkdWNlKXt0c3BhbnthbmltYXRpb246bm9uZTtvcGFjaXR5OjF9fQo8L3N0eWxlPgo8ZGVmcz48ZmlsdGVyIGlkPSJzaGFkb3ciIHg9Ii0yMCUiIHk9Ii00MCUiIHdpZHRoPSIxNTAlIiBoZWlnaHQ9IjE5MCUiPjxmZURyb3BTaGFkb3cgZHg9IjIiIGR5PSIyIiBzdGREZXZpYXRpb249IjEuNSIgZmxvb2QtY29sb3I9IiMyMjM2M2YiLz48L2ZpbHRlcj48L2RlZnM+Cjx0ZXh0IHk9IjE4IiBmaWxsPSIjOGRjNGQ2IiBmaWx0ZXI9InVybCgjc2hhZG93KSIgZm9udC1mYW1pbHk9IkludGVyLEFyaWFsLHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMTYiPgo8dHNwYW4gY2xhc3M9ImwiIHg9IjAiPkw8L3RzcGFuPjx0c3BhbiBjbGFzcz0ibyIgeD0iMjEuNDUzIj5vPC90c3Bhbj48dHNwYW4gY2xhc3M9ImEiIHg9IjQzLjQwNiI+YTwvdHNwYW4+PHRzcGFuIGNsYXNzPSJkIiB4PSI2NC43NjYiPmQ8L3RzcGFuPjx0c3BhbiBjbGFzcz0iaSIgeD0iODYuOTM4Ij5pPC90c3Bhbj48dHNwYW4gY2xhc3M9Im4iIHg9IjEwMy4yMDMiPm48L3RzcGFuPjx0c3BhbiBjbGFzcz0iZyIgeD0iMTI1LjAzMSI+ZzwvdHNwYW4+PHRzcGFuIGNsYXNzPSJkMSIgeD0iMTQ3LjIxOSI+LjwvdHNwYW4+PHRzcGFuIGNsYXNzPSJkMiIgeD0iMTY0LjE1NiI+LjwvdHNwYW4+CjwvdGV4dD48L3N2Zz4=") center/contain no-repeat!important;
+}
+
+body.pb-loader-letters>div.progress-bar-container>div.progress-bar::after{
+content:none!important;
+display:none!important;
+}
+
+@media (prefers-reduced-motion:reduce){
+body.pb-loader-dots>div.progress-bar-container>div.progress-bar::before{
+animation:none!important;
+box-shadow:1em -.5em color-mix(in srgb,var(--highlight) 82%,transparent),-1em .5em color-mix(in srgb,var(--cyan) 82%,transparent)!important;
+}
+
+body.pb-loader-dots>div.progress-bar-container>div.progress-bar::after{
+animation:none!important;
+box-shadow:.5em 1em color-mix(in srgb,var(--teal) 82%,transparent),-.5em -1em color-mix(in srgb,var(--mint) 82%,transparent)!important;
+}
+}
+
+/* ========================================================================== */
+/*                  MODULE: FILE EXPLORER — SOFT FOLDER TREE
+/* ========================================================================== */
+
+.workspace-leaf-content[data-type="file-explorer"] {
+    --sys-folder-tree-padding-start: var(
+        --nav-item-children-padding-start,
+        var(--nav-item-children-padding-left, var(--size-4-2, 8px))
+    );
+    --sys-folder-tree-guide-width: var(--nav-indentation-guide-width, 1px);
+    --sys-folder-tree-guide-gap: calc(
+        var(--sys-folder-tree-padding-start) + var(--sys-folder-tree-guide-width)
+    );
+    --sys-folder-tree-branch-tail: var(--size-4-2, 8px);
+    --sys-folder-tree-branch-length: calc(
+        var(--sys-folder-tree-guide-gap) + var(--sys-folder-tree-branch-tail)
+    );
+    --sys-folder-tree-row-center: calc(
+        var(--nav-item-size, 16px) / 2 + var(--size-4-2, 8px)
+    );
+
+    --sys-folder-tree-radius: 7px;
+    --sys-folder-tree-line-width: 1px;
+    --sys-folder-tree-hover-width: 1.5px;
+    --sys-folder-tree-hover-elbow-width: 2px;
+    --sys-folder-tree-file-dot-size: 2px;
+    --sys-folder-tree-file-dot-gap: 3px;
+    --sys-folder-tree-hover-color: color-mix(
+        in srgb,
+        var(--cc-accent, var(--interactive-accent)) 90%,
+        var(--text-normal) 10%
+    );
+}
+
+/* Johnny.Decimal-oriented depth contrast. */
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root > .nav-folder-children {
+    --sys-folder-tree-depth-strength: 100%;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root > .nav-folder-children .nav-folder > .nav-folder-children {
+    --sys-folder-tree-depth-strength: 60%;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root > .nav-folder-children .nav-folder .nav-folder > .nav-folder-children {
+    --sys-folder-tree-depth-strength: 40%;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root > .nav-folder-children .nav-folder .nav-folder .nav-folder > .nav-folder-children {
+    --sys-folder-tree-depth-strength: 30%;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root > .nav-folder-children .nav-folder .nav-folder .nav-folder .nav-folder > .nav-folder-children {
+    --sys-folder-tree-depth-strength: 24%;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root > .nav-folder-children .nav-folder .nav-folder .nav-folder .nav-folder .nav-folder > .nav-folder-children {
+    --sys-folder-tree-depth-strength: 19%;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder.mod-root > .nav-folder-children .nav-folder .nav-folder .nav-folder .nav-folder .nav-folder .nav-folder .nav-folder-children {
+    --sys-folder-tree-depth-strength: 15%;
+}
+
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children {
+    --sys-folder-tree-line-color: color-mix(
+        in srgb,
+        var(--nav-indentation-guide-color, var(--background-modifier-border)) var(--sys-folder-tree-depth-strength, 76%),
+        transparent
+    );
+    border-left: 0 !important;
+    border-inline-start: 0 !important;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > :is(.nav-folder, .nav-file) { position: relative; }
+.workspace-leaf-content[data-type="file-explorer"] :is(.nav-folder-title, .nav-file-title) { position: relative; z-index: 1; }
+
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-folder:not(:last-child)::before {
+    content:""; position:absolute; z-index:0; pointer-events:none;
+    left:calc(-1 * var(--sys-folder-tree-guide-gap)); top:0; bottom:0;
+    width:var(--sys-folder-tree-line-width); background:var(--sys-folder-tree-line-color);
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-file:not(:last-child)::before {
+    content:""; position:absolute; z-index:0; pointer-events:none;
+    left:calc(-1 * var(--sys-folder-tree-guide-gap)); top:0; bottom:0;
+    width:var(--sys-folder-tree-line-width); border-left:0!important;
+    background:repeating-linear-gradient(to bottom,
+        var(--sys-folder-tree-line-color) 0,
+        var(--sys-folder-tree-line-color) var(--sys-folder-tree-file-dot-size),
+        transparent var(--sys-folder-tree-file-dot-size),
+        transparent calc(var(--sys-folder-tree-file-dot-size) + var(--sys-folder-tree-file-dot-gap)));
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-folder:not(:last-child)::after {
+    content:""; position:absolute; z-index:0; pointer-events:none;
+    left:calc(-1 * var(--sys-folder-tree-guide-gap)); top:var(--sys-folder-tree-row-center);
+    width:var(--sys-folder-tree-branch-length);
+    border-top:var(--sys-folder-tree-line-width) solid var(--sys-folder-tree-line-color);
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-file:not(:last-child)::after {
+    content:""; position:absolute; z-index:0; pointer-events:none;
+    left:calc(-1 * var(--sys-folder-tree-guide-gap)); top:var(--sys-folder-tree-row-center);
+    width:var(--sys-folder-tree-branch-length);
+    border-top:var(--sys-folder-tree-line-width) dotted var(--sys-folder-tree-line-color);
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-folder:last-child::before {
+    content:""; position:absolute; z-index:0; pointer-events:none;
+    left:calc(-1 * var(--sys-folder-tree-guide-gap)); top:0;
+    width:var(--sys-folder-tree-branch-length); height:var(--sys-folder-tree-row-center);
+    border-left:var(--sys-folder-tree-line-width) solid var(--sys-folder-tree-line-color);
+    border-bottom:var(--sys-folder-tree-line-width) solid var(--sys-folder-tree-line-color);
+    border-bottom-left-radius:var(--sys-folder-tree-radius);
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-file:last-child::before {
+    content:""; position:absolute; z-index:0; pointer-events:none;
+    left:calc(-1 * var(--sys-folder-tree-guide-gap)); top:0;
+    width:var(--sys-folder-tree-branch-length); height:var(--sys-folder-tree-row-center);
+    border-left:var(--sys-folder-tree-line-width) dotted var(--sys-folder-tree-line-color);
+    border-bottom:var(--sys-folder-tree-line-width) dotted var(--sys-folder-tree-line-color);
+    border-bottom-left-radius:var(--sys-folder-tree-radius);
+}
+
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-folder:not(:last-child):has(~ .nav-folder :is(.nav-folder-title,.nav-file-title):hover,~ .nav-file > .nav-file-title:hover)::before {
+    width:var(--sys-folder-tree-hover-width); background:var(--sys-folder-tree-hover-color);
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-file:not(:last-child):has(~ .nav-folder :is(.nav-folder-title,.nav-file-title):hover,~ .nav-file > .nav-file-title:hover)::before {
+    border-left:0!important; width:var(--sys-folder-tree-hover-width);
+    background:repeating-linear-gradient(to bottom,
+        var(--sys-folder-tree-hover-color) 0,
+        var(--sys-folder-tree-hover-color) var(--sys-folder-tree-file-dot-size),
+        transparent var(--sys-folder-tree-file-dot-size),
+        transparent calc(var(--sys-folder-tree-file-dot-size) + var(--sys-folder-tree-file-dot-gap)));
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-folder:not(:last-child):has(:is(.nav-folder-title,.nav-file-title):hover)::before {
+    width:var(--sys-folder-tree-hover-width);
+    background:linear-gradient(to bottom,
+        var(--sys-folder-tree-hover-color) 0,
+        var(--sys-folder-tree-hover-color) var(--sys-folder-tree-row-center),
+        var(--sys-folder-tree-line-color) var(--sys-folder-tree-row-center),
+        var(--sys-folder-tree-line-color) 100%);
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-file:not(:last-child):has(> .nav-file-title:hover)::before {
+    border-left:0!important; width:var(--sys-folder-tree-hover-width);
+    background:repeating-linear-gradient(to bottom,
+        var(--sys-folder-tree-hover-color) 0,
+        var(--sys-folder-tree-hover-color) var(--sys-folder-tree-file-dot-size),
+        transparent var(--sys-folder-tree-file-dot-size),
+        transparent calc(var(--sys-folder-tree-file-dot-size) + var(--sys-folder-tree-file-dot-gap)));
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-folder:not(:last-child):has(:is(.nav-folder-title,.nav-file-title):hover)::after {
+    border-top-color:var(--sys-folder-tree-hover-color); border-top-width:var(--sys-folder-tree-hover-width); border-top-style:solid;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-file:not(:last-child):has(> .nav-file-title:hover)::after {
+    border-top-color:var(--sys-folder-tree-hover-color); border-top-width:var(--sys-folder-tree-hover-width); border-top-style:dotted;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-folder:last-child:has(:is(.nav-folder-title,.nav-file-title):hover)::before {
+    border-left-color:var(--sys-folder-tree-hover-color); border-left-width:var(--sys-folder-tree-hover-elbow-width);
+    border-bottom-color:var(--sys-folder-tree-hover-color); border-bottom-width:var(--sys-folder-tree-hover-elbow-width); border-bottom-style:solid;
+}
+.workspace-leaf-content[data-type="file-explorer"] .nav-folder-children > .nav-file:last-child:has(> .nav-file-title:hover)::before {
+    border-left-color:var(--sys-folder-tree-hover-color); border-left-width:var(--sys-folder-tree-hover-elbow-width); border-left-style:dotted;
+    border-bottom-color:var(--sys-folder-tree-hover-color); border-bottom-width:var(--sys-folder-tree-hover-elbow-width); border-bottom-style:dotted;
+}
+
+/* ========================================================================== */
+/*          MODULE: VIEW HEADER — COLLAPSIBLE BREADCRUMB
+/* ========================================================================== */
+
+.view-header {
+  --vhbc-open-duration: 560ms;
+  --vhbc-close-duration: 320ms;
+  --vhbc-node-duration: 360ms;
+  --vhbc-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --vhbc-ease-in: cubic-bezier(0.4, 0, 0.6, 1);
+  --vhbc-path-max: min(72vw, 64rem);
+}
+
+.view-header .view-header-title-container {
+  --file-header-justify: center;
+  gap: 0;
+}
+
+.view-header .view-header-title-container > .view-header-title-parent {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-inline-size: var(--vhbc-path-max);
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  align-items: center;
+  overflow: clip;
+  white-space: nowrap;
+}
+
+.view-header .view-header-title-container > .view-header-title {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.view-header .view-header-title-parent > .view-header-breadcrumb,
+.view-header .view-header-title-parent > .view-header-breadcrumb-separator {
+  --vhbc-step-delay: 300ms;
+  opacity: 0;
+  transform: translateX(0.52rem);
+  transform-origin: right center;
+  transition-property: opacity, transform;
+  transition-duration: 180ms, var(--vhbc-node-duration);
+  transition-timing-function: linear, var(--vhbc-ease-out);
+  transition-delay: 0ms;
+}
+
+.view-header .view-header-title-parent > :nth-last-child(1)  { --vhbc-step-delay:   0ms; }
+.view-header .view-header-title-parent > :nth-last-child(2)  { --vhbc-step-delay:  28ms; }
+.view-header .view-header-title-parent > :nth-last-child(3)  { --vhbc-step-delay:  56ms; }
+.view-header .view-header-title-parent > :nth-last-child(4)  { --vhbc-step-delay:  84ms; }
+.view-header .view-header-title-parent > :nth-last-child(5)  { --vhbc-step-delay: 112ms; }
+.view-header .view-header-title-parent > :nth-last-child(6)  { --vhbc-step-delay: 140ms; }
+.view-header .view-header-title-parent > :nth-last-child(7)  { --vhbc-step-delay: 168ms; }
+.view-header .view-header-title-parent > :nth-last-child(8)  { --vhbc-step-delay: 196ms; }
+.view-header .view-header-title-parent > :nth-last-child(9)  { --vhbc-step-delay: 224ms; }
+.view-header .view-header-title-parent > :nth-last-child(10) { --vhbc-step-delay: 252ms; }
+.view-header .view-header-title-parent > :nth-last-child(11) { --vhbc-step-delay: 280ms; }
+.view-header .view-header-title-parent > :nth-last-child(12) { --vhbc-step-delay: 300ms; }
+
+.view-header .view-header-title-container:has(
+  > .view-header-title:hover,
+  > .view-header-title-parent:hover
+) > .view-header-title-parent > .view-header-breadcrumb,
+.view-header .view-header-title-container:has(
+  > .view-header-title:hover,
+  > .view-header-title-parent:hover
+) > .view-header-title-parent > .view-header-breadcrumb-separator,
+.view-header .view-header-title-container:focus-within
+  > .view-header-title-parent > .view-header-breadcrumb,
+.view-header .view-header-title-container:focus-within
+  > .view-header-title-parent > .view-header-breadcrumb-separator {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: var(--vhbc-step-delay);
+}
+
+@supports (interpolate-size: allow-keywords) {
+  .view-header .view-header-title-container {
+    interpolate-size: allow-keywords;
+  }
+
+  .view-header .view-header-title-container > .view-header-title-parent {
+    inline-size: 0;
+    transition: inline-size var(--vhbc-close-duration) var(--vhbc-ease-in);
+  }
+
+  .view-header .view-header-title-container:has(
+    > .view-header-title:hover,
+    > .view-header-title-parent:hover
+  ) > .view-header-title-parent,
+  .view-header .view-header-title-container:focus-within
+    > .view-header-title-parent {
+    inline-size: max-content;
+    transition-duration: var(--vhbc-open-duration);
+    transition-timing-function: var(--vhbc-ease-out);
+  }
+}
+
+@supports not (interpolate-size: allow-keywords) {
+  .view-header .view-header-title-container > .view-header-title-parent {
+    max-inline-size: 0;
+    transition: max-inline-size 420ms var(--vhbc-ease-in);
+  }
+
+  .view-header .view-header-title-container:has(
+    > .view-header-title:hover,
+    > .view-header-title-parent:hover
+  ) > .view-header-title-parent,
+  .view-header .view-header-title-container:focus-within
+    > .view-header-title-parent {
+    max-inline-size: min(72vw, 36rem);
+    transition-duration: 680ms;
+    transition-timing-function: var(--vhbc-ease-out);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view-header .view-header-title-container > .view-header-title-parent,
+  .view-header .view-header-title-parent > .view-header-breadcrumb,
+  .view-header .view-header-title-parent > .view-header-breadcrumb-separator {
+    transition: none;
+  }
+}

@@ -1,0 +1,29 @@
+---
+id: Depth_Jump_Leap
+name: Depth Jump Leap
+level: beginner
+force: push
+mechanic: compound
+equipment: other
+category: plyometrics
+primaryMuscles:
+  - quadriceps
+secondaryMuscles:
+  - abductors
+  - adductors
+  - calves
+  - glutes
+  - hamstrings
+tags:
+  - calisthenics
+preview: "[[Depth_Jump_Leap-preview.webp]]"
+animation: "[[Depth_Jump_Leap.gif]]"
+images:
+  - "[[Depth_Jump_Leap.gif]]"
+---
+
+## How to Perform
+1. For this drill you will need two boxes or benches, one 12 to 16 inches high and the other 22 to 26 inches high.
+2. Stand on one of the two boxes with arms at the sides; feet should be together and slightly off the edge as in the depth jump. Place the other box approximately two or three feet in front of and facing the performer.
+3. Begin by dropping off the initial box, landing and simultaneously taking off with both feet.
+4. Rebound by driving upward and outward as intensely as possible, using the arms and full extension of the body to jump onto the higher box. Again, allow the legs to absorb the impact.
