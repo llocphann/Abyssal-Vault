@@ -22,23 +22,8 @@
               "icon": "lucide-file",
               "title": "Homepage"
             }
-          },
-          {
-            "id": "6d1beae5349b70e5",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "00_Capture/03_Zettelkasten/20260105103000 - Meaning Depends on Context.md",
-                "mode": "preview",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "20260105103000 - Meaning Depends on Context"
-            }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -316,13 +301,14 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "c081451803d30e39",
+  "active": "5ccbd243b28f37db",
   "lastOpenFiles": [
-    "00_Capture/02_Cornell/Sample — Language and Context.md",
-    "00_Capture/03_Zettelkasten/20260105103000 - Meaning Depends on Context.md",
+    "00_Capture/02_Cornell/hdufshd.md",
     "90_System/98_Homepage/Homepage.md",
-    "90_System/93_Configuration/settings.md",
+    "00_Capture/02_Cornell/Sample — Language and Context.md",
     "00_Capture/03_Zettelkasten/20260914190129 - d.md",
+    "00_Capture/03_Zettelkasten/20260105103000 - Meaning Depends on Context.md",
+    "90_System/93_Configuration/settings.md",
     "__morphic_competitive_bench__/Reset.md",
     "__morphic_competitive_bench__/Resource.md",
     "__morphic_competitive_bench__/Current-C.md",
@@ -353,7 +339,6 @@
     "20_Personal_Life/22_Finance/Finance_Dashboard.md",
     "20_Personal_Life/27_Game_Tracker/Game_Collection.base",
     "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
-    "20_Personal_Life/27_Game_Tracker/Games/Core Keeper.md",
     "20_Personal_Life/26_Food_&_Drinks/FoodnDrinks.base",
     "00_Capture/01_Journal/2026/September",
     "00_Capture/01_Journal/2026",
