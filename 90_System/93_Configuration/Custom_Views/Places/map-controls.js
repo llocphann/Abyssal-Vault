@@ -14,7 +14,11 @@
       ...mapHost.querySelectorAll('button.maplibregl-ctrl-zoom-in'),
       ...mapHost.querySelectorAll('button.maplibregl-ctrl-zoom-out'),
     ];
-    for (const control of controls) control.removeAttribute('title');
+
+    for (const control of controls) {
+      // Remove browser hover tooltips while preserving aria-label accessibility text.
+      control.removeAttribute('title');
+    }
   }
 
   polishControls();

@@ -1,1 +1,172 @@
-.cv-rating{display:flex;align-items:center;gap:10px}.cv-rating-stars{position:relative;display:inline-grid}.cv-rating-layer{grid-area:1/1;display:flex;gap:2px;pointer-events:none}.cv-rating-layer--empty{color:var(--text-faint)}.cv-rating-layer--filled{width:var(--cv-rating-fill,0%);overflow:hidden;color:var(--color-yellow,var(--cvp-accent));white-space:nowrap}.cv-rating-star::before{content:"★"}.cv-rating-hits{position:absolute;inset:0;display:grid;grid-template-columns:repeat(10,1fr)}.cv-rating-hit{min-width:0;padding:0;border:0;background:transparent;box-shadow:none;opacity:0;cursor:pointer}.cv-rating-value{min-width:3.2em;color:var(--cvp-muted);font-size:.72rem}.cv-rating.is-saving{opacity:.65}.cv-place-note-render[role="textbox"]{cursor:text}.cv-place.is-native-editor .cv-place-note-render{padding:18px 22px}.cv-place-note-state{display:inline-block;margin-top:4px}
+/* Places parity with Movies / TV: Live Preview notes and 10-point rating. */
+
+.cv-place-note-state {
+  display: block;
+  min-height: 1em;
+  margin-top: 4px;
+  color: var(--cvp-faint);
+  font-family: var(--font-monospace);
+  font-size: .62rem;
+  line-height: 1.2;
+}
+
+.cv-place-note-render {
+  cursor: text;
+}
+
+.cv-place.is-native-editor .cv-place-paper {
+  border-color: color-mix(in srgb, var(--cvp-type-accent, var(--cvp-accent)) 62%, var(--cvp-paper-edge) 38%);
+  box-shadow:
+    0 8px 24px color-mix(in srgb, var(--cvp-shadow) 64%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--cvp-type-accent, var(--cvp-accent)) 10%, transparent);
+}
+
+.cv-place-note-render [data-cv-editable-placeholder],
+.cv-place-note-render .markdown-source-view,
+.cv-place-note-render .cm-editor,
+.cv-place-note-render .cm-scroller,
+.cv-place-note-render .cm-sizer,
+.cv-place-note-render .cm-contentContainer,
+.cv-place-note-render .cm-content {
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  min-height: calc(var(--cvp-paper-line) * 14) !important;
+  background: transparent !important;
+}
+
+.cv-place-note-render .cm-editor,
+.cv-place-note-render .cm-scroller {
+  height: auto !important;
+}
+
+.cv-place-note-render .cm-scroller {
+  overflow: visible !important;
+}
+
+.cv-place-note-render .cm-content {
+  padding: 0 !important;
+  caret-color: var(--cvp-type-accent, var(--cvp-accent));
+}
+
+.cv-place-note-render .cm-gutters {
+  display: none !important;
+}
+
+/* Rating copied from the Movies / TV interaction model: five visual stars, ten hit zones. */
+.cv-place .cv-rating {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 11px;
+}
+
+.cv-place .cv-rating-stars {
+  position: relative;
+  width: min(100%, 186px);
+  min-width: 0;
+  height: clamp(22px, 3cqi, 30px);
+  flex: 1 1 auto;
+}
+
+.cv-place .cv-rating-layer {
+  position: absolute;
+  inset: 0 auto 0 0;
+  display: flex;
+  gap: clamp(3px, .55cqi, 6px);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cv-place .cv-rating-layer--empty {
+  width: 100%;
+  color: var(--cvp-border-strong);
+}
+
+.cv-place .cv-rating-layer--filled {
+  width: 100%;
+  color: var(--cvp-type-accent, var(--cvp-accent));
+  -webkit-clip-path: inset(0 calc(100% - var(--cv-rating-fill, 0%)) 0 0);
+  clip-path: inset(0 calc(100% - var(--cv-rating-fill, 0%)) 0 0);
+}
+
+.cv-place .cv-rating-star {
+  width: auto;
+  height: clamp(22px, 3cqi, 30px);
+  min-width: 0;
+  flex: 1 1 0;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z'/></svg>") center / contain no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 22 12 18.56 5.82 22 7 14.14 2 9.27l6.91-1.01L12 2z'/></svg>") center / contain no-repeat;
+}
+
+.cv-place .cv-rating-hits {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+}
+
+.cv-place .cv-rating .cv-rating-hit {
+  width: auto !important;
+  height: auto !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  cursor: pointer;
+  transform: none !important;
+}
+
+.cv-place .cv-rating .cv-rating-hit:hover,
+.cv-place .cv-rating .cv-rating-hit:active,
+.cv-place .cv-rating .cv-rating-hit:focus,
+.cv-place .cv-rating .cv-rating-hit:disabled {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: transparent !important;
+  transform: none !important;
+}
+
+.cv-place .cv-rating.is-saving .cv-rating-hit {
+  cursor: wait;
+}
+
+.cv-place .cv-rating-hit:focus-visible {
+  outline: 1px solid var(--cvp-type-accent, var(--cvp-accent));
+  outline-offset: 1px;
+}
+
+.cv-place .cv-rating-value {
+  min-width: 3.7em;
+  color: var(--cvp-type-accent, var(--cvp-accent-soft));
+  font-family: var(--font-monospace);
+  font-size: .82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Local Index attribution is rendered as a static credit below the map. */
+.cv-place-local-map-embed .maplibregl-ctrl-bottom-right,
+.cv-place-local-map-embed details.maplibregl-ctrl-attrib,
+.cv-place-local-map-embed .maplibregl-ctrl-attrib {
+  display: none !important;
+}
+
+@container (max-width: 500px) {
+  .cv-place .cv-rating {
+    gap: 8px;
+  }
+
+  .cv-place .cv-rating-value {
+    font-size: .74rem;
+  }
+}

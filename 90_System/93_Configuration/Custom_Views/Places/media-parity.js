@@ -14,14 +14,236 @@
 
   async function updateFrontmatter(property, value) {
     if (!app?.fileManager || !file) throw new Error("Place file is unavailable");
-    await app.fileManager.processFrontMatter(file, draft => { draft[property] = value; });
+    await app.fileManager.processFrontMatter(file, draft => {
+      draft[property] = value;
+    });
     frontmatter[property] = value;
   }
-  function setSaveState(message, tone = "") { const state=q('[data-role="save-state"]'); if(!state)return; state.textContent=message; state.dataset.tone=tone; }
-  function makeElement(tag,className,text){const element=doc.createElement(tag);if(className)element.className=className;if(text!==undefined)element.textContent=String(text);return element;}
-  function ensureRatingChip(){const host=q('[data-role="hero-chips"]');if(!host)return;const rating=Math.max(0,Math.min(10,Number(frontmatter.rating)||0));const candidates=Array.from(host.children).filter(element=>/^\d+(?:\.\d+)?\/(?:5|10)$/.test(String(element.textContent||"").trim()));if(!rating){candidates.forEach(element=>element.remove());return;}const chip=candidates.shift()||makeElement("span","cv-place-chip");const label=`${rating}/10`;chip.dataset.cvpRatingChip="true";if(String(chip.textContent||"").trim()!==label)chip.textContent=label;candidates.forEach(element=>element.remove());if(!chip.isConnected)host.appendChild(chip);}
-  function initRating(){const rating=q('[data-role="rating"]');const emptyLayer=q('[data-role="rating-empty"]');const filledLayer=q('[data-role="rating-filled"]');const hits=q('[data-role="rating-hits"]');const output=q('[data-role="rating-value"]');if(!rating||!emptyLayer||!filledLayer||!hits||!output)return;emptyLayer.replaceChildren();filledLayer.replaceChildren();for(let index=0;index<5;index+=1){emptyLayer.appendChild(makeElement("span","cv-rating-star"));filledLayer.appendChild(makeElement("span","cv-rating-star"));}let committed=Math.max(0,Math.min(10,Number(frontmatter.rating)||0));function paint(value){const safe=Math.max(0,Math.min(10,Number(value)||0));rating.style.setProperty("--cv-rating-fill",`${safe*10}%`);output.value=`${safe}/10`;output.textContent=`${safe}/10`;rating.setAttribute("aria-label",`Rating ${safe} out of 10`);}let saving=false;async function commit(next){if(saving)return;saving=true;const previous=committed;committed=next;paint(next);rating.classList.add("is-saving");const hitButtons=Array.from(hits.querySelectorAll("button"));hitButtons.forEach(button=>{button.disabled=true;});setSaveState("Saving…");try{await updateFrontmatter("rating",next);ensureRatingChip();setSaveState("Saved","success");}catch(error){committed=previous;paint(previous);setSaveState("Could not save","error");console.error("[custom-view:places] Could not save rating",error);}finally{rating.classList.remove("is-saving");hitButtons.forEach(button=>{button.disabled=false;});saving=false;}}hits.replaceChildren();for(let score=1;score<=10;score+=1){const hit=makeElement("button","cv-rating-hit");hit.type="button";hit.dataset.score=String(score);hit.setAttribute("aria-label",`Rate ${score} out of 10`);hit.addEventListener("mouseenter",()=>paint(score));hit.addEventListener("focus",()=>paint(score));hit.addEventListener("click",()=>void commit(score));hit.addEventListener("blur",()=>paint(committed));hits.appendChild(hit);}hits.addEventListener("mouseleave",()=>paint(committed));paint(committed);ensureRatingChip();}
-  function initBodyEditor(){const render=q('[data-role="note-render"]');const state=q('[data-role="note-state"]');if(!render||!state)return;let switchingMode=false;function findLeaf(){const leaves=typeof app?.workspace?.getLeavesOfType==="function"?app.workspace.getLeavesOfType("markdown"):[];return leaves.find(candidate=>candidate?.view?.file?.path===file?.path&&candidate.view.contentEl?.contains(container));}async function switchMode(mode,source,pendingText){if(switchingMode)return;const leaf=findLeaf();if(!leaf||typeof leaf.getViewState!=="function"||typeof leaf.setViewState!=="function"){state.textContent="Open this note in Live Preview to write here";return;}switchingMode=true;state.textContent=pendingText;try{const viewState=leaf.getViewState();await leaf.setViewState({...viewState,active:true,state:{...(viewState.state||{}),mode,source}});}catch(error){switchingMode=false;state.textContent=mode==="preview"?"Could not return to reading":"Could not start writing";console.error("[custom-view:places] Could not switch note mode",error);}}const nativePlaceholder=render.querySelector("[data-cv-editable-placeholder]");if(nativePlaceholder){root.classList.add("is-native-editor");state.textContent="Writing · autosaved";render.setAttribute("role","textbox");render.removeAttribute("aria-label");render.removeAttribute("title");return;}render.classList.toggle("is-empty",!bodyContent.trim());render.setAttribute("tabindex","0");render.setAttribute("role","textbox");render.removeAttribute("aria-label");render.removeAttribute("title");state.textContent="Click notes to write";render.addEventListener("click",event=>{if(event.target?.closest?.("a, button, input, textarea, select"))return;void switchMode("source",false,"Opening Live Preview…");});render.addEventListener("keydown",event=>{if(event.key!=="Enter"&&event.key!=="F2")return;event.preventDefault();void switchMode("source",false,"Opening Live Preview…");});}
-  function initCompactAttribution(){const mapHost=q('[data-role="local-map-embed"]');if(!mapHost||!win?.MutationObserver)return;function compact(){const controls=Array.from(mapHost.querySelectorAll("details.maplibregl-ctrl-attrib"));for(const control of controls){if(control.dataset.cvpCompactReady==="true")continue;control.removeAttribute("open");control.dataset.cvpCompactReady="true";}return controls.length>0;}compact();const observer=new win.MutationObserver(()=>compact());observer.observe(mapHost,{childList:true,subtree:true});}
-  initRating();initBodyEditor();initCompactAttribution();
+
+  function setSaveState(message, tone = "") {
+    const state = q('[data-role="save-state"]');
+    if (!state) return;
+    state.textContent = message;
+    state.dataset.tone = tone;
+  }
+
+  function makeElement(tag, className, text) {
+    const element = doc.createElement(tag);
+    if (className) element.className = className;
+    if (text !== undefined) element.textContent = String(text);
+    return element;
+  }
+
+  function ensureRatingChip() {
+    const host = q('[data-role="hero-chips"]');
+    if (!host) return;
+    const rating = Math.max(0, Math.min(10, Number(frontmatter.rating) || 0));
+    const candidates = Array.from(host.children).filter(element => /^\d+(?:\.\d+)?\/(?:5|10)$/.test(String(element.textContent || "").trim()));
+
+    if (!rating) {
+      candidates.forEach(element => element.remove());
+      return;
+    }
+
+    const chip = candidates.shift() || makeElement("span", "cv-place-chip");
+    const label = `${rating}/10`;
+    chip.dataset.cvpRatingChip = "true";
+    if (String(chip.textContent || "").trim() !== label) chip.textContent = label;
+    candidates.forEach(element => element.remove());
+    if (!chip.isConnected) host.appendChild(chip);
+  }
+
+  function initRating() {
+    const rating = q('[data-role="rating"]');
+    const emptyLayer = q('[data-role="rating-empty"]');
+    const filledLayer = q('[data-role="rating-filled"]');
+    const hits = q('[data-role="rating-hits"]');
+    const output = q('[data-role="rating-value"]');
+    if (!rating || !emptyLayer || !filledLayer || !hits || !output) return;
+
+    emptyLayer.replaceChildren();
+    filledLayer.replaceChildren();
+    for (let index = 0; index < 5; index += 1) {
+      emptyLayer.appendChild(makeElement("span", "cv-rating-star"));
+      filledLayer.appendChild(makeElement("span", "cv-rating-star"));
+    }
+
+    let committed = Math.max(0, Math.min(10, Number(frontmatter.rating) || 0));
+
+    function paint(value) {
+      const safe = Math.max(0, Math.min(10, Number(value) || 0));
+      rating.style.setProperty("--cv-rating-fill", `${safe * 10}%`);
+      output.value = `${safe}/10`;
+      output.textContent = `${safe}/10`;
+      rating.setAttribute("aria-label", `Rating ${safe} out of 10`);
+    }
+
+    let saving = false;
+    async function commit(next) {
+      if (saving) return;
+      saving = true;
+      const previous = committed;
+      committed = next;
+      paint(next);
+      rating.classList.add("is-saving");
+      const hitButtons = Array.from(hits.querySelectorAll("button"));
+      hitButtons.forEach(button => { button.disabled = true; });
+      setSaveState("Saving…");
+      try {
+        await updateFrontmatter("rating", next);
+        ensureRatingChip();
+        setSaveState("Saved", "success");
+      } catch (error) {
+        committed = previous;
+        paint(previous);
+        setSaveState("Could not save", "error");
+        console.error("[custom-view:places] Could not save rating", error);
+      } finally {
+        rating.classList.remove("is-saving");
+        hitButtons.forEach(button => { button.disabled = false; });
+        saving = false;
+      }
+    }
+
+    hits.replaceChildren();
+    for (let score = 1; score <= 10; score += 1) {
+      const hit = makeElement("button", "cv-rating-hit");
+      hit.type = "button";
+      hit.dataset.score = String(score);
+      hit.setAttribute("aria-label", `Rate ${score} out of 10`);
+      hit.addEventListener("mouseenter", () => paint(score));
+      hit.addEventListener("focus", () => paint(score));
+      hit.addEventListener("click", () => void commit(score));
+      hit.addEventListener("blur", () => paint(committed));
+      hits.appendChild(hit);
+    }
+
+    hits.addEventListener("mouseleave", () => paint(committed));
+    paint(committed);
+    ensureRatingChip();
+
+    const chipHost = q('[data-role="hero-chips"]');
+    if (chipHost && win?.MutationObserver) {
+      let scheduled = false;
+      const observer = new win.MutationObserver(() => {
+        if (scheduled) return;
+        scheduled = true;
+        win.queueMicrotask(() => {
+          scheduled = false;
+          ensureRatingChip();
+        });
+      });
+      observer.observe(chipHost, { childList: true, subtree: true, characterData: true });
+    }
+  }
+
+  function initBodyEditor() {
+    const render = q('[data-role="note-render"]');
+    const state = q('[data-role="note-state"]');
+    if (!render || !state) return;
+
+    let switchingMode = false;
+
+    function findLeaf() {
+      const leaves = typeof app?.workspace?.getLeavesOfType === "function"
+        ? app.workspace.getLeavesOfType("markdown")
+        : [];
+      return leaves.find(candidate =>
+        candidate?.view?.file?.path === file?.path &&
+        candidate.view.contentEl?.contains(container)
+      );
+    }
+
+    async function switchMode(mode, source, pendingText) {
+      if (switchingMode) return;
+      const leaf = findLeaf();
+      if (!leaf || typeof leaf.getViewState !== "function" || typeof leaf.setViewState !== "function") {
+        state.textContent = "Open this note in Live Preview to write here";
+        return;
+      }
+
+      switchingMode = true;
+      state.textContent = pendingText;
+      try {
+        const viewState = leaf.getViewState();
+        await leaf.setViewState({
+          ...viewState,
+          active: true,
+          state: {
+            ...(viewState.state || {}),
+            mode,
+            source,
+          },
+        });
+      } catch (error) {
+        switchingMode = false;
+        state.textContent = mode === "preview" ? "Could not return to reading" : "Could not start writing";
+        console.error("[custom-view:places] Could not switch note mode", error);
+      }
+    }
+
+    const nativePlaceholder = render.querySelector("[data-cv-editable-placeholder]");
+    if (nativePlaceholder) {
+      root.classList.add("is-native-editor");
+      state.textContent = "Writing · autosaved";
+      render.setAttribute("role", "textbox");
+      render.removeAttribute("aria-label");
+      render.removeAttribute("title");
+
+      const Controller = win?.AbortController || AbortController;
+      const outsideController = new Controller();
+      doc.addEventListener("click", event => {
+        if (!root.isConnected) {
+          outsideController.abort();
+          return;
+        }
+        if (render.contains(event.target)) return;
+        win?.setTimeout?.(() => {
+          void switchMode("preview", false, "Returning to reading…");
+        }, 0);
+      }, { capture: true, signal: outsideController.signal });
+      return;
+    }
+
+    render.classList.toggle("is-empty", !bodyContent.trim());
+    render.setAttribute("tabindex", "0");
+    render.setAttribute("role", "textbox");
+    render.removeAttribute("aria-label");
+    render.removeAttribute("title");
+    state.textContent = "Click notes to write";
+
+    render.addEventListener("click", event => {
+      if (event.target?.closest?.("a, button, input, textarea, select")) return;
+      void switchMode("source", false, "Opening Live Preview…");
+    });
+
+    render.addEventListener("keydown", event => {
+      if (event.key !== "Enter" && event.key !== "F2") return;
+      event.preventDefault();
+      void switchMode("source", false, "Opening Live Preview…");
+    });
+  }
+
+  function initCompactAttribution() {
+    const mapHost = q('[data-role="local-map-embed"]');
+    if (!mapHost || !win?.MutationObserver) return;
+
+    function compact() {
+      const controls = Array.from(mapHost.querySelectorAll("details.maplibregl-ctrl-attrib"));
+      for (const control of controls) {
+        if (control.dataset.cvpCompactReady === "true") continue;
+        control.removeAttribute("open");
+        control.dataset.cvpCompactReady = "true";
+      }
+      return controls.length > 0;
+    }
+
+    compact();
+    const observer = new win.MutationObserver(() => compact());
+    observer.observe(mapHost, { childList: true, subtree: true });
+  }
+
+  initRating();
+  initBodyEditor();
+  initCompactAttribution();
 })();
