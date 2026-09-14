@@ -17,6 +17,6 @@ views:
     maxZoom: 19
     mapHeight: 240
     mapTiles:
-      - https://raw.githubusercontent.com/llocphann/Veil/map-style-host/assets/map-styles/abyssal.json
+      - 90_System/93_Configuration/Map_Styles/abyssal.json
     mapTilesDark:
-      - https://raw.githubusercontent.com/llocphann/Veil/map-style-host/assets/map-styles/abyssal.json
+      - 90_System/93_Configuration/Map_Styles/abyssal.json
