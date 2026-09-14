@@ -1,3 +1,7 @@
+.setting-item[data-cv-view-id] .setting-item-info {
+    cursor: pointer;
+}
+
 .cv-hidden {
     display: none;
 }
@@ -16,27 +20,49 @@
 
 .cv-codemirror-container {
     width: 100%;
-    margin-bottom: 0.75rem;
 }
 
+/* Editor geometry uses Obsidian tokens so themes control the defaults. */
 .cv-codemirror-container .cm-editor.cm-editor {
-    border: 1px solid var(--background-modifier-border);
-    border-radius: 4px;
-    font-size: var(--font-inputs);
+    border: var(--border-width) solid var(--background-modifier-border);
+    border-radius: var(--radius-s);
+    background: var(--background-primary);
+    font-family: var(--font-monospace);
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-normal);
     height: 24em;
     outline: none;
+    overflow: hidden;
     text-align: left;
 }
-
-.cv-codemirror-container .cm-line,
-.cv-codemirror-container .cm-lineNumbers {
-    font-family: var(--font-monospace);
-}
-
 .cv-codemirror-container .cm-scroller {
-    font-family: var(--font-monospace);
-    font-size: var(--font-text-size);
+    font-family: inherit;
+    font-size: inherit;
+    line-height: var(--line-height-normal);
+    overflow: auto;
 }
+.cv-codemirror-container .cm-content { padding: var(--size-4-5) 0 var(--size-4-10); }
+.cv-codemirror-container .cm-line { padding: 0 var(--size-4-4) 0 var(--size-4-2); }
+.cv-codemirror-container .cm-line span { font-weight: inherit; }
+.cv-codemirror-container .cm-gutters {
+    border: 0;
+    background: var(--background-primary);
+    color: var(--text-faint);
+    user-select: none;
+}
+.cv-codemirror-container .cm-lineNumbers .cm-gutterElement {
+    min-width: var(--size-4-10);
+    padding: 0 var(--size-4-2) 0 0;
+}
+.cv-codemirror-container .cv-syn-variable { color: var(--color-blue); }
+.cv-codemirror-container .cv-syn-filter { color: var(--color-orange); }
+.cv-codemirror-container .cv-syn-keyword { color: var(--color-green); }
+.cv-codemirror-container .cv-syn-string { color: var(--color-cyan); }
+.cv-codemirror-container .cv-syn-number { color: var(--color-purple); }
+.cv-codemirror-container .cv-syn-comment { color: var(--code-comment); }
+.cv-codemirror-container .cv-syn-punctuation { color: var(--text-muted); }
+/* Template marks override host-language string colors inside attributes. */
+.cv-codemirror-container [class*="cv-syn-"] span { color: inherit; }
 
 .cv-codemirror-container .cm-search.cm-panel {
     display: flex;
@@ -153,19 +179,13 @@
     border-radius: var(--radius-m);
 }
 
+.modal.cv-template-modal {
+    --dialog-width: calc(var(--setting-group-max-width) + 2 * var(--size-4-4) + 2 * var(--modal-border-width));
+}
+
 .cv-edit-view-modal.modal-content {
     max-height: 80vh;
     overflow-y: auto;
-}
-
-.cv-edit-view-modal h2 {
-    margin-top: 0;
-    margin-bottom: var(--size-4-4);
-}
-
-.cv-edit-view-modal h3 {
-    margin-top: var(--size-4-4);
-    margin-bottom: var(--size-4-2);
 }
 
 .cv-modal-button-container {
@@ -242,19 +262,6 @@
     padding: 0;
 }
 
-/* Override modal styles for suggestion modals — needs body prefix for specificity over .modal */
-body .cv-suggestion-container.modal {
-    position: fixed;
-    margin: 0;
-    transform: none;
-    max-width: 500px;
-    max-height: 300px;
-    background-color: var(--background-primary);
-    border: 1px solid var(--background-modifier-border);
-    box-shadow: var(--shadow-s);
-    border-radius: var(--radius-m);
-}
-
 /* ─── Editable Content Mode ─────────────────────────────────────────────────── */
 
 /* In editable mode, hide the reading preview but NOT the source/editor view */
@@ -276,17 +283,30 @@ body .cv-suggestion-container.modal {
     display: block;
 }
 
-/* The template overlay in editable mode uses same layout as readonly */
-.obsidian-custom-view-editable .obsidian-custom-view-render {
-    padding: 30px;
-    height: 100%;
-    overflow-y: auto;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: var(--background-primary);
-    z-index: 10;
+/* The placeholder inherits Obsidian's preview class, but must not become
+   a second scroll container inside the template. */
+.obsidian-custom-view-render [data-cv-editable-placeholder].markdown-preview-view {
+    height: auto;
+    max-height: none;
+    overflow: visible;
+}
+
+.obsidian-custom-view-render [data-cv-editable-placeholder] > .markdown-embed-content {
+    height: auto;
+    overflow: visible;
+}
+
+.obsidian-custom-view-render [data-cv-editable-placeholder] > .markdown-embed-content > iframe {
+    height: var(--cv-editor-height, auto);
+    min-height: 0;
+    flex: none;
+}
+
+.cv-context-popover > .obsidian-custom-view-render {
+    position: relative;
+    height: auto;
+    max-height: var(--popover-height, 400px);
+    padding: 16px;
 }
 
 /* The editor embedded in the content placeholder should flow naturally */
@@ -314,54 +334,6 @@ body .cv-suggestion-container.modal {
 
 /* The zero-height frontmatter widget */
 .cv-frontmatter-hidden {
-    display: none;
-}
-
-.cv-suggestion-container.modal .modal-content {
-    padding: 0;
-    max-height: 300px;
-}
-
-.cv-suggestion-container .prompt-input-container {
-    margin-top: 2px;
-}
-
-.cv-suggestion-container .prompt-input-container input {
-    color: var(--text-normal);
-    font-family: inherit;
-    padding: var(--input-padding);
-    padding-inline-start: 36px;
-    font-size: var(--font-ui-small);
-    border-radius: var(--input-radius);
-    height: var(--input-height);
-    outline: none;
-}
-
-.cv-modal-container {
-    align-items: center;
-    justify-content: center;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    inset-inline-start: 0;
-    width: 100%;
-    z-index: var(--layer-modal);
-}
-
-/* Combobox positioning — needs body prefix for specificity over .modal */
-body .cv-combobox-positioned {
-    position: fixed;
-    margin: 0;
-    transform: none;
-    left: var(--cv-combobox-left, auto);
-    top: var(--cv-combobox-top, auto);
-}
-
-body .cv-modal-bg-hidden {
-    display: none;
-}
-
-body .cv-clear-button-hidden {
     display: none;
 }
 
@@ -398,18 +370,6 @@ body .cv-clear-button-hidden {
     display: none;
 }
 
-/* Experimental branch: hold the last painted note, with no crossfade. */
-:root[data-cv-navigation-held] {
-    view-transition-name: none;
-}
-:root[data-cv-navigation-held]::view-transition-group(cv-note),
-:root[data-cv-navigation-held]::view-transition-image-pair(cv-note),
-:root[data-cv-navigation-held]::view-transition-old(cv-note),
-:root[data-cv-navigation-held]::view-transition-new(cv-note) {
-    animation: none;
-    mix-blend-mode: normal;
-}
-
 /* Preserve layout while masking the working pane, including inline opacity values. */
 .view-content.cv-navigation-preparing {
     filter: opacity(0);
@@ -423,3 +383,124 @@ body .cv-clear-button-hidden {
     overflow: hidden;
     z-index: 10;
 }
+
+/* Inline note embeds participate in their parent note's layout. */
+.cv-context-embed > .obsidian-custom-view-render {
+    position: relative;
+    height: auto;
+}
+
+.cv-context-embed.obsidian-custom-view-hidden > .markdown-embed-content {
+    display: none;
+}
+
+/* Only the custom template contributes height in a hover preview. */
+.cv-context-popover.obsidian-custom-view-hidden > .markdown-embed-content,
+.cv-context-popover.obsidian-custom-view-editable > .markdown-embed-content {
+    display: none;
+}
+
+.cv-embedded-switching {
+    position: relative;
+    min-height: var(--cv-transition-height);
+}
+.cv-embedded-transition {
+    position: absolute;
+    inset: 0;
+    height: var(--cv-transition-height);
+    z-index: 11;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+/* Native suggestion rows own spacing and icons; code labels use the editor font. */
+.cm-tooltip.cv-editor-completions > ul > li[role="option"] {
+    font-family: var(--font-monospace);
+}
+
+.cv-code-setting-control {
+    min-width: 0;
+}
+
+/* Native extra-setting control with room for its visible label. */
+.cv-labeled-extra-button.extra-setting-button {
+    font-weight: var(--font-normal);
+    width: auto;
+    gap: var(--size-4-2);
+    font-size: var(--font-ui-small);
+    white-space: nowrap;
+}
+
+.workspace-leaf-content .view-content.cv-editor-workbench {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+.cv-editor-layout { display: flex; flex: 1; min-height: 0; min-width: 0; }
+.cv-editor-layout[data-dock="top"], .cv-editor-layout[data-dock="bottom"] { flex-direction: column; }
+.cv-editor-code, .cv-editor-preview-pane { flex: var(--cv-editor-grow, 1) 1 0; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+.cv-editor-toolbar { display: flex; align-items: center; gap: var(--size-4-2); flex-wrap: wrap; padding: var(--size-4-2); border-block: var(--border-width) solid var(--background-modifier-border); }
+.cv-editor-toolbar button { max-width: 100%; }
+.cv-editor-panels { display: flex; flex: 1; min-width: 0; min-height: 0; overflow: hidden; }
+.cv-editor-panels[data-orientation="vertical"] { flex-direction: column; }
+.cv-editor-section { flex: var(--cv-section-grow, 1) 1 0; display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+.cv-editor-section[hidden] { display: none; }
+.cv-editor-section-heading.setting-item { border-radius: 0; margin: 0; padding: var(--size-4-2) var(--size-4-3); border-bottom: var(--border-width) solid var(--background-modifier-border); cursor: grab; touch-action: none; }
+.cv-editor-section-heading:active { cursor: grabbing; }
+.cv-editor-section .cv-codemirror-container { flex: 1; min-width: 0; min-height: 0; }
+.cv-editor-section .cv-codemirror-container .cm-editor.cm-editor { height: 100%; border: 0; border-radius: 0; }
+.cv-editor-splitter { position: relative; z-index: 1; flex: 0 0 var(--border-width); cursor: col-resize; background: var(--background-modifier-border); touch-action: none; }
+.cv-editor-splitter:focus-visible { outline: var(--border-width) solid var(--interactive-accent); outline-offset: -2px; }
+.cv-editor-layout[data-dock="top"] > .cv-editor-splitter, .cv-editor-layout[data-dock="bottom"] > .cv-editor-splitter, .cv-editor-panels[data-orientation="vertical"] > .cv-editor-splitter { cursor: row-resize; }
+.cv-editor-preview { position: relative; flex: 1; min-height: 0; min-width: 0; overflow: hidden; }
+.cv-editor-preview-frame { width: 100%; height: 100%; border: 0; display: block; }
+.cv-editor-empty { display: grid; height: 100%; place-content: center; color: var(--text-muted); padding: var(--size-4-4); }
+
+.cv-editor-layout.cv-code-undocked > .cv-editor-preview-pane, .cv-editor-code.cv-code-undocked { flex: 1; }
+
+
+
+.cv-editor-note { margin-right: auto; min-width: 0; }
+.cv-editor-code, .cv-editor-preview-pane, .cv-editor-section { background: var(--background-primary); }
+.cv-editor-layout, .cv-editor-panels { background: var(--background-secondary); }
+
+.cv-editor-layout > .cv-editor-splitter { order: 1; }
+.cv-editor-layout[data-dock="right"] > .cv-editor-code, .cv-editor-layout[data-dock="bottom"] > .cv-editor-code,
+.cv-editor-layout[data-dock="left"] > .cv-editor-preview-pane, .cv-editor-layout[data-dock="top"] > .cv-editor-preview-pane { order: 2; }
+
+.cv-editor-contexts { display: flex; align-items: center; gap: var(--size-2-1); }
+.cv-editor-splitter::after { content: ""; position: absolute; inset: 0 -3px; }
+.cv-editor-panels[data-orientation="vertical"] > .cv-editor-splitter::after,
+.cv-editor-layout[data-dock="top"] > .cv-editor-splitter::after,
+.cv-editor-layout[data-dock="bottom"] > .cv-editor-splitter::after { inset: -3px 0; }
+
+.cv-preview-popover-stage { display: grid; place-items: center; width: 100%; height: 100%; overflow: auto; }
+.cv-preview-popover.popover { position: relative; inset: auto; margin: 0; max-width: 100%; max-height: 100%; }
+.cv-preview-popover > .cv-editor-preview-frame { width: var(--popover-width); height: var(--popover-height); max-height: var(--popover-max-height); }
+.cv-preview-canvas.canvas-wrapper { width: 100%; height: 100%; }
+.cv-preview-canvas .canvas-card-menu,
+.cv-preview-canvas .canvas-controls,
+.cv-preview-canvas .canvas-menu-container,
+.cv-preview-canvas .canvas-node-connection-point { display: none; }
+.cv-preview-canvas .canvas-node-content > .cv-editor-preview-frame { height: 100%; }
+
+.cv-editor-section-heading.setting-item { min-height: calc(var(--input-height) + var(--size-4-2) * 2 + var(--border-width)); }
+.cv-editor-preview-layer { position: absolute; inset: 0; }
+.cv-editor-preview-layer.is-pending { visibility: hidden; pointer-events: none; }
+
+/* Keep all editors reachable when a narrow pane cannot fit them at once. */
+.cv-editor-layout[data-compact="true"] .cv-editor-panels[data-orientation="vertical"] { overflow-y: auto; }
+.cv-editor-layout[data-compact="true"] .cv-editor-panels[data-orientation="vertical"] > .cv-editor-section:not([hidden]) { min-height: calc(var(--input-height) * 5); flex-shrink: 0; }
+@media (pointer: coarse) {
+    .cv-editor-splitter::after { inset: 0 -8px; }
+    .cv-editor-panels[data-orientation="vertical"] > .cv-editor-splitter::after,
+    .cv-editor-layout[data-dock="top"] > .cv-editor-splitter::after,
+    .cv-editor-layout[data-dock="bottom"] > .cv-editor-splitter::after { inset: -8px 0; }
+}
+
+.is-mobile .cv-editor-section-heading.setting-item { cursor: default; touch-action: pan-y; }
+/* Match native views' allowance for the floating mobile navigation and keyboard. */
+.is-mobile .workspace-leaf-content .view-content.cv-editor-workbench { padding-bottom: max(0px, var(--view-bottom-spacing, 0px)); }
