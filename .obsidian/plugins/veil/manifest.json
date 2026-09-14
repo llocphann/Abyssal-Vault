@@ -1,7 +1,7 @@
 {
   "id": "veil",
   "name": "Veil",
-  "version": "1.5.3",
+  "version": "1.7.0",
   "minAppVersion": "1.13.7",
   "description": "Set vault-local images, GIFs, or videos as workspace wallpapers with reusable scenes, context-aware routing, pools, transitions, framing, opacity, and visual effects.",
   "author": "llocphann",
