@@ -876,8 +876,15 @@
 
 .ledge-settings-panel-items {
   display: grid;
-  gap: var(--size-4-4);
-  margin: var(--size-4-3) 0 var(--size-4-6);
+  margin: var(--size-4-3) 0 0;
+}
+
+.ledge-settings-panel-items + .ledge-settings-data-inline {
+  margin-top: var(--size-4-3);
+}
+
+.ledge-settings-root .setting-group .setting-item:not(.setting-item-heading)::before {
+  border-top: 0;
 }
 
 .ledge-items-accordion-setting {
@@ -962,6 +969,10 @@
 
 .ledge-settings-panel-items .setting-item {
   padding-right: 0;
+}
+
+.ledge-settings-panel-items .setting-item.ledge-add-item-row {
+  padding-bottom: 0;
 }
 
 .ledge-settings-panel-items .setting-item-control input[type="text"] {
