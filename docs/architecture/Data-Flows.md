@@ -5,18 +5,19 @@ This page shows how the major Abyssal Vault subsystems transform source data int
 ## Daily system
 
 ```text
-System date
-   ↓
-schedule-callout.js / exercise-callout.js / cardio-callout.js
-   ↓
 01_Monday.md ... 07_Sunday.md
-   ↓
-Selected heading
-   ↓
-Homepage / Journal context
+   ├── Homepage
+   │      ↓
+   │  schedule-callout.js / exercise-callout.js / cardio-callout.js
+   │
+   └── Journal
+          ↓
+      Journal Custom View
+          ↓
+      configured schedule / Calisthenics / Cardio headings
 ```
 
-Edit the weekday source note once; consumers receive the updated content dynamically.
+Edit the weekday source note once; consumers receive the updated content dynamically. Journal Markdown itself no longer invokes the three Dataview schedule views.
 
 ## Places
 
