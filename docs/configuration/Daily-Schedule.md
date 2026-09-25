@@ -71,19 +71,17 @@ The current Sunday exercise plan includes Full-body Mobility, Easy Squat, Wall P
 # Runtime flow
 
 ```text
-Current date
-   ↓
-Dataview callout script
-   ↓
-Resolve weekday source note
-   ↓
-Read configured heading
-   ↓
-Homepage / Journal
+Weekday source notes
+   ├── Homepage → Dataview callout scripts
+   └── Journal → Journal Custom View direct read
+                    ↓
+              configured headings
+                    ↓
+              compact snapshot
 ```
 
-`schedule-callout.js`, `exercise-callout.js`, and `cardio-callout.js` all use this pattern.
+The Homepage continues to use `schedule-callout.js`, `exercise-callout.js`, and `cardio-callout.js`. Journal notes no longer contain those DataviewJS calls; the Journal Custom View reads the same weekday source file directly.
 
 ## Maintenance rule
 
-Do not duplicate a recurring weekday schedule into the Homepage or Journal templates. Edit the weekday source note instead so every consumer receives the same data.
+Do not duplicate a recurring weekday schedule into the Homepage or Journal templates. Edit the weekday source note instead so every consumer receives the same data. Journal's template contains no schedule transclusion code.
