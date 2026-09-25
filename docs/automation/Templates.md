@@ -11,9 +11,8 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 - **Quote parsing** — separates quote text and author.
 - **Daily metadata** — creates Day, journal, mood, energy, weight, reflection, quote, and quote-author fields.
 - **Daily tag** — adds the Daily Notes tag.
-- **Schedule injection** — embeds the current weekday schedule.
-- **Exercise injection** — embeds the current Calisthenics section.
-- **Cardio injection** — embeds the current Cardio section.
+- **Schedule source** — the note body stays plain Markdown; the Journal Custom View reads the matching weekday source directly.
+- **Training snapshot** — the Custom View reads the configured Calisthenics and Cardio headings without DataviewJS blocks in the note.
 - **Day Planner** — creates planning space.
 - **Daily Log** — creates chronological logging space.
 - **Body Pic** — creates a physique-tracking location.
