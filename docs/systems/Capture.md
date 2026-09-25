@@ -23,7 +23,9 @@ Daily Journal notes are created from `Journal_Template.md`.
 
 Cornell notes are created from `Cornell_Template.md` and are intended for structured learning.
 
-`Sample — Language and Context.md` demonstrates the output.
+The note body is plain Markdown: H2 headings define major Cornell sections, while H3 marker headings define individual cue/note entries. Reading mode converts those entries into the two-column Cornell sheet; Live Preview remains a native editable Markdown document. Legacy fenced `cornell` blocks remain supported while older notes are migrated.
+
+`Sample — Quang hợp cơ bản.md` demonstrates the Markdown-native Cornell structure.
 
 ### Functions
 
