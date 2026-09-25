@@ -36,6 +36,7 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 - **Feynman Summary** — requires explanation in the learner's own words.
 - **Active Recall** — creates self-test prompts.
 - **Spaced Review** — creates Today, +1, +3, +7, +14, and +30 review checkpoints.
+- **Semantic Markdown** — uses H2 sections plus H3 marker headings (`?`, `!`, `E-`, `V-`, `X-`, `R-`, `*`, and `.`) instead of fenced Cornell code blocks. The Custom View still reads legacy Cornell fences during migration.
 
 ## `Zettelkasten_Template.md`
 
