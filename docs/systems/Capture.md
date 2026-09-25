@@ -10,9 +10,8 @@ Daily Journal notes are created from `Journal_Template.md`.
 
 - **Date identity** — each Journal note represents one calendar day.
 - **Daily metadata** — stores mood, energy, weight, reflection, quote, and quote author.
-- **Dynamic schedule** — embeds the current weekday schedule from `90_System/97_Daily_Schedule`.
-- **Dynamic exercise** — embeds the current Calisthenics section.
-- **Dynamic cardio** — embeds the current Cardio section.
+- **Dynamic schedule** — the Journal Custom View reads the weekday schedule directly from `90_System/97_Daily_Schedule`.
+- **Dynamic exercise/cardio** — the Custom View reads the configured Calisthenics and Cardio headings directly; Journal Markdown contains no DataviewJS schedule calls.
 - **Day Planner** — provides planning space.
 - **Daily Log** — provides chronological logging space.
 - **Body Pic** — provides a location for physique-tracking images.
