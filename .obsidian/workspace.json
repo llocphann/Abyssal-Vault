@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "4e70db3eef8dce43",
+        "id": "9f0c726901136d8f",
         "type": "tabs",
         "children": [
           {
-            "id": "5ccbd243b28f37db",
+            "id": "0a5f392973893cf7",
             "type": "leaf",
             "pinned": true,
             "state": {
@@ -141,7 +141,7 @@
       {
         "id": "faa38c380235c599",
         "type": "tabs",
-        "dimension": 23.824701195219124,
+        "dimension": 27.338129496402882,
         "children": [
           {
             "id": "21fab2252cb21bfd",
@@ -248,7 +248,7 @@
       {
         "id": "4b266b3d65ff2f45",
         "type": "tabs",
-        "dimension": 22.948207171314742,
+        "dimension": 28.507194244604317,
         "children": [
           {
             "id": "53afeb1e7e8c6603",
@@ -265,7 +265,7 @@
       {
         "id": "21a8f80e28189dff",
         "type": "tabs",
-        "dimension": 53.22709163346613,
+        "dimension": 44.1546762589928,
         "children": [
           {
             "id": "ddb492e143439b97",
@@ -301,12 +301,37 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "5ccbd243b28f37db",
+  "active": "0a5f392973893cf7",
   "lastOpenFiles": [
+    "90_System/93_Configuration/settings.md",
+    "20_Personal_Life/23_Places/Map.base",
+    "20_Personal_Life/33_Bodybuilding/Bodybuilding.base",
+    "20_Personal_Life/26_Food_&_Drinks/FoodnDrinks.base",
+    "20_Personal_Life/22_Finance/Finance_Dashboard.md",
+    "20_Personal_Life/27_Game_Tracker/Game_Collection.base",
+    "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
+    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
+    "90_System/98_Homepage/Homepage.md",
+    "CHANGELOG.md",
+    "90_System/95_Media_Assets/TV_Series/65733-cover.jpg",
+    "90_System/95_Media_Assets/TV_Series/71728-cover.jpg",
+    "90_System/95_Media_Assets/TV_Series/76479-backdrop.jpg",
+    "90_System/95_Media_Assets/TV_Series/76479-cover.jpg",
+    "90_System/95_Media_Assets/TV_Series/79240-cover.jpg",
+    "90_System/95_Media_Assets/TV_Series/79588-backdrop.jpg",
+    "90_System/95_Media_Assets/TV_Series/79588-cover.jpg",
+    "90_System/95_Media_Assets/TV_Series/84958-backdrop.jpg",
+    "90_System/95_Media_Assets/TV_Series/84958-cover.jpg",
+    "90_System/95_Media_Assets/TV_Series/86831-backdrop.jpg",
+    "90_System/95_Media_Assets/Movies",
+    "90_System/95_Media_Assets/TV_Series",
+    "20_Personal_Life/27_Game_Tracker/Games/Crimson Desert Enhanced.md",
+    "90_System/95_Media_Assets/Games",
+    "90_System/95_Media_Assets/Recipes/Illustrations",
+    "20_Personal_Life/26_Food_&_Drinks/Recipes/Lamb Moussaka.md",
     "__morphic_competitive_bench__/First.md",
     "__morphic_competitive_bench__/Reset.md",
     "__morphic_competitive_bench__/Warm.md",
-    "90_System/98_Homepage/Homepage.md",
     "__morphic_competitive_bench__/Canvas-100.canvas",
     "__morphic_competitive_bench__/Canvas-50.canvas",
     "__morphic_competitive_bench__/Canvas-10.canvas",
@@ -327,32 +352,7 @@
     "__morphic_competitive_bench__/Noop.md",
     "__morphic_competitive_bench__/Nav-B.md",
     "__morphic_competitive_bench__/Nav-A.md",
-    "__morphic_competitive_bench__",
-    "20_Personal_Life/22_Finance/Finance.base",
-    "00_Capture/02_Cornell/hdufshd.md",
-    "00_Capture/02_Cornell/Sample — Language and Context.md",
-    "00_Capture/03_Zettelkasten/20260914190129 - d.md",
-    "00_Capture/03_Zettelkasten/20260105103000 - Meaning Depends on Context.md",
-    "90_System/93_Configuration/settings.md",
-    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
-    "20_Personal_Life/33_Bodybuilding/Bodybuilding.base",
-    "20_Personal_Life/23_Places/Map.base",
-    "20_Personal_Life/27_Game_Tracker/Game_Collection.base",
-    "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
-    "20_Personal_Life/26_Food_&_Drinks/FoodnDrinks.base",
-    "00_Capture/01_Journal/2026/September",
-    "00_Capture/01_Journal/2026",
     "__morphic_canvas_error_probe__/Probe.canvas",
-    "__morphic_canvas_readiness_probe__/Probe.canvas",
-    "90_System/95_Media_Assets/Recipes/themealdb-53238-cover.jpg",
-    "90_System/95_Media_Assets/Recipes/spoonacular-991010-cover.jpg",
-    "90_System/95_Media_Assets/Recipes/spoonacular-664828-cover.jpg",
-    "90_System/95_Media_Assets/Recipes/spoonacular-649512-cover.jpg",
-    "90_System/95_Media_Assets/Recipes/spoonacular-649225-cover.jpg",
-    "90_System/95_Media_Assets/Recipes/spoonacular-638746-cover.jpg",
-    "90_System/95_Media_Assets/Recipes/spoonacular-632797-cover.jpg",
-    "90_System/95_Media_Assets/TV_Series/47665-backdrop.jpg",
-    "90_System/95_Media_Assets/TV_Series/65733-backdrop.jpg",
-    "90_System/95_Media_Assets/TV_Series/65733-cover.jpg"
+    "__morphic_canvas_readiness_probe__/Probe.canvas"
   ]
 }
