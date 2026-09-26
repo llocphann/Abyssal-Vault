@@ -303,6 +303,12 @@
   },
   "active": "0a5f392973893cf7",
   "lastOpenFiles": [
+    "90_System/95_Media_Assets/Exercise/Anatomy/muscle-map.svg",
+    "90_System/95_Media_Assets/Exercise/Anatomy/SOURCE.md",
+    "90_System/95_Media_Assets/Exercise/Anatomy/NOTICE.txt",
+    "90_System/95_Media_Assets/Exercise/Anatomy/LICENSE.txt",
+    "90_System/95_Media_Assets/Exercise/Anatomy",
+    "90_System/95_Media_Assets/Exercise",
     "90_System/93_Configuration/settings.md",
     "20_Personal_Life/23_Places/Map.base",
     "20_Personal_Life/33_Bodybuilding/Bodybuilding.base",
@@ -323,11 +329,7 @@
     "90_System/95_Media_Assets/TV_Series/84958-backdrop.jpg",
     "90_System/95_Media_Assets/TV_Series/84958-cover.jpg",
     "90_System/95_Media_Assets/TV_Series/86831-backdrop.jpg",
-    "90_System/95_Media_Assets/Movies",
-    "90_System/95_Media_Assets/TV_Series",
     "20_Personal_Life/27_Game_Tracker/Games/Crimson Desert Enhanced.md",
-    "90_System/95_Media_Assets/Games",
-    "90_System/95_Media_Assets/Recipes/Illustrations",
     "20_Personal_Life/26_Food_&_Drinks/Recipes/Lamb Moussaka.md",
     "__morphic_competitive_bench__/First.md",
     "__morphic_competitive_bench__/Reset.md",
@@ -351,7 +353,6 @@
     "__morphic_competitive_bench__/Metadata.md",
     "__morphic_competitive_bench__/Noop.md",
     "__morphic_competitive_bench__/Nav-B.md",
-    "__morphic_competitive_bench__/Nav-A.md",
     "__morphic_canvas_error_probe__/Probe.canvas",
     "__morphic_canvas_readiness_probe__/Probe.canvas"
   ]
