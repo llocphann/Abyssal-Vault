@@ -8,7 +8,7 @@ Current recipe records include examples such as `Asian Beef.md`, `Beef pho.md`, 
 
 ### Functions of a Recipe note
 
-- **`category`** — classifies the recipe.
+- **`recipe_category`** — classifies the recipe.
 - **`cuisine`** — stores cuisine origin.
 - **`tagline`** — provides a short subtitle.
 - **`cover`** — points to a local food image.
@@ -39,7 +39,7 @@ The template is intentionally lightweight and delegates record generation to `tp
 - **HTML cleanup** — removes unwanted markup and entities.
 - **Time derivation** — imports or derives preparation/cooking time.
 - **Difficulty derivation** — estimates complexity from time, ingredient count, and instruction structure.
-- **Category derivation** — derives a useful recipe category when needed.
+- **Category derivation** — derives the `recipe_category` value when needed.
 - **Illustration selection** — chooses a semantic recipe illustration key.
 - **Local media** — downloads recipe images into `90_System/95_Media_Assets/Recipes`.
 
@@ -49,7 +49,7 @@ The template is intentionally lightweight and delegates record generation to `tp
 
 - **Recipe discovery** — filters records categorized as Recipes.
 - **Total time** — calculates `prep_time + cook_time`.
-- **Recipe front card** — displays category, favorite state, time, title, tagline, servings, difficulty, and bookmark state.
+- **Recipe front card** — displays `recipe_category`, favorite state, time, title, tagline, servings, difficulty, and bookmark state.
 - **Recipe back card** — displays ingredients in a scrollable area.
 - **Recipes view** — provides the card collection.
 - **Edit Data** — provides an editable metadata table.

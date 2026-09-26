@@ -35,8 +35,11 @@ for (let index = 0; index < quoteLines.length; index += 1) {
 
 const quoteYaml = JSON.stringify(quoteText);
 const quoteAuthorYaml = JSON.stringify(quoteAuthor);
-tR += `---\nDay: ${dayName}\njournal: Daily Notes\nmood:\nenergy:\nweight:\nreflection:\nquote: ${quoteYaml}\nquote_author: ${quoteAuthorYaml}\ntags:\n  - Daily-notes\n---\n`;
+tR += `---\njournal-date: ${fileDate}\nDay: ${dayName}\njournal: Daily Notes\nmood:\nenergy:\nweight:\nreflection:\nquote: ${quoteYaml}\nquote_author: ${quoteAuthorYaml}\ntags:\n  - Daily-notes\n---\n`;
 -%>
+
+---
+
 ## Day Planner
 
 ---

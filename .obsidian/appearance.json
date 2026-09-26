@@ -1,12 +1,5 @@
 {
   "enabledCssSnippets": [
-    "01_Core_System_v2",
-    "02_Homepage",
-    "03_Bases",
-    "04_Content_Interface_And_Plugins",
-    "05_Style_Setting",
-    "06_Markdown_Table_v2",
-    "01_Core_System",
     "01_Core",
     "02_Components",
     "03_Compatibility",

@@ -52,7 +52,7 @@ Automation scripts live under `90_System/92_Scripts`. They are divided broadly i
 - **Instruction cleanup** — removes markup and normalizes steps.
 - **Prep/cook time** — imports or derives timing information.
 - **Difficulty derivation** — estimates complexity from time, ingredients, and instructions.
-- **Category derivation** — derives a usable category.
+- **Category derivation** — derives the `recipe_category` value.
 - **Cuisine import** — stores cuisine metadata.
 - **Serving import** — stores serving count.
 - **Description cleanup** — removes unwanted HTML/entities.

@@ -18,9 +18,9 @@ Abyssal-Vault/
 │   ├── 26_Food_&_Drinks/
 │   ├── 27_Game_Tracker/
 │   └── 33_Bodybuilding/
-├── 30_Academics/
-├── 40_Digital_Library/
-├── 50_Interests_and_Research/
+├── 40_Academics/
+├── 60_Digital_Library/
+├── 70_Interests_&_Research/
 ├── 90_System/
 │   ├── 91_Templates/
 │   ├── 92_Scripts/
@@ -39,9 +39,9 @@ Abyssal-Vault/
 | `00_Capture` | High-frequency entry point for journals, Cornell notes, Zettelkasten notes, and clippings. |
 | `10_Projects` | Workspace for project-specific notes and material. |
 | `20_Personal_Life` | Structured personal databases and trackers. |
-| `30_Academics` | Long-term academic material. |
-| `40_Digital_Library` | Digital resources and reference material. |
-| `50_Interests_and_Research` | Focused research and personal interests. |
+| `40_Academics` | Long-term academic material. |
+| `60_Digital_Library` | Digital resources and reference material. |
+| `70_Interests_&_Research` | Focused research and personal interests. |
 | `90_System` | Templates, scripts, configuration, local media, recurring schedules, and Homepage logic. |
 | `99_Archives` | Inactive material separated from active systems. |
 

@@ -79,81 +79,6 @@
       "key": "8"
     }
   ],
-  "editing-toolbar:fullscreen-focus": [],
-  "editing-toolbar:header0-text": [],
-  "editing-toolbar:workplace-fullscreen-focus": [],
-  "editing-toolbar:header1-text": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "1"
-    }
-  ],
-  "editing-toolbar:header2-text": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "2"
-    }
-  ],
-  "editing-toolbar:header3-text": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "3"
-    }
-  ],
-  "editing-toolbar:header4-text": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "4"
-    }
-  ],
-  "editing-toolbar:header5-text": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "5"
-    }
-  ],
-  "editing-toolbar:header6-text": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "6"
-    }
-  ],
-  "editing-toolbar:center": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "M"
-    }
-  ],
-  "editing-toolbar:justify": [
-    {
-      "modifiers": [
-        "Mod"
-      ],
-      "key": "J"
-    }
-  ],
-  "quickadd:choice:e26ead52-86bc-4f2e-a0e4-d144cb7f3c4b": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "T"
-    }
-  ],
   "markdown:toggle-preview": [
     {
       "modifiers": [
@@ -179,52 +104,6 @@
       "key": " "
     }
   ],
-  "local-gpt:quick-access-2": [
-    {
-      "modifiers": [
-        "Alt",
-        "Mod"
-      ],
-      "key": "W"
-    }
-  ],
-  "local-gpt:quick-access-3": [
-    {
-      "modifiers": [
-        "Alt",
-        "Mod"
-      ],
-      "key": "S"
-    }
-  ],
-  "local-gpt:quick-access-4": [
-    {
-      "modifiers": [
-        "Alt",
-        "Mod"
-      ],
-      "key": "F"
-    }
-  ],
-  "local-gpt:quick-access-1": [
-    {
-      "modifiers": [
-        "Alt",
-        "Mod"
-      ],
-      "key": "G"
-    }
-  ],
-  "local-gpt:context-menu": [
-    {
-      "modifiers": [
-        "Alt",
-        "Mod",
-        "Shift"
-      ],
-      "key": "G"
-    }
-  ],
   "app:open-settings": [
     {
       "modifiers": [
@@ -233,7 +112,6 @@
       "key": ","
     }
   ],
-  "editing-toolbar:ai-inline-completion": [],
   "editor:follow-link": [],
   "zk-prefixer": [
     {
@@ -331,22 +209,6 @@
       "key": "L"
     }
   ],
-  "omnisearch:show-modal": [
-    {
-      "modifiers": [
-        "Alt"
-      ],
-      "key": "Escape"
-    }
-  ],
-  "floating-toc:search-in-toc": [],
-  "cornell-marginalia:cornell-switch-tab-vault": [],
-  "cornell-marginalia:cornell-switch-tab-threads": [],
-  "cornell-marginalia:cornell-switch-tab-current": [],
-  "cornell-marginalia:cornell-switch-tab-board": [],
-  "cornell-marginalia:cornell-refresh-explorer": [],
-  "cornell-marginalia:cornell-focus-explorer": [],
-  "cornell-marginalia:cornell-mass-stitch": [],
   "switcher:open": [
     {
       "modifiers": [
@@ -362,16 +224,6 @@
         "Shift"
       ],
       "key": "D"
-    }
-  ],
-  "cornell-marginalia:cornell-open-sidebar-doodle": [],
-  "cornell-marginalia:cornell-search-explorer": [
-    {
-      "modifiers": [
-        "Alt",
-        "Shift"
-      ],
-      "key": "F"
     }
   ],
   "editor:open-search": [

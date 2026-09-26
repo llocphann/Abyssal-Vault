@@ -9,11 +9,10 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 - **Weekday detection** — resolves the weekday used by the Daily Schedule system.
 - **Random quote** — calls `tp.user.quotes()`.
 - **Quote parsing** — separates quote text and author.
-- **Daily metadata** — creates Day, journal, mood, energy, weight, reflection, quote, and quote-author fields.
+- **Daily metadata** — creates `journal-date`, Day, journal, mood, energy, weight, reflection, quote, and quote-author fields.
 - **Daily tag** — adds the Daily Notes tag.
-- **Schedule injection** — embeds the current weekday schedule.
-- **Exercise injection** — embeds the current Calisthenics section.
-- **Cardio injection** — embeds the current Cardio section.
+- **Schedule source** — the note body stays plain Markdown; the Journal Custom View reads the matching weekday source directly.
+- **Training snapshot** — the Custom View reads the configured Calisthenics and Cardio headings without DataviewJS blocks in the note.
 - **Day Planner** — creates planning space.
 - **Daily Log** — creates chronological logging space.
 - **Body Pic** — creates a physique-tracking location.
@@ -36,14 +35,15 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 - **Feynman Summary** — requires explanation in the learner's own words.
 - **Active Recall** — creates self-test prompts.
 - **Spaced Review** — creates Today, +1, +3, +7, +14, and +30 review checkpoints.
+- **Semantic Markdown** — uses H2 sections plus H3 marker headings (`?`, `!`, `E-`, `V-`, `X-`, `R-`, `*`, and `.`) instead of fenced Cornell code blocks. The Custom View still reads legacy Cornell fences during migration.
 
 ## `Zettelkasten_Template.md`
 
 - **Timestamp ID** — generates a stable `YYYYMMDDHHmmss` identity.
 - **Filename identity** — renames the note to `<ID> - <Title>`.
 - **Note type** — supports Permanent, Literature, and Fleeting notes.
-- **Core Idea** — requires a concise atomic proposition.
-- **Content** — provides space for one self-contained idea.
+- **Core Idea** — uses a plain Markdown H2 section for the atomic proposition; the Custom View supplies the visual callout treatment.
+- **Content** — uses plain Markdown prose instead of the legacy `> [!info] Explanation` callout.
 - **Parent / Overview** — links the broader concept.
 - **Supporting / Extension** — links supporting ideas.
 - **Contradiction / Alternative** — links competing ideas.

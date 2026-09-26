@@ -27,12 +27,12 @@ aliases: []
 # <% noteTitle %>
 
 ## Core Idea
-Abstract
+
 A single, self-contained sentence describing the main essence of this note.
 
 ## Content
-> [!info] Explanation
-> Elaborate the atomic concept in your own words with clarity and conciseness. Keep focus strictly on a single idea to preserve atomicity.
+
+Elaborate the atomic concept in your own words with clarity and conciseness. Keep focus strictly on a single idea to preserve atomicity.
 
 ## Context & Connections
 *Link to existing notes using [[]] with explicit context on how they relate:*

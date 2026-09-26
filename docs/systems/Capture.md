@@ -10,9 +10,8 @@ Daily Journal notes are created from `Journal_Template.md`.
 
 - **Date identity** — each Journal note represents one calendar day.
 - **Daily metadata** — stores mood, energy, weight, reflection, quote, and quote author.
-- **Dynamic schedule** — embeds the current weekday schedule from `90_System/97_Daily_Schedule`.
-- **Dynamic exercise** — embeds the current Calisthenics section.
-- **Dynamic cardio** — embeds the current Cardio section.
+- **Dynamic schedule** — the Journal Custom View reads the weekday schedule directly from `90_System/97_Daily_Schedule`.
+- **Dynamic exercise/cardio** — the Custom View reads the configured Calisthenics and Cardio headings directly; Journal Markdown contains no DataviewJS schedule calls.
 - **Day Planner** — provides planning space.
 - **Daily Log** — provides chronological logging space.
 - **Body Pic** — provides a location for physique-tracking images.
@@ -23,7 +22,9 @@ Daily Journal notes are created from `Journal_Template.md`.
 
 Cornell notes are created from `Cornell_Template.md` and are intended for structured learning.
 
-`Sample — Language and Context.md` demonstrates the output.
+The note body is plain Markdown: H2 headings define major Cornell sections, while H3 marker headings define individual cue/note entries. Reading mode converts those entries into the two-column Cornell sheet; Live Preview remains a native editable Markdown document. Legacy fenced `cornell` blocks remain supported while older notes are migrated.
+
+`Sample — Quang hợp cơ bản.md` demonstrates the Markdown-native Cornell structure.
 
 ### Functions
 

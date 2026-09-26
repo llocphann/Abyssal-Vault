@@ -57,9 +57,9 @@ Abyssal-Vault/
 ├── 00_Capture/
 ├── 10_Projects/
 ├── 20_Personal_Life/
-├── 30_Academics/
-├── 40_Digital_Library/
-├── 50_Interests_and_Research/
+├── 40_Academics/
+├── 60_Digital_Library/
+├── 70_Interests_&_Research/
 ├── 90_System/
 ├── 99_Archives/
 └── docs/

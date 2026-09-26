@@ -25,109 +25,80 @@ aliases: []
 
 # <% noteTitle %>
 
-```cornell
-%%> ! Session Metadata %%
+## Session Metadata
+
+### ! Session Metadata
+
 - **Course:** [[<% courseName %>]]
 - **Context:** <% noteContext %>
 - **Date:** <% tp.date.now("YYYY-MM-DD (dddd)") %>
 - **Instructor / Author:**
 - **Source:**
-````
-
----
 
 ## Learning Objectives
 
-```cornell
-%%> . Learning Goals %%
+### . Learning Goals
+
 - What should I understand after this session?
 - Which concepts are most important?
-```
-
----
 
 ## Main Notes
 
-```cornell
-%%> ? Guiding Question ;; %%
+### ? Guiding Question
+
 Write the main explanation here.
 
 - Supporting point
 - Supporting point
 - Formula / Example
-```
 
----
+### ! Key Concept
 
-```cornell
-%%> ! Key Concept %%
 Definition, theorem, important statement or mechanism.
 
 - Key idea
 - Why it matters
-```
 
----
+### E- Example
 
-```cornell
-%%> E- Example %%
 Worked example, diagram explanation, case study or application.
-```
 
----
+### V- Verified
 
-```cornell
-%%> V- Verified %%
 Facts confirmed from textbook, paper or instructor.
-```
 
----
+### X- Common Mistake
 
-```cornell
-%%> X- Common Mistake %%
 Misconception, exception or incorrect reasoning to avoid.
-```
 
----
+### R- Related
 
-```cornell
-%%> R- Related %%
 Related notes, prerequisite concepts or follow-up topics.
 
 - [[ ]]
 - [[ ]]
-```
-
----
 
 ## Summary
 
-```cornell
-%%> * Feynman Summary %%
-Explain this topic in your own words using 3–5 sentences.
-```
+### * Feynman Summary
 
----
+Explain this topic in your own words using 3–5 sentences.
 
 ## Active Recall
 
-```cornell
-%%> ? Self-Test ;; %%
+### ? Self-Test
+
 - Question 1
 - Question 2
 - Question 3
-```
-
----
 
 ## Next Review
 
-```cornell
-%%> V- Review Schedule %%
+### V- Review Schedule
+
 - [ ] Today
 - [ ] +1 day
 - [ ] +3 days
 - [ ] +7 days
 - [ ] +14 days
 - [ ] +30 days
-```

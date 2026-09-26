@@ -91,7 +91,7 @@ These fields are shared between `Game_Collection.base`, catalog import, and plat
 
 ## Recipes
 
-Important fields include `category`, `cuisine`, `tagline`, `cover`, `recipe_illustration`, `description`, `servings`, `prep_time`, `cook_time`, `difficulty`, `favorite`, `bookmarked`, `ingredients`, `instructions`, `tips`, `pairs_well_with`, and provider/source metadata.
+Important fields include `recipe_category`, `cuisine`, `tagline`, `cover`, `recipe_illustration`, `description`, `servings`, `prep_time`, `cook_time`, `difficulty`, `favorite`, `bookmarked`, `ingredients`, `instructions`, `tips`, `pairs_well_with`, and provider/source metadata.
 
 ## Exercises
 
