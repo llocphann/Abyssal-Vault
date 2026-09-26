@@ -1,22 +1,79 @@
 {
-  "collapse-filter": false,
+  "collapse-filter": true,
   "search": "",
   "showTags": true,
   "showAttachments": false,
   "hideUnresolved": true,
   "showOrphans": false,
-  "collapse-color-groups": true,
-  "colorGroups": [],
-  "collapse-display": false,
-  "showArrow": false,
-  "textFadeMultiplier": -1.2,
-  "nodeSizeMultiplier": 0.358762193070972,
-  "lineSizeMultiplier": 0.358762193070972,
-  "collapse-forces": false,
-  "centerStrength": 0.584931046081399,
-  "repelStrength": 10.0697152310056,
-  "linkStrength": 0.668909070523601,
-  "linkDistance": 364,
-  "scale": 0.04451114851285443,
+  "collapse-color-groups": false,
+  "colorGroups": [
+    {
+      "query": "path:00_Capture  ",
+      "color": {
+        "a": 1,
+        "rgb": 9293014
+      }
+    },
+    {
+      "query": "path:\"10_Projects\"",
+      "color": {
+        "a": 1,
+        "rgb": 8896976
+      }
+    },
+    {
+      "query": "path:20_Personal_Life  ",
+      "color": {
+        "a": 1,
+        "rgb": 8502985
+      }
+    },
+    {
+      "query": "path:40_Academics  ",
+      "color": {
+        "a": 1,
+        "rgb": 8044738
+      }
+    },
+    {
+      "query": "path:60_Digital_Library  ",
+      "color": {
+        "a": 1,
+        "rgb": 7127220
+      }
+    },
+    {
+      "query": "path:70_Interests_&_Research  ",
+      "color": {
+        "a": 1,
+        "rgb": 6267046
+      }
+    },
+    {
+      "query": "path:\"90_System\"",
+      "color": {
+        "a": 1,
+        "rgb": 3965315
+      }
+    },
+    {
+      "query": "path:\"99_Archives\"",
+      "color": {
+        "a": 1,
+        "rgb": 2240063
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": true,
+  "textFadeMultiplier": -0.9,
+  "nodeSizeMultiplier": 0.4625,
+  "lineSizeMultiplier": 0.3125,
+  "collapse-forces": true,
+  "centerStrength": 0.45,
+  "repelStrength": 9,
+  "linkStrength": 0.75,
+  "linkDistance": 220,
+  "scale": 0.023194058246658183,
   "close": true
 }
