@@ -2,6 +2,17 @@
 
 All notable changes to Abyssal Vault are documented here.
 
+## 1.0.1.1 — 2026-09-26
+
+### Fixed
+
+- Added the missing sample media assets used by the Game, Movie, TV Series, and Recipe notes so their Bases render with images out of the box.
+- Updated ignore rules so these bundled sample assets remain tracked in the reusable vault.
+
+### Improved
+
+- Refreshed Obsidian graph/workspace state included with the sample-media update.
+
 ## 1.0.1 — 2026-09-26
 
 ### Fixed
