@@ -37,15 +37,6 @@ const quoteYaml = JSON.stringify(quoteText);
 const quoteAuthorYaml = JSON.stringify(quoteAuthor);
 tR += `---\nDay: ${dayName}\njournal: Daily Notes\nmood:\nenergy:\nweight:\nreflection:\nquote: ${quoteYaml}\nquote_author: ${quoteAuthorYaml}\ntags:\n  - Daily-notes\n---\n`;
 -%>
-
-```dataviewjs
-dv.view("90_System/92_Scripts/Dataview/homepage/schedule-callout")
-dv.view("90_System/92_Scripts/Dataview/homepage/exercise-callout")
-dv.view("90_System/92_Scripts/Dataview/homepage/cardio-callout")
-```
-
----
-
 ## Day Planner
 
 ---
