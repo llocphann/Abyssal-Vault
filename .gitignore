@@ -17,14 +17,6 @@ Thumbs.db
 !/20_Personal_Life/29_Contact/.gitkeep
 
 # Generated/imported personal media
-/90_System/95_Media_Assets/Movies/*
-!/90_System/95_Media_Assets/Movies/.gitkeep
-/90_System/95_Media_Assets/TV_Series/*
-!/90_System/95_Media_Assets/TV_Series/.gitkeep
-/90_System/95_Media_Assets/Games/*
-!/90_System/95_Media_Assets/Games/.gitkeep
-/90_System/95_Media_Assets/Recipes/*
-!/90_System/95_Media_Assets/Recipes/.gitkeep
 /90_System/96_Auto_Attachments/*
 !/90_System/96_Auto_Attachments/.gitkeep
 
