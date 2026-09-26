@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "216e1c693e01b8f5",
+        "id": "9f0c726901136d8f",
         "type": "tabs",
         "children": [
           {
-            "id": "f591d44d5bee8d20",
+            "id": "0a5f392973893cf7",
             "type": "leaf",
             "pinned": true,
             "state": {
@@ -301,11 +301,18 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "f591d44d5bee8d20",
+  "active": "0a5f392973893cf7",
   "lastOpenFiles": [
-    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
+    "90_System/93_Configuration/settings.md",
+    "20_Personal_Life/23_Places/Map.base",
+    "20_Personal_Life/33_Bodybuilding/Bodybuilding.base",
+    "20_Personal_Life/26_Food_&_Drinks/FoodnDrinks.base",
+    "20_Personal_Life/22_Finance/Finance_Dashboard.md",
     "20_Personal_Life/27_Game_Tracker/Game_Collection.base",
+    "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
+    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
     "90_System/98_Homepage/Homepage.md",
+    "CHANGELOG.md",
     "90_System/95_Media_Assets/TV_Series/65733-cover.jpg",
     "90_System/95_Media_Assets/TV_Series/71728-cover.jpg",
     "90_System/95_Media_Assets/TV_Series/76479-backdrop.jpg",
@@ -318,12 +325,6 @@
     "90_System/95_Media_Assets/TV_Series/86831-backdrop.jpg",
     "90_System/95_Media_Assets/Movies",
     "90_System/95_Media_Assets/TV_Series",
-    "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
-    "90_System/93_Configuration/settings.md",
-    "20_Personal_Life/23_Places/Map.base",
-    "20_Personal_Life/33_Bodybuilding/Bodybuilding.base",
-    "20_Personal_Life/26_Food_&_Drinks/FoodnDrinks.base",
-    "20_Personal_Life/22_Finance/Finance_Dashboard.md",
     "20_Personal_Life/27_Game_Tracker/Games/Crimson Desert Enhanced.md",
     "90_System/95_Media_Assets/Games",
     "90_System/95_Media_Assets/Recipes/Illustrations",
@@ -351,7 +352,6 @@
     "__morphic_competitive_bench__/Noop.md",
     "__morphic_competitive_bench__/Nav-B.md",
     "__morphic_competitive_bench__/Nav-A.md",
-    "00_Capture/02_Cornell/hdufshd.md",
     "__morphic_canvas_error_probe__/Probe.canvas",
     "__morphic_canvas_readiness_probe__/Probe.canvas"
   ]
