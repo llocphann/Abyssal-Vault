@@ -61,6 +61,15 @@ Automation scripts live under `90_System/92_Scripts`. They are divided broadly i
 - **Provider identity** — preserves external recipe IDs.
 - **Source tracking** — stores provider and source URL.
 
+## `book_metadata.js`
+
+- **Book search** — supports Open Library and Google Books, title/author or ISBN-10/ISBN-13.
+- **Edition identity** — offers Open Library edition selection and preserves ISBN, Work/Edition and Google Volume identifiers.
+- **Schema normalization** — maps source metadata into the existing Book Tracker fields and personal note sections.
+- **Cover caching** — securely downloads recognized image formats into `90_System/95_Media_Assets/Books`.
+- **Duplicate and failure safety** — checks provider/ISBN identities and protects existing nonempty notes.
+- **Tests** — `node tests/book_metadata.test.js`; setup guide: `docs/systems/Book-Auto-Import.md`.
+
 ## `tmdb_media.js`
 
 - **Movie asset folder** — stores Movie assets under `90_System/95_Media_Assets/Movies`.

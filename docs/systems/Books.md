@@ -42,3 +42,7 @@ The template initializes a valid Book schema with `Status: Haven't started`, zer
 - **Book Data — Edit** — provides a table for direct metadata editing.
 
 The Markdown Book note remains the source of truth; the Base only renders and edits its fields.
+
+## Automatic metadata import
+
+Creating a blank Book note in the existing Books folder now invokes `book_metadata.js` through `Book_Template.md`. Select a book/edition from Open Library or Google Books to populate existing fields and a local cover while keeping reading progress and personal notes separate. See [Automatic Book Notes](Book-Auto-Import.md) for provider settings, safety and tests.

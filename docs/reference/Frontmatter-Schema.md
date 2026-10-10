@@ -31,6 +31,8 @@ This page summarizes fields that act as contracts between Markdown records and A
 | `Rating` | Personal score. |
 | `Genre` | Multi-value classification. |
 
+New imported Book notes may also contain `isbn10`, `isbn13`, `openlibrary_work_id`, `openlibrary_edition_id`, `google_books_id`, `book_provider`, `provider_book_id`, `publisher`, `published_date`, `language`, and `source_url`. These are additive; the original fields above remain unchanged. See [Automatic Book Notes](../systems/Book-Auto-Import.md).
+
 ## Finance
 
 ### Shared

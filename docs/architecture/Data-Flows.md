@@ -34,6 +34,20 @@ Place note + coordinates
 
 There is no separate Globe database. The same Place records are reused everywhere.
 
+## Books
+
+```text
+Book_Template.md
+   ↓
+book_metadata.js
+   ↓
+Open Library / Google Books → choose exact edition/volume
+   ↓
+Normalized Book frontmatter + local cover
+   ↓
+Book_Tracker.base + book-v1 Custom View
+```
+
 ## Movies and TV
 
 ```text

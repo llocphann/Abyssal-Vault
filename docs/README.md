@@ -18,6 +18,7 @@ Abyssal Vault is a local-first personal information system built on Obsidian and
 - [Finance](systems/Finance.md)
 - [Places](systems/Places.md)
 - [Book Tracker](systems/Books.md)
+- [Automatic Book Notes](systems/Book-Auto-Import.md)
 - [Media Tracker](systems/Media.md)
 - [Food & Drinks](systems/Food-and-Drinks.md)
 - [Game Tracker](systems/Games.md)

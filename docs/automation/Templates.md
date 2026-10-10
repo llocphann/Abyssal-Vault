@@ -76,17 +76,12 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 
 ## `Book_Template.md`
 
-- **Book identity** — initializes a Book record compatible with `Book_Tracker.base`.
-- **Author / Cover** — provides author and artwork fields.
-- **Reading state** — initializes status to `Haven't started`.
-- **Page progress** — initializes CurrentPage and TotalPages.
-- **Reading dates** — provides DateStarted and DateFinished.
-- **Rating / Genre** — provides evaluation and classification fields.
-- **Synopsis** — creates summary space.
-- **Notes & Takeaways** — creates knowledge-extraction space.
-- **Highlights** — creates quotation/excerpt space.
-- **Review & Thoughts** — creates personal review space.
-- **Connections** — creates links to related books, topics, applications, or projects.
+- **Templater entrypoint** — delegates to `tp.user.book_metadata(tp)` when a new blank note is created inside the Books folder.
+- **Provider search** — supports Open Library and Google Books, searching by title, author or ISBN and selecting a precise edition/volume.
+- **Schema compatibility** — imports `Title`, `Author`, `Cover`, `Genre`, `TotalPages`, and synopsis without changing existing Book Base or Custom View contracts.
+- **Local cover** — downloads a provider-scoped image under `90_System/95_Media_Assets/Books` and stores a basename wikilink.
+- **Personal state** — initializes `Status`, `CurrentPage`, reading dates and `Rating` without inventing personal activity.
+- **Safe fallback** — preserves existing nonempty notes; failed search/cancellation creates a blank template, while detected duplicate records are not generated.
 
 ## `Place_Template.md`
 
