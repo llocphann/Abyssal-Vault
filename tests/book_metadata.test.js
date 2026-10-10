@@ -7,16 +7,16 @@ async function runBookMetadataTests() {
   coverBytes.set([255, 216, 255]);
   const json = value => ({status:200,json:value});
   function makeTp({query="Sample Book", choose=()=>0, responder=()=>{throw Error("Unexpected request");},
-    existing=null, size=0, cancel=false, settingsLanguage=""}={}) {
+    existing=null, size=0, cancel=false, settingsLanguage="", settingsProvider="", progressDom=false}={}) {
     const target = {path:`${BOOKS}/Untitled.md`,name:"Untitled.md",stat:{size,ctime:42}};
     const old = existing ? {path:`${BOOKS}/Existing.md`,name:"Existing.md",
       stat:{size:512,ctime:12},frontmatter:existing} : null;
-    const settingsFile = settingsLanguage ? {
-      path:"90_System/93_Configuration/settings.md",
-      name:"settings.md",frontmatter:{book_language:settingsLanguage}
+    const settingsFile = settingsLanguage || settingsProvider ? {
+      path:"90_System/93_Configuration/settings.md",name:"settings.md",
+      frontmatter:{book_language:settingsLanguage,book_provider:settingsProvider}
     } : null;
     const files = [target,...(old?[old]:[]),...(settingsFile?[settingsFile]:[])],
-      covers=[], notices=[], hooks=[], urls=[], dialogs=[];
+      covers=[], notices=[], hooks=[], urls=[], dialogs=[], progressEvents=[];
     const folders = new Set([BOOKS, "90_System", "90_System/95_Media_Assets"]);
     let trashed = false;
     const get = p => files.find(f=>f.path===p) || covers.find(f=>f.path===p) ||
@@ -32,7 +32,30 @@ async function runBookMetadataTests() {
           dialogs.push({title,labels});
           return values[choose(labels,values)]??null;
         }},
-      obsidian:{Notice:class{constructor(msg){notices.push(msg);}},
+      obsidian:{Notice:class{
+        constructor(msg, duration) {
+          notices.push(msg);
+          if (progressDom && duration === 0) {
+            const makeNode = type => {
+              const element = {type,style:{},empty(){},
+                createDiv:opts => {
+                  if (opts?.text) progressEvents.push({label:opts.text});
+                  return makeNode("div");
+                },
+                createEl:name=>makeNode(name),
+                setText:value=>progressEvents.push({text:value}),
+                setAttribute:()=>{}};
+              Object.defineProperty(element,"value",{
+                set:n=>progressEvents.push({value:n}),get:()=>0
+              });
+              return element;
+            };
+            this.noticeEl=makeNode("notice");
+          }
+        }
+        setMessage(msg) { progressEvents.push({message:msg}); return this; }
+        hide() { progressEvents.push({hidden:true}); }
+      },
         requestUrl:async({url})=>{urls.push(url);return responder(url);}},
       app:{
         fileManager:{trashFile:async file=>{assert.equal(file,target);trashed=true;}},
@@ -44,7 +67,7 @@ async function runBookMetadataTests() {
             covers.push({path:p,name:p.split("/").pop()});}}
       }
     };
-    return {tp,urls,covers,hooks,notices,dialogs,get trashed(){return trashed;}};
+    return {tp,urls,covers,hooks,notices,dialogs,progressEvents,get trashed(){return trashed;}};
   }
   const google={id:"vol-A",volumeInfo:{title:"Sample Book",authors:["A. Author"],
     pageCount:300,categories:["Fantasy"],description:"<b>Read me</b> &amp; enjoy",
@@ -267,6 +290,131 @@ async function runBookMetadataTests() {
       "Original Language — When Available"
     ].join("|"));
   }
-  console.log("17 Book importer tests passed (including English UI labels, language preferences and Unicode).");
+
+  // Google Books API failures explicitly switch to Open Library.
+  {
+    const s=makeTp({query:"Fantastic Mr. Fox",progressDom:true,
+      responder:url=>url.includes("googleapis.com")
+        ? (()=>{throw Error("Simulated Google Books outage")})()
+        : openResponse(url)});
+    const note=await importer(s.tp);
+    assert.match(note,/book_provider: "Open Library"/);
+    assert.ok(s.notices.some(x=>x.includes("Switching to Open Library")));
+    assert.ok(s.progressEvents.some(x=>x.text?.includes("Switching to Open Library")));
+    assert.ok(s.progressEvents.some(x=>x.value===1));
+    assert.ok(s.progressEvents.some(x=>x.value===2));
+    assert.ok(s.progressEvents.some(x=>x.value===3));
+    assert.ok(s.progressEvents.some(x=>x.value===4));
+    assert.ok(s.progressEvents.some(x=>x.value===5));
+    assert.ok(s.progressEvents.some(x=>x.hidden));
+  }
+  // Empty Google search result also uses the fallback, including Google-only mode.
+  {
+    const s=makeTp({settingsProvider:"googlebooks",query:"Fantastic Mr. Fox",
+      responder:url=>url.includes("googleapis.com")?json({items:[]}):openResponse(url)});
+    const note=await importer(s.tp);
+    assert.match(note,/book_provider: "Open Library"/);
+    assert.ok(s.notices.some(x=>x.includes("Google Books returned no results")));
+    assert.ok(s.urls.some(x=>x.includes("openlibrary.org/search.json")));
+    assert.ok(s.progressEvents.some(x=>x.message?.includes("Switching to Open Library")));
+  }
+  // Invalid Google JSON payload is an extraction failure, not a blank note.
+  {
+    const s=makeTp({query:"Fantastic Mr. Fox",
+      responder:url=>url.includes("googleapis.com")?{status:200,json:{items:{bad:true}}}:openResponse(url)});
+    assert.match(await importer(s.tp),/book_provider: "Open Library"/);
+    assert.ok(s.notices.some(x=>x.includes("Switching to Open Library")));
+  }
+  // No result from either provider safely creates a blank Book note.
+  {
+    const s=makeTp({query:"Unknown book",
+      responder:url=>url.includes("googleapis.com")?json({items:[]})
+        : url.includes("openlibrary.org/search.json")?json({docs:[]})
+        : (()=>{throw Error(url)})()});
+    const note=await importer(s.tp);
+    assert.match(note,/TotalPages: 0/);
+    assert.ok(s.notices.some(x=>x.includes("Neither provider")));
+    assert.ok(s.progressEvents.some(x=>x.hidden));
+  }
+  const sparseGoogle={...google,volumeInfo:{...google.volumeInfo,pageCount:0,
+    description:"",imageLinks:{thumbnail:"https://unsafe.example/cover.jpg"}}};
+  const googleOnlySource=url=>url.includes("googleapis.com")?json({items:[sparseGoogle]})
+    : url.includes("books.google.com")?{status:200,arrayBuffer:coverBytes.buffer}
+    : null;
+  // Selected sparse Google data can recover using the exact Open Library ISBN.
+  {
+    const s=makeTp({query:"Sample Book",
+      choose:(_labels,values)=>typeof values[0]==="string"?0:
+        values.findIndex(x=>x.source==="googlebooks"),
+      responder:url=>googleOnlySource(url)||
+        (url.includes("/isbn/9780140328721.json")?json(edition):
+        url.includes("openlibrary.org/search.json")?json({docs:[]}):
+        url.includes("/works/OL45804W.json")?json({description:"A fox story"}):
+        url.includes("/authors/OL123A.json")?json({name:"Roald Dahl"}):
+        url.includes("covers.openlibrary.org")?{status:200,arrayBuffer:coverBytes.buffer}:
+        (()=>{throw Error(url)})())});
+    const note=await importer(s.tp);
+    assert.match(note,/book_provider: "Open Library"/);
+    assert.match(note,/isbn13: "9780140328721"/);
+    assert.match(note,/TotalPages: 96/);
+    assert.ok(s.notices.some(x=>x.includes("metadata is incomplete. Switching to Open Library")));
+  }
+  // A mismatched edition MUST NOT replace a selected Google Books record.
+  {
+    const mismatch={...edition,isbn_13:["9780306406157"]};
+    const s=makeTp({query:"Sample Book",
+      choose:(_labels,values)=>typeof values[0]==="string"?0:
+        values.findIndex(x=>x.source==="googlebooks"),
+      responder:url=>googleOnlySource(url)||
+        (url.includes("/isbn/9780140328721.json")?json(mismatch):
+        url.includes("openlibrary.org/search.json")?json({docs:[]}):
+        url.includes("/works/OL45804W.json")?json({description:"Not the same edition"}):
+        url.includes("/authors/OL123A.json")?json({name:"Someone"}):
+        url.includes("covers.openlibrary.org")?{status:200,arrayBuffer:coverBytes.buffer}:
+        (()=>{throw Error(url)})())});
+    const note=await importer(s.tp);
+    assert.match(note,/book_provider: "Google Books"/);
+    assert.match(note,/TotalPages: 0/);
+    assert.match(note,/isbn13: "9780140328721"/);
+    assert.ok(s.notices.some(x=>x.includes("Keeping available Google Books metadata")));
+  }
+  // Failed Google cover is retried at Open Library only with the same ISBN;
+  // Google provider metadata is kept when the cover alone is missing.
+  {
+    const coverless={...google,volumeInfo:{...google.volumeInfo,
+      imageLinks:{thumbnail:"https://unsafe.example/cover.jpg"}}};
+    const s=makeTp({query:"Sample Book",
+      choose:(_labels,values)=>typeof values[0]==="string"?0:
+        values.findIndex(x=>x.source==="googlebooks"),
+      responder:url=>url.includes("googleapis.com")?json({items:[coverless]})
+        : url.includes("/isbn/9780140328721.json")?json(edition)
+        : url.includes("openlibrary.org/search.json")?json({docs:[]})
+        : url.includes("/works/OL45804W.json")?json({description:"A fox story"})
+        : url.includes("/authors/OL123A.json")?json({name:"Roald Dahl"})
+        : url.includes("covers.openlibrary.org")?{status:200,arrayBuffer:coverBytes.buffer}
+        : (()=>{throw Error(url)})()});
+    const note=await importer(s.tp);
+    assert.match(note,/book_provider: "Google Books"/);
+    assert.match(note,/Cover: "\[\[openlibrary-OL7353617M-cover.jpg\]\]"/);
+    assert.ok(s.notices.some(x=>x.includes("Google Books cover unavailable. Switching to Open Library")));
+  }
+  // No ISBN means do not silently borrow cover or metadata from an unrelated edition.
+  {
+    const noIsbn={...google,volumeInfo:{...google.volumeInfo,
+      pageCount:0,industryIdentifiers:[],description:"",
+      imageLinks:{thumbnail:"https://unsafe.example/a.jpg"}}};
+    const s=makeTp({query:"Sample Book",
+      choose:(_labels,values)=>typeof values[0]==="string"?0:
+        values.findIndex(x=>x.source==="googlebooks"),
+      responder:url=>url.includes("googleapis.com")?json({items:[noIsbn]})
+        : url.includes("openlibrary.org/search.json")?json({docs:[]})
+        : (()=>{throw Error(url)})()});
+    const note=await importer(s.tp);
+    assert.match(note,/book_provider: "Google Books"/);
+    assert.match(note,/Cover: ""/);
+    assert.ok(!s.urls.some(x=>x.includes("/isbn/")));
+    assert.ok(s.notices.some(x=>x.includes("No ISBN to verify")));
+  }
+  console.log("25 Book importer tests passed (including Google-to-Open-Library fallback and progress).");
 }
 runBookMetadataTests().catch(error => { console.error(error); process.exitCode = 1; });

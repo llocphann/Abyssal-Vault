@@ -68,6 +68,7 @@ Automation scripts live under `90_System/92_Scripts`. They are divided broadly i
 - **Schema normalization** — maps source metadata into the existing Book Tracker fields and personal note sections.
 - **Cover caching** — securely downloads recognized image formats into `90_System/95_Media_Assets/Books`.
 - **Duplicate and failure safety** — checks provider/ISBN identities and protects existing nonempty notes.
+- **Google Books fallback** — explicit Google-to-Open-Library notifications for unavailable/empty searches, ISBN-verified metadata/cover recovery, request timeouts, and an English five-step progress bar with elapsed time.
 - **Tests** — `node tests/book_metadata.test.js`; setup guide: `docs/systems/Book-Auto-Import.md`.
 
 ## `tmdb_media.js`

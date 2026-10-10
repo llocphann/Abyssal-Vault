@@ -78,6 +78,70 @@ module.exports = async function bookMetadata(tp) {
     return lines.join("\n");
   }
   const notify = msg => { if (tp.obsidian?.Notice) new tp.obsidian.Notice(msg, 8000); };
+  // A persistent, non-blocking Obsidian Notice shows actual workflow steps.
+  // The bar measures steps, not fabricated network bytes. An elapsed timer
+  // keeps updating while provider requests are pending.
+  function createImportProgress() {
+    if (!tp.obsidian?.Notice) return {update:()=>{},close:()=>{}};
+    let notice, label, bar, counter, interval = null, step = 0;
+    let message = "Preparing book import", start = Date.now();
+    try {
+      notice = new tp.obsidian.Notice("Book import: Preparing...", 0);
+      const host = notice.noticeEl;
+      if (typeof host?.createDiv === "function") {
+        if (typeof host.empty === "function") host.empty();
+        const root = host.createDiv({cls:"abyssal-book-import-progress"});
+        label = root.createDiv({text:message});
+        bar = root.createEl("progress");
+        bar.max = 5;
+        bar.value = 0;
+        bar.style.width = "100%";
+        bar.style.display = "block";
+        bar.setAttribute("aria-label", "Book import step progress");
+        counter = root.createDiv({text:"Step 0 of 5 · 0s elapsed"});
+        counter.style.fontSize = "var(--font-smaller)";
+        counter.style.color = "var(--text-muted)";
+      }
+    } catch (_) { /* Metadata import must work even without Notice DOM APIs. */ }
+    const refresh = () => {
+      const elapsed = Math.floor((Date.now() - start) / 1000);
+      if (label?.setText) label.setText(message);
+      if (counter?.setText) counter.setText(`Step ${step} of 5 · ${elapsed}s elapsed`);
+      if (bar) bar.value = step;
+      if (!label && typeof notice?.setMessage === "function")
+        notice.setMessage(`${message} — Step ${step} of 5 · ${elapsed}s`);
+    };
+    if (typeof setInterval === "function") interval = setInterval(refresh, 1000);
+    return {
+      update(next, text) {
+        step = Math.max(0, Math.min(5, next));
+        message = text;
+        refresh();
+      },
+      close() {
+        if (interval != null && typeof clearInterval === "function") clearInterval(interval);
+        interval = null;
+        try { notice?.hide?.(); } catch (_) {}
+      }
+    };
+  }
+  // Obsidian requestUrl does not expose incremental download progress or
+  // an abort handle. A request timeout prevents an unreachable provider from
+  // leaving the workflow waiting indefinitely; late responses are ignored.
+  async function withTimeout(operation, seconds = 15) {
+    if (typeof setTimeout !== "function") return operation();
+    let timer;
+    try {
+      return await Promise.race([
+        Promise.resolve().then(operation),
+        new Promise((_, reject) => {
+          timer = setTimeout(() => reject(Error("Provider request timed out")), seconds * 1000);
+        })
+      ]);
+    } finally {
+      if (timer != null) clearTimeout(timer);
+    }
+  }
   const target = tp.config?.target_file;
   if (target && Number(target.stat?.size || 0) > 0) {
     notify("Existing Book note preserved; import only runs on a new blank note.");
@@ -123,7 +187,7 @@ module.exports = async function bookMetadata(tp) {
       googleKey: /^fill in/i.test(googleKey) ? "" : googleKey, language:normalizePreference(language) };
   }
   async function getJson(url) {
-    const resp = await tp.obsidian.requestUrl({url, method:"GET", headers:{Accept:"application/json"}});
+    const resp = await withTimeout(() => tp.obsidian.requestUrl({url, method:"GET", headers:{Accept:"application/json"}}));
     if (resp.status < 200 || resp.status >= 300) throw Error(`HTTP ${resp.status}`);
     return resp.json != null ? resp.json : JSON.parse(resp.text || "{}");
   }
@@ -154,7 +218,11 @@ module.exports = async function bookMetadata(tp) {
     const url = `${GOOGLE}?q=${encodeURIComponent(query)}&maxResults=12&printType=books` +
       (key ? `&key=${encodeURIComponent(key)}` : "");
     const lang = !isbn && ["vi","en"].includes(preference) ? preference : "";
-    const preferred = lang ? await getJson(`${url}&langRestrict=${lang}`) : null;
+    // A failed language-restricted endpoint also falls back to the
+    // unrestricted Google query, before considering the other provider.
+    let preferred = null;
+    if (lang) try { preferred = await getJson(`${url}&langRestrict=${lang}`); }
+    catch (_) { /* Retry Google without language restriction. */ }
     const data = preferred?.items?.length ? preferred : await getJson(url);
     return (data.items || []).map(item => {
       const v = item.volumeInfo || {}, id = txt(item.id);
@@ -266,7 +334,7 @@ module.exports = async function bookMetadata(tp) {
     const trusted = host === "covers.openlibrary.org" || host === "books.google.com" ||
       host === "books.googleusercontent.com" || host.endsWith(".googleusercontent.com");
     if (!trusted) return "";
-    const response = await tp.obsidian.requestUrl({url:b.coverUrl, method:"GET"});
+    const response = await withTimeout(() => tp.obsidian.requestUrl({url:b.coverUrl, method:"GET"}), 12);
     if (response.status < 200 || response.status >= 300 || !response.arrayBuffer) return "";
     const bytes = new Uint8Array(response.arrayBuffer);
     if (bytes.byteLength < 128) return "";
@@ -317,6 +385,62 @@ module.exports = async function bookMetadata(tp) {
     }
     throw Error("No available filename");
   }
+  // A Google result can contain a title but lack usable edition metadata.
+  // Recover from Open Library using a verified ISBN; never guess an edition
+  // from title similarity or silently substitute a different translation.
+  async function recoverGoogleDetails(book, preference, progress) {
+    const incomplete = !book.author || !book.pages || (!book.description && !book.coverUrl);
+    if (!incomplete) return book;
+    const isbn = book.isbn13 || book.isbn10;
+    if (!isbn) {
+      notify("Google Books metadata is incomplete. No ISBN to verify an Open Library edition; keeping the Google Books record.");
+      return book;
+    }
+    progress.update(3, "Google Books metadata incomplete. Switching to Open Library...");
+    notify("Google Books metadata is incomplete. Switching to Open Library by ISBN...");
+    try {
+      const candidates = await openSearch(isbn, isbn, preference);
+      // ISBN-specific lookup is required; do not pick a title-only match.
+      for (const candidate of candidates.slice(0, 5)) {
+        const replacement = await openDetail(candidate, preference);
+        if (!replacement) continue;
+        const identical = (book.isbn13 && book.isbn13 === replacement.isbn13) ||
+          (book.isbn10 && book.isbn10 === replacement.isbn10);
+        if (!identical) continue;
+        const score = b => Number(!!b.author) + Number(b.pages > 0) +
+          Number(!!b.description) + Number(!!b.coverUrl);
+        if (score(replacement) > score(book)) {
+          notify("Open Library returned more complete metadata for the same ISBN.");
+          return replacement;
+        }
+        break;
+      }
+    } catch (_) { /* Keep Google record when fallback fails. */ }
+    notify("Open Library could not improve the verified edition. Keeping available Google Books metadata.");
+    return book;
+  }
+  // Keep Google Books metadata if its cover alone is unavailable. A cover
+  // can be taken from Open Library only after verifying the identical ISBN.
+  async function recoverGoogleCover(book, preference, progress) {
+    if (book.provider !== "Google Books" || book.cover) return;
+    const isbn = book.isbn13 || book.isbn10;
+    if (!isbn) return;
+    progress.update(4, "Google Books cover unavailable. Switching to Open Library...");
+    notify("Google Books cover unavailable. Switching to Open Library for a matching ISBN...");
+    try {
+      const candidates = await openSearch(isbn, isbn, preference);
+      for (const candidate of candidates.slice(0, 5)) {
+        const edition = await openDetail(candidate, preference);
+        if (!edition) continue;
+        const identical = (book.isbn13 && book.isbn13 === edition.isbn13) ||
+          (book.isbn10 && book.isbn10 === edition.isbn10);
+        if (!identical || !edition.coverUrl) continue;
+        book.cover = await saveCover(edition);
+        if (book.cover) notify("Book cover recovered from Open Library for the same ISBN.");
+        break;
+      }
+    } catch (_) { /* Missing cover is non-fatal. */ }
+  }
   if (typeof tp.obsidian?.requestUrl !== "function") return renderBlank();
   let conf;
   try { conf = await settings(); } catch (_) { conf = {mode:"auto", googleKey:"",language:"auto"}; }
@@ -339,35 +463,79 @@ module.exports = async function bookMetadata(tp) {
       options.map(x=>x.code), false, "Preferred Book Language (Esc = Default)");
     if (selected) preference = selected;
   } catch (_) { /* Keep configured preference when UI is unavailable. */ }
-  const sources = conf.mode === "auto" ? ["openlibrary", "googlebooks"] : [conf.mode];
-  const matches = [];
-  for (const source of sources) {
-    try {
-      const items = source === "openlibrary" ? await openSearch(query, isbn, preference) :
-        await googleSearch(query, isbn, conf.googleKey, preference);
-      matches.push(...items);
-    } catch (_) { notify(`${source} search unavailable; continuing with other providers.`); }
-  }
-  if (!matches.length) { notify("No matching books; created blank Book template."); return renderBlank(); }
-  const labels = matches.map(m =>
-    `[${m.source === "openlibrary" ? "Open Library" : "Google Books"}] ${m.title} · ${m.author || "Unknown author"} · ${m.year || "n.d."} · ${m.id}`.slice(0,200));
-  let chosen;
-  try { chosen = await tp.system.suggester(labels, matches, false, "Choose a book"); }
-  catch (_) { return renderBlank(); }
-  if (!chosen) return renderBlank();
+  // Try Google first. Even in googlebooks-only mode, an unavailable or
+  // empty Google search falls back to Open Library. In Auto, both catalogs
+  // are shown so users can select the edition that matches their book.
+  const sources = conf.mode === "openlibrary" ? ["openlibrary"] : ["googlebooks","openlibrary"];
+  const progress = createImportProgress();
   try {
-    const b = chosen.source === "openlibrary" ? await openDetail(chosen, preference) : googleDetail(chosen);
-    if (!b) return renderBlank();
-    const prior = duplicate(b);
-    if (prior) { notify(`Book already exists: ${prior.path}. No duplicate metadata created.`); return rejectDuplicate(); }
-    try { b.cover = await saveCover(b); }
-    catch (_) { notify("Metadata imported; cover download failed."); }
-    const name = availableName(b);
-    if (name !== originalTitle) {
-      try { await tp.file.rename(name); }
-      catch (_) { notify("Metadata imported; filename could not be renamed."); }
+    const matches = [];
+    let googleFailed = false;
+    for (const source of sources) {
+      const isGoogle = source === "googlebooks";
+      if (isGoogle) progress.update(1,"Searching Google Books...");
+      else if (googleFailed) progress.update(2,"Google Books unavailable. Switching to Open Library...");
+      else progress.update(2,conf.mode === "openlibrary"
+        ? "Searching Open Library..." : "Checking Open Library for additional editions...");
+      try {
+        const items = isGoogle
+          ? await googleSearch(query, isbn, conf.googleKey, preference)
+          : await openSearch(query, isbn, preference);
+        matches.push(...items);
+        if (isGoogle && !items.length) {
+          googleFailed = true;
+          progress.update(2,"Google Books returned no results. Switching to Open Library...");
+          notify("Google Books returned no results. Switching to Open Library...");
+        }
+      } catch (_) {
+        if (isGoogle) {
+          googleFailed = true;
+          progress.update(2,"Google Books unavailable. Switching to Open Library...");
+          notify("Google Books unavailable. Switching to Open Library...");
+        } else {
+          notify("Open Library is unavailable. Using any results already found.");
+        }
+      }
     }
-    if (name !== b.title) b.alias = b.title;
-    return render(b);
-  } catch (_) { notify("Book details unavailable; created blank Book template."); return renderBlank(); }
+    if (!matches.length) {
+      notify("Neither provider returned a matching book. Creating a blank Book note.");
+      return renderBlank();
+    }
+    progress.update(3,"Waiting for book selection...");
+    const labels = matches.map(m =>
+      `[${m.source === "openlibrary" ? "Open Library" : "Google Books"}] ${m.title} · ${m.author || "Unknown author"} · ${m.year || "n.d."} · ${m.id}`.slice(0,200));
+    let chosen;
+    try { chosen = await tp.system.suggester(labels, matches, false, "Choose a book"); }
+    catch (_) { return renderBlank(); }
+    if (!chosen) return renderBlank();
+    try {
+      progress.update(3,`Retrieving ${chosen.source === "openlibrary" ? "Open Library" : "Google Books"} metadata...`);
+      let b = chosen.source === "openlibrary" ? await openDetail(chosen, preference) : googleDetail(chosen);
+      if (!b) return renderBlank();
+      if (chosen.source === "googlebooks")
+        b = await recoverGoogleDetails(b, preference, progress);
+      const prior = duplicate(b);
+      if (prior) {
+        notify(`Book already exists: ${prior.path}. No duplicate metadata created.`);
+        return rejectDuplicate();
+      }
+      progress.update(4,"Downloading and caching book cover...");
+      try { b.cover = await saveCover(b); }
+      catch (_) { notify("Book metadata imported, but the cover could not be downloaded."); }
+      if (!b.cover) await recoverGoogleCover(b, preference, progress);
+      progress.update(5,"Creating Book note...");
+      const name = availableName(b);
+      if (name !== originalTitle) {
+        try { await tp.file.rename(name); }
+        catch (_) { notify("Metadata imported; filename could not be renamed."); }
+      }
+      if (name !== b.title) b.alias = b.title;
+      return render(b);
+    } catch (_) {
+      notify("Book details unavailable from the selected source. Creating a blank Book note.");
+      return renderBlank();
+    }
+  } finally {
+    progress.close();
+  }
 };

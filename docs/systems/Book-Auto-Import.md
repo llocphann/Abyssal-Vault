@@ -49,6 +49,42 @@ google_books_key: "" # optional; never commit a real key
 
 Open Library needs no API key. Public Google Books metadata queries can work without a key but remain subject to service limits.
 
+## Google Books fallback and progress
+
+To avoid an unresponsive-looking import, the importer shows a non-blocking
+Obsidian progress notice with a **five-step bar, current activity and elapsed
+seconds**. This indicates workflow steps, not an invented network-download
+percentage; API calls do not provide byte-level progress. The indicator is
+closed even if the user cancels, a request fails or the note is rejected as
+a duplicate.
+
+1. **Searching Google Books** — in `auto` or `googlebooks` provider mode.
+2. **Checking / switching to Open Library** — Google failures and empty search
+   results show an explicit "Switching to Open Library..." notice. Auto also
+   offers Open Library as an additional option when Google search succeeds.
+3. **Retrieving metadata** — after selecting a result. If a Google Books
+   edition is missing key metadata, the importer can recover a *better*
+   Open Library record only when its ISBN is identical.
+4. **Downloading cover** — if a Google cover is missing or invalid, the
+   importer looks for a cover from an ISBN-matched Open Library edition.
+   Other metadata stays attributed to Google Books for cover-only fallback.
+5. **Creating Book note** — preserves the existing Book Tracker schema.
+
+In `googlebooks` provider mode, Open Library is still tried if Google
+search fails or yields no results. In `openlibrary` mode, Google Books
+is not queried. If both sources are unavailable, the importer creates a
+valid blank Book note instead of hanging.
+
+JSON requests have a **15-second timeout** and cover requests a **12-second
+timeout**. Obsidian's `requestUrl` does not support aborting an in-flight
+request, so these timeouts stop waiting for slow requests without cancelling
+their underlying network transport. When no verified ISBN exists, no
+different-language edition is silently substituted; incomplete Google
+metadata may instead be kept intact for manual correction.
+
+All UI labels and notifications remain **in English**, while book titles,
+authors and content remain multilingual.
+
 ## Schema
 
 **Unchanged fields:** `Title`, `Author`, `Cover`, `Status`, `CurrentPage`, `TotalPages`, `DateStarted`, `DateFinished`, `Rating`, `Genre`, and `tags: [Book]`. Imported books start at `Haven't started`, page 0, and unrated. The Synopsis body imports the source description when available, but personal takeaways, reviews and highlights are never fabricated.
@@ -74,4 +110,4 @@ node --check 90_System/92_Scripts/Template_Scripts/book_metadata.js
 node tests/book_metadata.test.js
 ```
 
-Sixteen tests use mocked Obsidian APIs and make no external network calls, including Auto, Unicode searches, language preferences, edition ranking, fallback and ISBN protection. A manual smoke test in Obsidian remains necessary to verify dialogs, real provider responses and Custom View rendering.
+Twenty-five tests use mocked Obsidian APIs and make no external network calls, including multilingual search, provider fallback, incomplete metadata, ISBN-safe cover recovery and progress UI. A manual smoke test in Obsidian remains necessary to verify dialogs, real provider responses and Custom View rendering.
