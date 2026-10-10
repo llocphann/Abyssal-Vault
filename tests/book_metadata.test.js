@@ -16,7 +16,7 @@ async function runBookMetadataTests() {
       name:"settings.md",frontmatter:{book_language:settingsLanguage}
     } : null;
     const files = [target,...(old?[old]:[]),...(settingsFile?[settingsFile]:[])],
-      covers=[], notices=[], hooks=[], urls=[];
+      covers=[], notices=[], hooks=[], urls=[], dialogs=[];
     const folders = new Set([BOOKS, "90_System", "90_System/95_Media_Assets"]);
     let trashed = false;
     const get = p => files.find(f=>f.path===p) || covers.find(f=>f.path===p) ||
@@ -28,7 +28,10 @@ async function runBookMetadataTests() {
       date:{now:()=> "20261010-130000"},
       hooks:{on_all_templates_executed:fn=>hooks.push(fn)},
       system:{prompt:async()=>cancel?null:query,
-        suggester:async(labels,values)=>values[choose(labels,values)]??null},
+        suggester:async(labels,values,_throw,title)=>{
+          dialogs.push({title,labels});
+          return values[choose(labels,values)]??null;
+        }},
       obsidian:{Notice:class{constructor(msg){notices.push(msg);}},
         requestUrl:async({url})=>{urls.push(url);return responder(url);}},
       app:{
@@ -41,7 +44,7 @@ async function runBookMetadataTests() {
             covers.push({path:p,name:p.split("/").pop()});}}
       }
     };
-    return {tp,urls,covers,hooks,notices,get trashed(){return trashed;}};
+    return {tp,urls,covers,hooks,notices,dialogs,get trashed(){return trashed;}};
   }
   const google={id:"vol-A",volumeInfo:{title:"Sample Book",authors:["A. Author"],
     pageCount:300,categories:["Fantasy"],description:"<b>Read me</b> &amp; enjoy",
@@ -248,6 +251,22 @@ async function runBookMetadataTests() {
     assert.match(note,/language: "ja"/);
     assert.match(note,/Title: "ノルウェイの森"/);
   }
-  console.log("16 Book importer tests passed (including language preferences and Unicode).");
+  // The reusable Vault template must display English-only UI copy. Input
+  // and book metadata can still contain arbitrary Unicode languages.
+  {
+    const s=makeTp({responder:googleResponse,
+      choose:(_labels,items)=>typeof items[0]==="string" ? 0 :
+        items.findIndex(x=>x.source==="googlebooks")});
+    assert.match(await importer(s.tp),/Title: "Sample Book"/);
+    const popup=s.dialogs[0];
+    assert.equal(popup.title,"Preferred Book Language (Esc = Default)");
+    assert.equal(popup.labels.join("|"),[
+      "Auto — All Languages (default)",
+      "Vietnamese — Prefer Vietnamese Editions",
+      "English — Prefer English Editions",
+      "Original Language — When Available"
+    ].join("|"));
+  }
+  console.log("17 Book importer tests passed (including English UI labels, language preferences and Unicode).");
 }
 runBookMetadataTests().catch(error => { console.error(error); process.exitCode = 1; });

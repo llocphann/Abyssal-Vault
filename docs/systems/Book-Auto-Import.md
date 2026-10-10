@@ -7,12 +7,12 @@ Book notes use the existing `Book_Tracker.base` and `book-v1` Custom View. Markd
 1. Open Obsidian and reload Templater user scripts (restart once after pulling the new files).
 2. Create a **new blank note** inside `20_Personal_Life/24_Book_Tracker/Books`.
 3. The existing Templater folder mapping automatically invokes `90_System/91_Templates/Book_Template.md`, which delegates to `book_metadata.js`.
-4. Enter a title, author or valid ISBN-10/13. Choose a preferred language (default: **Tự động — mọi ngôn ngữ**), then select the book and exact edition. Esc at the search prompt creates a blank note; Esc in the language selector keeps the configured default.
+4. Enter a title, author or valid ISBN-10/13. Choose a preferred language (default: **Auto — All Languages**), then select the book and exact edition. Esc at the search prompt creates a blank note; Esc in the language selector keeps the configured default.
 5. Verify edition, page count and cover. Reading progress, rating, highlights and personal notes remain yours to edit.
 
 ## Preferred language
 
-**Default: `auto` — Tự động, mọi ngôn ngữ.** No language restrictions are added for Auto. Unicode search terms and filenames retain Vietnamese accents and Japanese, Chinese, or Korean writing.
+**Default: `auto` — Auto, All Languages.** No language restrictions are added for Auto. Unicode search terms and filenames retain Vietnamese accents and Japanese, Chinese, or Korean writing.
 
 | Preference | Behavior |
 | --- | --- |

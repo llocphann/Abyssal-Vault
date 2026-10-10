@@ -22,10 +22,10 @@ module.exports = async function bookMetadata(tp) {
       (/^[a-z]{2}$/.test(raw) ? raw : "");
   };
   const langs = [
-    {code:"auto",name:"Tự động — mọi ngôn ngữ"},
-    {code:"vi",name:"Tiếng Việt — ưu tiên bản tiếng Việt"},
-    {code:"en",name:"Tiếng Anh — ưu tiên bản tiếng Anh"},
-    {code:"original",name:"Ngôn ngữ gốc — khi xác định được"}
+    {code:"auto",name:"Auto — All Languages"},
+    {code:"vi",name:"Vietnamese — Prefer Vietnamese Editions"},
+    {code:"en",name:"English — Prefer English Editions"},
+    {code:"original",name:"Original Language — When Available"}
   ];
   const normalizePreference = x => {
     const v = txt(x).toLowerCase().replace(/[\s_-]/g,"");
@@ -336,7 +336,7 @@ module.exports = async function bookMetadata(tp) {
   try {
     const selected = await tp.system.suggester(
       options.map(x=>x.name+(x.code===conf.language ? " (default)" : "")),
-      options.map(x=>x.code), false, "Ngôn ngữ ưu tiên (Esc = mặc định)");
+      options.map(x=>x.code), false, "Preferred Book Language (Esc = Default)");
     if (selected) preference = selected;
   } catch (_) { /* Keep configured preference when UI is unavailable. */ }
   const sources = conf.mode === "auto" ? ["openlibrary", "googlebooks"] : [conf.mode];
