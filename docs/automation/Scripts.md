@@ -10,9 +10,19 @@ Automation scripts live under `90_System/92_Scripts`. They are divided broadly i
 - **Random selection** — returns a random quote.
 - **Callout formatting** — returns output suitable for an Obsidian quote callout.
 
+## `import_progress.js`
+
+- **Shared UI** — provides a reusable, non-blocking Obsidian Notice with an English title, five-step HTML `progress` bar, current operation label and live elapsed-time counter.
+- **Entrypoint** — `tp.user.import_progress(tp, {title:"Game Import",totalSteps:5})` returns `update(step,message)` and `close()`; invoke `close()` in a `finally` block.
+- **Stages, not bytes** — a step-based indicator avoids displaying fake network-transfer percentages. Elapsed time continues to refresh during long API requests and interactive selections.
+- **Safe failure** — tolerates a missing Notice DOM; `close()` clears its interval and hides the notice, including on failure or early return.
+- **Consumers** — `Movie_Template.md`, `TV_Show_Template.md`, `game_metadata.js` and `spoonacular_recipe.js`. The existing Book importer keeps its already-working progress UI.
+- **Test** — `node tests/import_progress.test.js` from the repository root (mocked APIs; no vault or network writes).
+
 ## `game_metadata.js`
 
 - **Steam search/details** — retrieves catalog metadata from Steam.
+- **Progress UI** — follows Steam search/selection/details, RAWG fallback, artwork/statistics and note creation through the shared five-step Notice.
 - **Steam URL/App ID input** — accepts direct Steam identities.
 - **RAWG fallback** — can query RAWG when configured.
 - **Cover download** — stores a local game cover.
@@ -44,6 +54,8 @@ Automation scripts live under `90_System/92_Scripts`. They are divided broadly i
 
 ## `spoonacular_recipe.js`
 
+- **Progress UI** — shows Spoonacular and TheMealDB search phases, result selection, detail loading, local cover download and note creation; the notice always closes.
+
 - **Provider selection** — supports Auto, Spoonacular, and TheMealDB.
 - **Local configuration** — reads provider/API settings from local configuration.
 - **Recipe search** — queries external recipe catalogs.
@@ -72,6 +84,8 @@ Automation scripts live under `90_System/92_Scripts`. They are divided broadly i
 - **Tests** — `node tests/book_metadata.test.js`; setup guide: `docs/systems/Book-Auto-Import.md`.
 
 ## `tmdb_media.js`
+
+- **Progress integration** — Movie and TV templates show shared workflow progress while this script caches local poster/backdrop files.
 
 - **Movie asset folder** — stores Movie assets under `90_System/95_Media_Assets/Movies`.
 - **TV asset folder** — stores TV assets under `90_System/95_Media_Assets/TV_Series`.

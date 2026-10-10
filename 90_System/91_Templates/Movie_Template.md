@@ -53,6 +53,9 @@ function failGeneratedNote(reason) {
   });
 }
 
+const importProgress = typeof tp.user?.import_progress === "function"
+  ? tp.user.import_progress(tp, {title:"Movie Import",totalSteps:5})
+  : {update:()=>{},close:()=>{}};
 try {
 const settingsPath = "90_System/93_Configuration/settings.local.md";
 const settingsFile = tp.app.vault.getAbstractFileByPath(settingsPath);
@@ -78,6 +81,7 @@ const searchUrl =
   "&include_adult=false&language=en-US&page=1";
 let searchResponse;
 try {
+  importProgress.update(1,"Searching TMDB for movies...");
   searchResponse = await tp.web.request(searchUrl);
 } catch (e) {
   failGeneratedNote(`TMDB search error: ${e.message || e}`);
@@ -98,6 +102,7 @@ const display = limited.map(r => {
 //---------------------------------------------------------------------
 // 3) Pick movie
 //---------------------------------------------------------------------
+importProgress.update(2,"Waiting for movie selection...");
 const chosenMovie = await tp.system.suggester(display, limited, true, "Pick a movie");
 if (!chosenMovie) {
   failGeneratedNote("Selection cancelled.");
@@ -112,6 +117,7 @@ const detailsUrl =
   `?api_key=${api_key}&language=en-US&append_to_response=credits,external_ids`;
 let details, credits, externalIds;
 try {
+  importProgress.update(3,"Fetching TMDB movie details...");
   details = await tp.web.request(detailsUrl);
   credits = details?.credits || {};
   externalIds = details?.external_ids || {};
@@ -140,6 +146,7 @@ const tmdbId = movieId;
 //---------------------------------------------------------------------
 // 5E) Local Code 128 barcode — IMDb numeric ID + TMDB ID
 //---------------------------------------------------------------------
+importProgress.update(4,"Preparing artwork and metadata...");
 const BARCODE_FOLDER = "90_System/95_Media_Assets/Movies";
 const CODE128_PATTERNS = [
   "212222","222122","222221","121223","121322","131222","122213","122312","132212","221213",
@@ -343,6 +350,7 @@ const backdropLink = localMediaLink(localMedia.backdrop);
 //---------------------------------------------------------------------
 // 6) Rating (1–10 to match the ten-point rating view)
 //---------------------------------------------------------------------
+importProgress.update(5,"Finalizing movie note...");
 const ratingChoices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 let rating = await tp.system.suggester(ratingChoices, ratingChoices, false, "Pick your rating (1–10)");
 if (!rating) rating = "";
@@ -449,5 +457,7 @@ tR += lines.join("\n");
 } catch (error) {
   failGeneratedNote(error);
   return;
+} finally {
+  importProgress.close();
 }
 %>

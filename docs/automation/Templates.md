@@ -125,6 +125,8 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 
 ## `Movie_Template.md`
 
+- **Progress UI** — the shared English five-step Notice shows TMDB search, selection, detail retrieval, assets and final note generation, closing on error/cancel.
+
 - **Private TMDB configuration** — reads the TMDB key from local configuration.
 - **Search** — searches TMDB by prompt or filename.
 - **Result selection** — lets the user choose the correct match.
@@ -142,6 +144,8 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 
 ## `TV_Show_Template.md`
 
+- **Progress UI** — the same shared Notice follows TMDB TV search, selection, detail retrieval, artwork and note generation; closes on early return.
+
 - **Private TMDB configuration** — reads TMDB credentials locally.
 - **TV search and selection** — searches the TMDB TV catalog and lets the user choose a result.
 - **Metadata import** — imports creators, directors, writers, cast, genres, networks, seasons, episodes, runtime, status, dates, language, description, tagline, and external IDs.
@@ -151,6 +155,8 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 - **Failure safety** — protects existing records.
 
 ## `Game_Template.md`
+
+- **Progress UI** — `game_metadata.js` opens a shared five-step Notice for Steam/RAWG and closes it with `finally`.
 
 - **Metadata import** — calls `tp.user.game_metadata(tp)`.
 - **Personal Log** — adds gameplay-reflection prompts.
@@ -164,6 +170,8 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 - **Existing-record update** — synchronizes personal statistics without recreating the Game record.
 
 ## `Recipe_Template.md`
+
+- **Progress UI** — `spoonacular_recipe.js` uses the shared five-step Notice across Spoonacular/TheMealDB search, selection, details, local cover and note generation.
 
 - **Importer entrypoint** — calls `tp.user.spoonacular_recipe(tp)`.
 - **Provider abstraction** — delegates provider choice and schema normalization to the importer.

@@ -624,13 +624,22 @@ module.exports = async function spoonacularRecipe(tp) {
   const query = String(prompted || "").trim() || (untitled ? "" : currentTitle);
   if (!query) return renderBlank();
 
+  const progress = typeof tp.user?.import_progress === "function"
+    ? tp.user.import_progress(tp, {title:"Recipe Import",totalSteps:5})
+    : {update:()=>{},close:()=>{}};
+  try {
   const results = [];
-  for (const provider of providers) {
+  for (const [index, provider] of providers.entries()) {
+    progress.update(index === 0 ? 1 : 2,
+      index === 0 ? `Searching ${provider.label} recipes...`
+        : `Checking ${provider.label} for additional recipes...`);
     try {
       const providerResults = await provider.search(tp, query);
       results.push(...providerResults.map((result) => ({ ...result, provider })));
     } catch (error) {
       // Provider failures and credentials stay private.
+      if (index + 1 < providers.length) progress.update(2,
+        `${provider.label} unavailable. Trying ${providers[index+1].label}...`);
     }
   }
   if (!results.length) {
@@ -638,6 +647,7 @@ module.exports = async function spoonacularRecipe(tp) {
     return renderBlank();
   }
 
+  progress.update(3,"Waiting for recipe selection...");
   const labels = results.map((item) =>
     `[${item.provider.label}] ${item.title} · #${item.id}`);
   let chosen;
@@ -652,9 +662,11 @@ module.exports = async function spoonacularRecipe(tp) {
   if (!chosen) return renderBlank();
 
   try {
+    progress.update(3,`Fetching ${chosen.provider.label} recipe details...`);
     const recipe = await chosen.provider.fetch(
       tp, chosen, query, fallbackTitle, tp.date.now("YYYY-MM-DD"),
     );
+    progress.update(4,"Downloading and caching recipe cover...");
     try {
       recipe.cover = await saveLocalCover(tp, chosen.provider, recipe);
     } catch (error) {
@@ -663,6 +675,7 @@ module.exports = async function spoonacularRecipe(tp) {
         "Recipe data was imported, but the local cover could not be downloaded. You can add a cover later.",
       );
     }
+    progress.update(5,"Writing recipe note...");
     if (recipe.title !== currentTitle) {
       try {
         await tp.file.rename(recipe.title);
@@ -676,5 +689,8 @@ module.exports = async function spoonacularRecipe(tp) {
       `${chosen.provider.label} is unavailable or its rate limit was exceeded. A safe blank template was created.`,
     );
     return renderBlank();
+  }
+  } finally {
+    progress.close();
   }
 };
