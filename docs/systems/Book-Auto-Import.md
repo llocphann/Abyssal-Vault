@@ -7,8 +7,23 @@ Book notes use the existing `Book_Tracker.base` and `book-v1` Custom View. Markd
 1. Open Obsidian and reload Templater user scripts (restart once after pulling the new files).
 2. Create a **new blank note** inside `20_Personal_Life/24_Book_Tracker/Books`.
 3. The existing Templater folder mapping automatically invokes `90_System/91_Templates/Book_Template.md`, which delegates to `book_metadata.js`.
-4. Enter a title, author or valid ISBN-10/13; select a result from Open Library or Google Books. For Open Library search results, choose an edition. Press Esc to create a blank note.
+4. Enter a title, author or valid ISBN-10/13. Choose a preferred language (default: **Tự động — mọi ngôn ngữ**), then select the book and exact edition. Esc at the search prompt creates a blank note; Esc in the language selector keeps the configured default.
 5. Verify edition, page count and cover. Reading progress, rating, highlights and personal notes remain yours to edit.
+
+## Preferred language
+
+**Default: `auto` — Tự động, mọi ngôn ngữ.** No language restrictions are added for Auto. Unicode search terms and filenames retain Vietnamese accents and Japanese, Chinese, or Korean writing.
+
+| Preference | Behavior |
+| --- | --- |
+| `auto` | Search every language with no `lang` or `langRestrict` filter. |
+| `vi` | Prefer Vietnamese. Open Library's `lang=vi` boosts appropriate editions without excluding others. Google Books tries `langRestrict=vi` first, then searches all languages if it finds no result. |
+| `en` | Prefer English with `lang=en` and `langRestrict=en`; Google Books also has unrestricted fallback. |
+| `original` | Where Open Library explicitly declares a Work's original language, prioritize matching editions. Otherwise no language restriction; Google Books does not reliably identify original-language editions. |
+
+A precise ISBN lookup remains exact, regardless of language preference. The importer will not silently replace an ISBN's edition with a different translation. Available metadata (page count, cover, summary) may differ by edition; verify the selected result.
+
+The persistent default is `book_language: auto` in `settings.md`. You may override it with `book_language: vi` (or another supported value) in the gitignored `settings.local.md`. The selection for one new note does not change the default or any existing reading record.
 
 ## Providers
 
@@ -21,12 +36,14 @@ Optional non-secret setting in `90_System/93_Configuration/settings.md`:
 
 ```yaml
 book_provider: auto # auto | openlibrary | googlebooks
+book_language: auto # auto | vi | en | original
 ```
 
 Optional local override in **gitignored** `90_System/93_Configuration/settings.local.md`:
 
 ```yaml
 book_provider: auto
+book_language: auto
 google_books_key: "" # optional; never commit a real key
 ```
 
@@ -57,4 +74,4 @@ node --check 90_System/92_Scripts/Template_Scripts/book_metadata.js
 node tests/book_metadata.test.js
 ```
 
-Nine tests use mocked Obsidian APIs and make no external network calls. A manual smoke test in Obsidian remains necessary to verify dialogs, real provider responses and Custom View rendering.
+Sixteen tests use mocked Obsidian APIs and make no external network calls, including Auto, Unicode searches, language preferences, edition ranking, fallback and ISBN protection. A manual smoke test in Obsidian remains necessary to verify dialogs, real provider responses and Custom View rendering.
