@@ -13,6 +13,26 @@ module.exports = async function bookMetadata(tp) {
     const m = txt(s).match(new RegExp("(?:^|/)(OL\\d+" + suffix + ")$", "i"));
     return m ? m[1].toUpperCase() : "";
   };
+  // Normalize common provider-specific ISO 639-3 codes to ISO 639-1.
+  const langCode = x => {
+    const raw = txt(typeof x === "object" && x ? (x.key || x.code || "") : x)
+      .toLowerCase().replace(/^\/languages\//, "");
+    return ({eng:"en",vie:"vi",jpn:"ja",zho:"zh",chi:"zh",kor:"ko",
+      fra:"fr",fre:"fr",deu:"de",ger:"de",rus:"ru",spa:"es"})[raw] ||
+      (/^[a-z]{2}$/.test(raw) ? raw : "");
+  };
+  const langs = [
+    {code:"auto",name:"Tự động — mọi ngôn ngữ"},
+    {code:"vi",name:"Tiếng Việt — ưu tiên bản tiếng Việt"},
+    {code:"en",name:"Tiếng Anh — ưu tiên bản tiếng Anh"},
+    {code:"original",name:"Ngôn ngữ gốc — khi xác định được"}
+  ];
+  const normalizePreference = x => {
+    const v = txt(x).toLowerCase().replace(/[\s_-]/g,"");
+    return ["auto","vi","en","original"].includes(v) ? v : "auto";
+  };
+  const editionLangs = x => (Array.isArray(x?.languages) ? x.languages : [])
+    .map(langCode).filter(Boolean);
   const cleanIsbn = x => txt(x).replace(/[\s-]/g, "").toUpperCase();
   function validIsbn(x) {
     const s = cleanIsbn(x);
@@ -85,29 +105,29 @@ module.exports = async function bookMetadata(tp) {
     return "";
   }
   async function settings() {
-    let provider = "auto", googleKey = "";
+    let provider = "auto", googleKey = "", language = "auto";
     for (const path of [PUBLIC_SETTINGS, LOCAL_SETTINGS]) {
       const file = tp.app.vault.getAbstractFileByPath(path);
       if (!file) continue;
       const front = tp.app.metadataCache.getFileCache(file)?.frontmatter || {};
-      let p = txt(front.book_provider), k = txt(front.google_books_key);
-      if (!p || !k) {
+      let p = txt(front.book_provider), k = txt(front.google_books_key), l = txt(front.book_language);
+      if (!p || !k || !l) {
         const s = await tp.app.vault.read(file);
         const read = name => txt(s.match(new RegExp("^" + name + ":\\s*(.*?)\\s*$", "m"))?.[1]).replace(/^['"]|['"]$/g, "");
-        p ||= read("book_provider"); k ||= read("google_books_key");
+        p ||= read("book_provider"); k ||= read("google_books_key"); l ||= read("book_language");
       }
-      provider = p || provider; googleKey = k || googleKey;
+      provider = p || provider; googleKey = k || googleKey; language = l || language;
     }
     const mode = provider.toLowerCase().replace(/[\s_-]/g, "");
     return { mode: ["openlibrary", "googlebooks"].includes(mode) ? mode : "auto",
-      googleKey: /^fill in/i.test(googleKey) ? "" : googleKey };
+      googleKey: /^fill in/i.test(googleKey) ? "" : googleKey, language:normalizePreference(language) };
   }
   async function getJson(url) {
     const resp = await tp.obsidian.requestUrl({url, method:"GET", headers:{Accept:"application/json"}});
     if (resp.status < 200 || resp.status >= 300) throw Error(`HTTP ${resp.status}`);
     return resp.json != null ? resp.json : JSON.parse(resp.text || "{}");
   }
-  async function openSearch(q, isbn) {
+  async function openSearch(q, isbn, preference) {
     if (isbn) {
       try {
         const e = await getJson(`${OL}/isbn/${encodeURIComponent(isbn)}.json`);
@@ -119,7 +139,8 @@ module.exports = async function bookMetadata(tp) {
     }
     const qpart = isbn ? `isbn=${encodeURIComponent(isbn)}` : `q=${encodeURIComponent(q)}`;
     const fields = "key,title,author_name,first_publish_year,edition_key,cover_i,isbn";
-    const data = await getJson(`${OL}/search.json?${qpart}&fields=${fields}&limit=12`);
+    const lang = !isbn && ["vi","en"].includes(preference) ? `&lang=${preference}` : "";
+    const data = await getJson(`${OL}/search.json?${qpart}&fields=${fields}&limit=12${lang}`);
     return (data.docs || []).map(x => {
       const workId = identifier(x.key, "W"), editionId = identifier(first(x.edition_key), "M");
       const id = editionId || workId;
@@ -128,21 +149,31 @@ module.exports = async function bookMetadata(tp) {
         coverId:x.cover_i || 0} : null;
     }).filter(Boolean);
   }
-  async function googleSearch(q, isbn, key) {
+  async function googleSearch(q, isbn, key, preference) {
     const query = isbn ? `isbn:${isbn}` : q;
     const url = `${GOOGLE}?q=${encodeURIComponent(query)}&maxResults=12&printType=books` +
       (key ? `&key=${encodeURIComponent(key)}` : "");
-    const data = await getJson(url);
+    const lang = !isbn && ["vi","en"].includes(preference) ? preference : "";
+    const preferred = lang ? await getJson(`${url}&langRestrict=${lang}`) : null;
+    const data = preferred?.items?.length ? preferred : await getJson(url);
     return (data.items || []).map(item => {
       const v = item.volumeInfo || {}, id = txt(item.id);
       return id && v.title ? {source:"googlebooks", id, title:txt(v.title),
-        author:unique(v.authors).join(", "), year:txt(v.publishedDate).slice(0,4), item} : null;
+        author:unique(v.authors).join(", "), year:txt(v.publishedDate).slice(0,4),
+        language:langCode(v.language), item} : null;
     }).filter(Boolean).filter(x => !isbn ||
       (x.item.volumeInfo.industryIdentifiers || []).some(i => cleanIsbn(i.identifier) === isbn));
   }
   const olNames = xs => unique((xs || []).map(x => typeof x === "string" ? x : x?.name));
-  async function openDetail(c) {
+  async function openDetail(c, preference) {
     let choice = c;
+    let originalLang = "";
+    if (preference === "original" && c.workId && !c.direct) {
+      try {
+        const work = await getJson(`${OL}/works/${c.workId}.json`);
+        originalLang = langCode(first(work.original_languages) || work.original_language);
+      } catch (_) { /* Unknown: retain every available edition. */ }
+    }
     if (!c.direct && c.workId) {
       const editions = [];
       if (c.editionId) editions.push({key:`/books/${c.editionId}`, title:c.title, suggested:true});
@@ -153,14 +184,22 @@ module.exports = async function bookMetadata(tp) {
           if (id && !editions.some(x => identifier(x.key, "M") === id)) editions.push(e);
         }
       } catch (_) { /* Suggested edition is still usable. */ }
+      const wanted = preference === "original" ? originalLang : preference;
+      const ordered = wanted === "vi" || wanted === "en" ||
+        (preference === "original" && wanted)
+        ? editions.map((item,index)=>({item,index})).sort((a,b)=>
+            Number(editionLangs(b.item).includes(wanted)) -
+            Number(editionLangs(a.item).includes(wanted)) || a.index-b.index
+          ).map(x=>x.item) : editions;
       if (editions.length === 1) choice = {...c, editionId:identifier(editions[0].key, "M")};
       else if (editions.length > 1) {
-        const display = editions.slice(0, 40).map(e => {
+        const visible = ordered.slice(0, 40);
+        const display = visible.map(e => {
           const publish = txt(e.publish_date);
-          return `${e.suggested ? "[Suggested] " : ""}${txt(e.title || c.title)} · ${olNames(e.publishers)[0] || "Publisher unknown"} · ${publish || "Date unknown"} · ${first(e.isbn_13) || first(e.isbn_10) || "No ISBN"}`.slice(0, 190);
+          return `${e.suggested ? "[Suggested] " : ""}${editionLangs(e).join(", ") || "unknown language"} · ${txt(e.title || c.title)} · ${olNames(e.publishers)[0] || "Publisher unknown"} · ${publish || "Date unknown"} · ${first(e.isbn_13) || first(e.isbn_10) || "No ISBN"}`.slice(0, 190);
         });
         let selected;
-        try { selected = await tp.system.suggester(display, editions.slice(0,40), false,
+        try { selected = await tp.system.suggester(display, visible, false,
           "Choose an edition (Esc to cancel)"); } catch (_) { selected = null; }
         if (!selected) return null;
         choice = {...c, editionId:identifier(selected.key, "M")};
@@ -186,8 +225,8 @@ module.exports = async function bookMetadata(tp) {
     const n = Number(edition.number_of_pages);
     const coverId = Number(first(edition.covers) || choice.coverId || first(work.covers) || 0);
     const recordId = choice.editionId || workId;
-    const lang = txt(first(edition.languages)?.key || first(edition.languages))
-      .replace(/^\/languages\//, "");
+    const rawLang = txt(first(edition.languages)?.key || first(edition.languages)).replace(/^\/languages\//,"");
+    const lang = langCode(rawLang) || rawLang;
     return {...blank(choice.title), title:txt(edition.title || work.title || choice.title), author,
       isbn10, isbn13, pages:Number.isInteger(n) && n > 0 ? n : 0,
       genres:unique((edition.subjects || work.subjects || []).filter(x => typeof x === "string")).slice(0,8),
@@ -211,7 +250,7 @@ module.exports = async function bookMetadata(tp) {
       genres:unique(v.categories), isbn10:validIsbn(ten) ? ten : "",
       isbn13:validIsbn(thirteen) ? thirteen : "", googleId:c.id,
       provider:"Google Books", providerId:c.id, publisher:txt(v.publisher),
-      published:txt(v.publishedDate), language:txt(v.language),
+      published:txt(v.publishedDate), language:langCode(v.language) || txt(v.language),
       sourceUrl:txt(v.canonicalVolumeLink || v.infoLink) ||
         `https://books.google.com/books?id=${encodeURIComponent(c.id)}`,
       description:htmlText(v.description), coverUrl:image, coverId:`googlebooks-${c.id}`};
@@ -280,7 +319,7 @@ module.exports = async function bookMetadata(tp) {
   }
   if (typeof tp.obsidian?.requestUrl !== "function") return renderBlank();
   let conf;
-  try { conf = await settings(); } catch (_) { conf = {mode:"auto", googleKey:""}; }
+  try { conf = await settings(); } catch (_) { conf = {mode:"auto", googleKey:"",language:"auto"}; }
   let answer;
   try { answer = await tp.system.prompt("Search by title, author, or ISBN (Esc: blank note)",
     untitled ? "" : originalTitle); } catch (_) { return renderBlank(); }
@@ -290,12 +329,22 @@ module.exports = async function bookMetadata(tp) {
   const candidateIsbn = cleanIsbn(query.replace(/^isbn(?:-1[03])?\s*:?\s*/i, ""));
   const isbn = /^(?:\d{9}[\dX]|\d{13})$/.test(candidateIsbn) ? candidateIsbn : "";
   if (isbn && !validIsbn(isbn)) { notify("Invalid ISBN checksum; created blank Book template."); return renderBlank(); }
+  // Per-book preference. Esc keeps the setting (Auto: all languages by default).
+  const options = [...langs.filter(x=>x.code===conf.language),
+    ...langs.filter(x=>x.code!==conf.language)];
+  let preference = conf.language;
+  try {
+    const selected = await tp.system.suggester(
+      options.map(x=>x.name+(x.code===conf.language ? " (default)" : "")),
+      options.map(x=>x.code), false, "Ngôn ngữ ưu tiên (Esc = mặc định)");
+    if (selected) preference = selected;
+  } catch (_) { /* Keep configured preference when UI is unavailable. */ }
   const sources = conf.mode === "auto" ? ["openlibrary", "googlebooks"] : [conf.mode];
   const matches = [];
   for (const source of sources) {
     try {
-      const items = source === "openlibrary" ? await openSearch(query, isbn) :
-        await googleSearch(query, isbn, conf.googleKey);
+      const items = source === "openlibrary" ? await openSearch(query, isbn, preference) :
+        await googleSearch(query, isbn, conf.googleKey, preference);
       matches.push(...items);
     } catch (_) { notify(`${source} search unavailable; continuing with other providers.`); }
   }
@@ -307,7 +356,7 @@ module.exports = async function bookMetadata(tp) {
   catch (_) { return renderBlank(); }
   if (!chosen) return renderBlank();
   try {
-    const b = chosen.source === "openlibrary" ? await openDetail(chosen) : googleDetail(chosen);
+    const b = chosen.source === "openlibrary" ? await openDetail(chosen, preference) : googleDetail(chosen);
     if (!b) return renderBlank();
     const prior = duplicate(b);
     if (prior) { notify(`Book already exists: ${prior.path}. No duplicate metadata created.`); return rejectDuplicate(); }
