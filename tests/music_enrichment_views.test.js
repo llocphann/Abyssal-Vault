@@ -10,7 +10,7 @@ class El{
  addEventListener(k,v){this.events[k]=v}
 }
 async function run(){
- const names="music-cover music-cover-fallback music-title music-artist music-year music-duration music-track music-tracks music-genres music-description music-source-link music-open-album music-details music-tracklist music-track-count music-favourite music-favourite-label music-feedback music-rating-value music-lyrics-status music-lyrics-text music-lyrics-source music-retry-lyrics music-find-artwork music-paper-content".split(" ");
+ const names="music-cover music-cover-fallback music-title music-artist music-year music-duration music-track music-tracks music-genres music-description music-source-link music-open-album music-details music-tracklist music-track-count music-favourite music-favourite-label music-feedback music-rating-value music-lyrics-status music-lyrics-text music-lyrics-source music-retry-lyrics music-find-artwork music-paper-content music-writing-guide".split(" ");
  const elements=Object.fromEntries(names.map(n=>[n,new El]));
  elements["music-favourite"].append(new El("span"));
  const doc={createElement:tag=>new El(tag)},root=new El;root.dataset.musicKind="song";root.ownerDocument=doc;
@@ -32,6 +32,7 @@ async function run(){
  };
  const file={basename:"Quiet Night",path:"20_Personal_Life/28_Music_Tracker/Songs/Quiet Night.md"};
  const tp={container:{querySelector:()=>root},file,activeDocument:doc,
+  bodyContent:"## Personal Reflections\n\n## Notes\n",
   frontmatter:{Title:"Quiet Night",Artist:"Test Artist",Album:"Blue Hour",Duration:210,Cover:""},
   app:{metadataCache:{getFirstLinkpathDest:()=>null},vault:{
     getResourcePath:()=>"",
@@ -45,6 +46,8 @@ async function run(){
  };
  new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(tp,fetchMock,undefined,undefined,undefined);
  for(let n=0;n<24;n++)await Promise.resolve();
+ assert.equal(elements["music-writing-guide"].hidden,false,
+   "Blank Song reflections should show the short inline questions");
  assert.equal(elements["music-lyrics-status"].hidden,true);
  assert.ok([...localFiles.keys()].some(path=>path.endsWith("/LRCLIB-76.txt")));
  assert.ok([...localFiles.values()].some(value=>value.includes("Fictional lyrics fixture line.")));
@@ -131,6 +134,14 @@ async function run(){
  assert.ok(noteText.includes("A different handwritten line."));
  assert.ok(localFiles.get(personalPath).includes("My personally transcribed lyric line."));
 
+ // Authored reflections should hide the on-paper question hint.
+ tp.bodyContent="## Personal Reflections\n\nThis song reminds me of home.\n\n## Notes\n";
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,async()=>{throw Error("Lyrics use local file");},undefined,undefined,undefined
+ );
+ for(let n=0;n<30;n++)await Promise.resolve();
+ assert.equal(elements["music-writing-guide"].hidden,true,
+   "Authored Song reflections must not show questions");
  // Simulate an old note without a LyricsFile; check the metadata bridge.
  tp.frontmatter.LyricsFile="";
  localFiles.clear();
