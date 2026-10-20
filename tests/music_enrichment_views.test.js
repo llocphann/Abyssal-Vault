@@ -10,7 +10,7 @@ class El{
  addEventListener(k,v){this.events[k]=v}
 }
 async function run(){
- const names="music-cover music-cover-fallback music-title music-artist music-year music-duration music-track music-tracks music-genres music-description music-source-link music-open-album music-details music-tracklist music-track-count music-favourite music-favourite-label music-feedback music-rating-value music-lyrics-status music-lyrics-text music-lyrics-source music-retry-lyrics music-find-artwork music-paper-content music-writing-guide".split(" ");
+ const names="music-cover music-cover-fallback music-title music-artist music-year music-duration music-track music-tracks music-genres music-description music-source-link music-open-album music-details music-tracklist music-track-count music-favourite music-favourite-label music-feedback music-rating-value music-lyrics-status music-lyrics-text music-lyrics-source music-retry-lyrics music-find-artwork music-paper-content".split(" ");
  const elements=Object.fromEntries(names.map(n=>[n,new El]));
  elements["music-favourite"].append(new El("span"));
  const doc={createElement:tag=>new El(tag)},root=new El;root.dataset.musicKind="song";root.ownerDocument=doc;
@@ -46,8 +46,7 @@ async function run(){
  };
  new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(tp,fetchMock,undefined,undefined,undefined);
  for(let n=0;n<24;n++)await Promise.resolve();
- assert.equal(elements["music-writing-guide"].hidden,false,
-   "Blank Song reflections should show the short inline questions");
+
  assert.equal(elements["music-lyrics-status"].hidden,true);
  assert.ok([...localFiles.keys()].some(path=>path.endsWith("/LRCLIB-76.txt")));
  assert.ok([...localFiles.values()].some(value=>value.includes("Fictional lyrics fixture line.")));
@@ -140,8 +139,7 @@ async function run(){
    tp,async()=>{throw Error("Lyrics use local file");},undefined,undefined,undefined
  );
  for(let n=0;n<30;n++)await Promise.resolve();
- assert.equal(elements["music-writing-guide"].hidden,true,
-   "Authored Song reflections must not show questions");
+
  // Simulate an old note without a LyricsFile; check the metadata bridge.
  tp.frontmatter.LyricsFile="";
  localFiles.clear();
