@@ -531,6 +531,29 @@ if (musicRoot) {
       });
     }catch(error){console.warn("[Music] Legacy journal cleanup failed",error);}
   }
+  // The short questions are on-paper hints, not additional Markdown. Hide
+  // them once the matching reflection section contains authored content.
+  function musicRenderWritingGuide() {
+    const guide=musicQ('[data-role="music-writing-guide"]');
+    if(!guide)return;
+    const body=String(musicContext?.bodyContent||"");
+    const name=musicKind==="song"?"Personal Reflections":"Album Impressions";
+    const lines=body.split(/\r?\n/);
+    let inside=false,found=false;
+    const written=[];
+    for(const line of lines) {
+      if(/^##\s+/.test(line)){
+        if(inside)break;
+        if(new RegExp("^##\\s+"+name+"\\s*$","i").test(line)){
+          inside=true;found=true;
+        }
+      }else if(inside)written.push(line);
+    }
+    const value=written.join("\n").replace(/<!--[\s\S]*?-->/g,"").trim();
+    guide.hidden=found&&value.length>0;
+  }
+  musicRenderWritingGuide();
+
   const musicPaper=musicQ('[data-role="music-paper-content"]');
   if(musicPaper&&musicApp?.workspace&&musicFile){
     musicPaper.addEventListener("click",event=>{
