@@ -10,7 +10,7 @@ function fixture({kind="song",mode=kind,provider="musicbrainz",missingRelease=fa
   const fm={Title:kind==="song"?"Quiet Night":"Blue Hour",Artist:"Test Artist",
     Album:"Blue Hour",Duration:210,MusicBrainzId:kind==="song"?"recording-1":"release-1",
     ReleaseGroupId:"group-1",Favourite:true,PersonalRating:4,Cover:"",LyricsId:""};
-  const changes=[],calls=[];
+  const changes=[],calls=[],localFiles=new Map(),dirs=new Set([ROOT,SONGS,ALBUMS]);
   const target={path,basename:existing?"Existing":"Untitled",stat:{size:existing?320:0,ctime:42}};
   const requests=[];
   const remote=async url=>{
@@ -63,13 +63,17 @@ function fixture({kind="song",mode=kind,provider="musicbrainz",missingRelease=fa
     app:{
       workspace:{getActiveFile:()=>target},
       vault:{read:async()=>existing?"---\nTitle: Existing\n---\n\n## Personal Reflections\n- Original thoughts":"" ,
-        getAbstractFileByPath:()=>null,getMarkdownFiles:()=>[]},
+        getAbstractFileByPath:path=>localFiles.has(path)||dirs.has(path)?{path}:null,
+        getMarkdownFiles:()=>[],
+        createFolder:async path=>{dirs.add(path);},
+        create:async(path,body)=>{if(localFiles.has(path))throw Error("Cannot overwrite lyrics");localFiles.set(path,body);return {path};}
+      },
       metadataCache:{getFileCache:()=>({frontmatter:fm})},
       fileManager:{processFrontMatter:async(file,fn)=>{const draft={...fm};fn(draft);
         changes.push(draft);Object.assign(fm,draft);}}
     }
   };
-  return {tp,calls,changes,requests,fm,remote,mode};
+  return {tp,calls,changes,requests,fm,remote,mode,localFiles};
 }
 async function run(){
   {const f=fixture({fromGroup:true});
@@ -77,7 +81,10 @@ async function run(){
     assert.match(note,/Cover: "https:\/\/coverartarchive.org\/group-cover.jpg"/);
     assert.match(note,/LyricsId: "71"/);
     assert.match(note,/LyricsStatus: "available"/);
+    assert.match(note,/LyricsFile: "20_Personal_Life\/28_Music_Tracker\/Lyrics\/LRCLIB-71.txt"/);
+    assert.equal(f.localFiles.get(ROOT+"/Lyrics/LRCLIB-71.txt"),"Fixture words, not actual song lyrics.\n");
     assert.ok(!note.includes("Fixture words, not actual song lyrics"));
+    assert.ok(!note.includes("## Lyrics"));
   }
   {const f=fixture({provider:"itunes"});
     const note=await importer(f.tp,"song");
@@ -98,6 +105,7 @@ async function run(){
     assert.equal(f.fm.PersonalRating,4);
     assert.equal(f.fm.Cover,"https://is1-ssl.mzstatic.com/artwork.jpg");
     assert.equal(f.fm.LyricsId,"71");
+    assert.equal(f.fm.LyricsFile,ROOT+"/Lyrics/LRCLIB-71.txt");
     assert.ok(!Object.hasOwn(f.changes[0],"PersonalReflections"));
   }
   {const f=fixture({refresh:true,kind:"album",fromGroup:true});
