@@ -5111,6 +5111,9 @@ background:var(--bases-bg-alt);
   grid-template-rows: minmax(0, 1fr);
   align-items: stretch;
   gap: 0 !important;
+  box-sizing: border-box !important;
+  container-type: inline-size;
+  isolation: isolate;
   min-width: 0 !important;
   min-height: 178px;
   padding: clamp(10px, 3.5cqi, 16px) !important;
@@ -5145,6 +5148,10 @@ background:var(--bases-bg-alt);
   [data-view-name="Favourite Songs"],
   [data-view-name="Favourite Albums"]
 ) .bases-cards-property[data-property="formula.music_art"] {
+  position: relative !important;
+  inset: auto !important;
+  top: 0 !important;
+  inset-inline-start: 0 !important;
   grid-column: 1;
   grid-row: 1;
   display: block !important;
@@ -5214,6 +5221,10 @@ background:var(--bases-bg-alt);
   [data-view-name="Favourite Songs"],
   [data-view-name="Favourite Albums"]
 ) .bases-cards-property[data-property="formula.music_card"] {
+  position: relative !important;
+  inset: auto !important;
+  top: 0 !important;
+  inset-inline-start: 0 !important;
   grid-column: 2;
   grid-row: 1;
   display: block !important;
