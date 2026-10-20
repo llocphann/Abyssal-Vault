@@ -5531,3 +5531,33 @@ background:var(--bases-bg-alt);
     transition: none !important;
   }
 }
+
+
+/* Music artwork uses native image(Cover) and icon("disc-3") formula results. */
+.bases-view:is([data-view-name="Music Library"],[data-view-name="Favourite Songs"],[data-view-name="Favourite Albums"])
+  .bases-cards-property[data-property="formula.music_art"] :is(img, svg) {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  min-height: 0 !important;
+  object-fit: cover !important;
+  object-position: center;
+  border: 1px solid var(--music-card-border);
+  border-radius: 13px;
+  background: var(--background-secondary-alt);
+  color: var(--interactive-accent);
+}
+.bases-view:is([data-view-name="Music Library"],[data-view-name="Favourite Songs"],[data-view-name="Favourite Albums"])
+  .bases-cards-property[data-property="formula.music_art"] :is(.bases-image, .bases-rendered-image, .bases-rendered-value) {
+  height: 100% !important;
+  width: 100% !important;
+  aspect-ratio: 1 / 1;
+  overflow: hidden !important;
+}
+.bases-view[data-view-name="Favourite Albums"]
+  .bases-cards-property[data-property="formula.music_art"] :is(img,svg) {
+  border: none;
+  border-radius: 0;
+  aspect-ratio: 1 / 1;
+}
