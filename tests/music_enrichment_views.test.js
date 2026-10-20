@@ -51,6 +51,27 @@ async function run(){
  assert.ok(patches.some(p=>p.StoreUrl==="https://music.apple.com/song/123"));
  assert.ok(calls.some(url=>url.startsWith("https://lrclib.net/api/get?")));
  assert.ok(calls.some(url=>url.startsWith("https://itunes.apple.com/search?")));
- console.log("Music Custom View enrichment passed.");
+ // With an allowlisted Obsidian request bridge, no browser fetch is needed.
+ const bridgeCalls=[];
+ tp.activeWindow={__abyssalMusicRequest:async url=>{
+   bridgeCalls.push(url);
+   if(url.startsWith("https://lrclib.net/"))return {
+     id:76,trackName:"Quiet Night",artistName:"Test Artist",plainLyrics:"Fixture lyric"
+   };
+   if(url.startsWith("https://itunes.apple.com/"))return {results:[{
+     trackName:"Quiet Night",artistName:"Test Artist",collectionName:"Blue Hour",
+     artworkUrl100:"https://is1-ssl.mzstatic.com/test-cover.jpg",
+     trackViewUrl:"https://music.apple.com/song/123"
+   }]};
+   throw Error("Unexpected music request "+url);
+ }};
+ const blockedFetch=async()=>{throw Error("Browser fetch must not run with an Obsidian bridge");};
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,blockedFetch,undefined,undefined,undefined
+ );
+ for(let n=0;n<60;n++)await Promise.resolve();
+ assert.ok(bridgeCalls.some(url=>url.startsWith("https://itunes.apple.com/")));
+ assert.ok(bridgeCalls.some(url=>url.startsWith("https://lrclib.net/")));
+ console.log("Music Custom View enrichment and CORS bridge passed.");
 }
 run().catch(error=>{console.error(error);process.exitCode=1;});
