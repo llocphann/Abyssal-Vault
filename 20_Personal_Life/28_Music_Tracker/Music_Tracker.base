@@ -1,58 +1,66 @@
 formulas:
-  music_art: |-
-    if(
-      categories.containsAny(link("Albums"), link("Songs")),
-      if(
-        Cover,
-        image(Cover),
-        icon("disc-3")
-      ),
-      null
-    )
   music_card: |-
     if(
       categories.containsAny(link("Albums")),
-      html((
-                "<article class='music-peek-card music-peek-album'>" +
-          "<div class='music-peek-compact'><div class='music-peek-head'><span class='music-peek-kicker'>ALBUM</span>{heart}</div><h3 class='music-peek-title'>{title}</h3><p class='music-peek-artist'>{artist}</p><div class='music-peek-chips'>{compactGenres}{compactYear}</div></div>" +
-          "<section class='music-peek-detail' aria-label='Album details'><div class='music-peek-detail-head'><div><span class='music-peek-kicker'>ALBUM</span><h3 class='music-peek-detail-title'>{title}</h3><p class='music-peek-artist'>{artist}</p></div>{heart}</div>" +
-            "<div class='music-peek-meta'><span>{year}</span><span>{tracks}</span><span>{duration}</span></div><div class='music-peek-tags'>{genres}</div><p class='music-peek-description'>{description}</p>" +
-            "<div class='music-peek-actions'>{source}<span class='music-peek-hint'>Open album for tracks ↗</span></div></section>" +
-        "</article>"
-      )
-        .replace(/\{title\}/g, escapeHTML(if(Title, Title.toString(), file.basename.toString())))
-        .replace(/\{artist\}/g, escapeHTML(if(Artist, Artist.toString(), if(AlbumArtist, AlbumArtist.toString(), "Unknown artist"))))
-        .replace(/\{heart\}/g, if(Favourite, "<span class='music-peek-heart' aria-label='Favourite'>♥</span>", ""))
-        .replace("{year}", if(Year, Year.toString(), if(ReleaseDate, ReleaseDate.toString().slice(0, 4), "Year unknown")))
-        .replace("{tracks}", if(TrackCount, TrackCount.toString() + " tracks", "Tracklist unavailable"))
-        .replace("{duration}", if(Duration, (Duration / 60).round().toString() + " min", ""))
-        .replace("{genres}", if(Genre, list(Genre).slice(0, 3).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
-        .replace("{compactGenres}", if(Genre, list(Genre).slice(0, 2).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
-        .replace("{compactYear}", if(Year, "<span class='music-peek-chip music-peek-year'>" + Year.toString() + "</span>", if(ReleaseDate, "<span class='music-peek-chip music-peek-year'>" + ReleaseDate.toString().slice(0, 4) + "</span>", "")))
-        .replace("{description}", escapeHTML(if(Description, Description.toString(), "")))
-        .replace("{source}", if(StoreUrl, "<a class='music-peek-link' href=\"" + escapeHTML(StoreUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Listen ↗</a>", if(SourceUrl, "<a class='music-peek-link' href=\"" + escapeHTML(SourceUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Source ↗</a>", "")))),
+          html((
+            "<article class='music-peek-card music-peek-album'>" +
+            "<div class='music-peek-head'><span class='music-peek-kicker'>ALBUM</span>{heart}</div><h3 class='music-peek-title'>{title}</h3><p class='music-peek-artist'>{artist}</p>" +
+            "<div class='music-peek-chips'>{genres}{yearChip}</div></article>"
+          )
+            .replace(/\{title\}/g, escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+            .replace(/\{artist\}/g, escapeHTML(if(Artist, Artist.toString(), if(AlbumArtist, AlbumArtist.toString(), "Unknown artist"))))
+            .replace(/\{heart\}/g, if(Favourite, "<span class='music-peek-heart' aria-label='Favourite'>♥</span>", ""))
+            .replace(/\{genres\}/g, if(Genre, list(Genre).slice(0, 2).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
+            .replace(/\{yearChip\}/g, if(Year, "<span class='music-peek-chip music-peek-year'>" + Year.toString() + "</span>", if(ReleaseDate, "<span class='music-peek-chip music-peek-year'>" + ReleaseDate.toString().slice(0,4) + "</span>", "")))),
       if(
         categories.containsAny(link("Songs")),
-        html((
-                    "<article class='music-peek-card music-peek-song'>" +
-            "<div class='music-peek-compact'><div class='music-peek-head'><span class='music-peek-kicker'>SONG</span>{heart}</div><h3 class='music-peek-title'>{title}</h3><p class='music-peek-artist'>{artist}</p><div class='music-peek-chips'>{compactGenres}{compactYear}</div></div>" +
-            "<section class='music-peek-detail' aria-label='Song details'><div class='music-peek-detail-head'><div><span class='music-peek-kicker'>SONG</span><h3 class='music-peek-detail-title'>{title}</h3><p class='music-peek-artist'>{artist}</p></div>{heart}</div>" +
-              "<div class='music-peek-meta'><span>{duration}</span><span>{track}</span><span>{year}</span></div><p class='music-peek-album'>{album}</p><div class='music-peek-tags'>{genres}</div>" +
-              "<p class='music-peek-description'>{description}</p><div class='music-peek-actions'>{source}<span class='music-peek-hint'>Open song for notes ↗</span></div></section>" +
-          "</article>"
-        )
-          .replace(/\{title\}/g, escapeHTML(if(Title, Title.toString(), file.basename.toString())))
-          .replace(/\{artist\}/g, escapeHTML(if(Artist, Artist.toString(), "Unknown artist")))
-          .replace(/\{heart\}/g, if(Favourite, "<span class='music-peek-heart' aria-label='Favourite'>♥</span>", ""))
-          .replace("{duration}", if(Duration, (Duration / 60).floor().toString() + ":" + if(Duration % 60 < 10, "0", "") + (Duration % 60).round().toString(), ""))
-          .replace("{track}", if(TrackNumber, "Track " + TrackNumber.toString(), "Single"))
-          .replace("{year}", if(Year, Year.toString(), if(ReleaseDate, ReleaseDate.toString().slice(0, 4), "")))
-          .replace("{album}", escapeHTML(if(Album, Album.toString(), "Single release")).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1"))
-          .replace("{genres}", if(Genre, list(Genre).slice(0, 3).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
-          .replace("{compactGenres}", if(Genre, list(Genre).slice(0, 2).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
-          .replace("{compactYear}", if(Year, "<span class='music-peek-chip music-peek-year'>" + Year.toString() + "</span>", if(ReleaseDate, "<span class='music-peek-chip music-peek-year'>" + ReleaseDate.toString().slice(0, 4) + "</span>", "")))
-          .replace("{description}", escapeHTML(if(Description, Description.toString(), "")))
-          .replace("{source}", if(StoreUrl, "<a class='music-peek-link' href=\"" + escapeHTML(StoreUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Listen ↗</a>", if(SourceUrl, "<a class='music-peek-link' href=\"" + escapeHTML(SourceUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Source ↗</a>", "")))),
+              html((
+                "<article class='music-peek-card music-peek-song'>" +
+                "<div class='music-peek-head'><span class='music-peek-kicker'>SONG</span>{heart}</div><h3 class='music-peek-title'>{title}</h3><p class='music-peek-artist'>{artist}</p>" +
+                "<div class='music-peek-chips'>{genres}{yearChip}</div></article>"
+              )
+                .replace(/\{title\}/g, escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+                .replace(/\{artist\}/g, escapeHTML(if(Artist, Artist.toString(), "Unknown artist")))
+                .replace(/\{heart\}/g, if(Favourite, "<span class='music-peek-heart' aria-label='Favourite'>♥</span>", ""))
+                .replace(/\{genres\}/g, if(Genre, list(Genre).slice(0, 2).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
+                .replace(/\{yearChip\}/g, if(Year, "<span class='music-peek-chip music-peek-year'>" + Year.toString() + "</span>", if(ReleaseDate, "<span class='music-peek-chip music-peek-year'>" + ReleaseDate.toString().slice(0,4) + "</span>", "")))),
+        null
+      )
+    )
+  music_details: |-
+    if(
+      categories.containsAny(link("Albums")),
+          html((
+            "<section class='music-peek-detail music-peek-album-detail'><header class='music-peek-detail-head'><div><span class='music-peek-kicker'>ALBUM</span><h3 class='music-peek-detail-title'>{title}</h3><p class='music-peek-artist'>{artist}</p></div>{heart}</header>" +
+            "<div class='music-peek-meta'><span>{year}</span><span>{tracks}</span><span>{duration}</span></div><div class='music-peek-tags'>{genres}</div>" +
+            "<p class='music-peek-description'>{description}</p><footer class='music-peek-actions'>{source}<span class='music-peek-hint'>Open card for tracklist ↗</span></footer></section>"
+          )
+            .replace(/\{title\}/g, escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+            .replace(/\{artist\}/g, escapeHTML(if(Artist, Artist.toString(), if(AlbumArtist, AlbumArtist.toString(), "Unknown artist"))))
+            .replace(/\{heart\}/g, if(Favourite, "<span class='music-peek-heart' aria-label='Favourite'>♥</span>", ""))
+            .replace(/\{year\}/g, if(Year, Year.toString(), if(ReleaseDate, ReleaseDate.toString().slice(0, 4), "")))
+            .replace(/\{duration\}/g, if(Duration, (Duration / 60).round().toString() + " min", ""))
+            .replace(/\{tracks\}/g, if(TrackCount, TrackCount.toString() + " tracks", ""))
+            .replace(/\{genres\}/g, if(Genre, list(Genre).slice(0, 3).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
+            .replace(/\{description\}/g, escapeHTML(if(Description, Description.toString(), "")))
+            .replace(/\{source\}/g, if(StoreUrl, "<a class='music-peek-link' href=\"" + escapeHTML(StoreUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Listen ↗</a>", if(SourceUrl, "<a class='music-peek-link' href=\"" + escapeHTML(SourceUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Source ↗</a>", "")))),
+      if(
+        categories.containsAny(link("Songs")),
+              html((
+                "<section class='music-peek-detail music-peek-song-detail'><header class='music-peek-detail-head'><div><span class='music-peek-kicker'>SONG</span><h3 class='music-peek-detail-title'>{title}</h3><p class='music-peek-artist'>{artist}</p></div>{heart}</header>" +
+                "<div class='music-peek-meta'><span>{year}</span><span>{duration}</span><span>{track}</span></div><p class='music-peek-album'>{album}</p><div class='music-peek-tags'>{genres}</div>" +
+                "<p class='music-peek-description'>{description}</p><footer class='music-peek-actions'>{source}<span class='music-peek-hint'>Open card for notes ↗</span></footer></section>"
+              )
+                .replace(/\{title\}/g, escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+                .replace(/\{artist\}/g, escapeHTML(if(Artist, Artist.toString(), "Unknown artist")))
+                .replace(/\{heart\}/g, if(Favourite, "<span class='music-peek-heart' aria-label='Favourite'>♥</span>", ""))
+                .replace(/\{year\}/g, if(Year, Year.toString(), if(ReleaseDate, ReleaseDate.toString().slice(0, 4), "")))
+                .replace(/\{duration\}/g, if(Duration, (Duration / 60).floor().toString() + ":" + if(Duration % 60 < 10, "0", "") + (Duration % 60).round().toString(), ""))
+                .replace(/\{track\}/g, if(TrackNumber, "Track " + TrackNumber.toString(), "Single"))
+                .replace(/\{album\}/g, escapeHTML(if(Album, Album.toString(), "Single release")).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1"))
+                .replace(/\{genres\}/g, if(Genre, list(Genre).slice(0, 3).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
+                .replace(/\{description\}/g, escapeHTML(if(Description, Description.toString(), "")))
+                .replace(/\{source\}/g, if(StoreUrl, "<a class='music-peek-link' href=\"" + escapeHTML(StoreUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Listen ↗</a>", if(SourceUrl, "<a class='music-peek-link' href=\"" + escapeHTML(SourceUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Source ↗</a>", "")))),
         null
       )
     )
@@ -127,11 +135,13 @@ views:
       property: categories
       direction: ASC
     order:
-      - formula.music_art
       - formula.music_card
+      - formula.music_details
     sort:
       - property: file.name
         direction: ASC
+    image: note.Cover
+    imageAspectRatio: 1
     cardSize: 250
   - type: cards
     name: Favourite Songs
@@ -140,11 +150,13 @@ views:
         - categories.containsAny(link("Songs"))
         - Favourite == true
     order:
-      - formula.music_art
       - formula.music_card
+      - formula.music_details
     sort:
       - property: Title
         direction: ASC
+    image: note.Cover
+    imageAspectRatio: 1
     cardSize: 250
   - type: cards
     name: Favourite Albums
@@ -153,11 +165,13 @@ views:
         - categories.containsAny(link("Albums"))
         - Favourite == true
     order:
-      - formula.music_art
       - formula.music_card
+      - formula.music_details
     sort:
       - property: Title
         direction: ASC
+    image: note.Cover
+    imageAspectRatio: 1
     cardSize: 250
   - type: table
     name: Songs Data
