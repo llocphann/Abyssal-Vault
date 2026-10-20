@@ -16,6 +16,17 @@ const compatibilityCss = fs.readFileSync(path.join(root,".obsidian/snippets/03_C
 assert.ok(base.includes("html(("), "HTML formula wrapping should happen after replacement");
 assert.match(base, /image\(Cover\)/, "Native image renderer must display Music covers");
 assert.match(base, /icon\("disc-3"\)/, "Missing artwork must have a native icon fallback");
+const musicBaseCss = fs.readFileSync(path.join(root,".obsidian/snippets/02_Components.css"),"utf8");
+assert.match(base, /music-peek-card music-peek-song/);
+assert.match(base, /music-peek-card music-peek-album/);
+assert.equal((base.match(/cardSize: 250/g)||[]).length,3);
+assert.ok(!base.includes("music-song-card")&&!base.includes("music-album-card"));
+assert.match(musicBaseCss, /\.music-peek-detail\s*\{[\s\S]*?position: absolute !important/);
+assert.match(musicBaseCss, /data-music-peek-side="left"/);
+assert.match(musicBaseCss, /prefers-reduced-motion/);
+assert.match(musicBaseCss, /hover: none/);
+assert.match(sync, /__abyssalMusicPeekListeners/);
+
 assert.match(base, /\.replace\("\{source\}"[\s\S]*?\)\)\)\),/);
 assert.match(songHtml, /{{file\.content}}/);
 assert.match(albumHtml, /{{file\.content}}/);
