@@ -125,7 +125,7 @@ views:
     sort:
       - property: file.name
         direction: ASC
-    cardSize: 300
+    cardSize: 360
   - type: cards
     name: Favourite Songs
     filters:
@@ -138,7 +138,7 @@ views:
     sort:
       - property: Title
         direction: ASC
-    cardSize: 300
+    cardSize: 360
   - type: cards
     name: Favourite Albums
     filters:
