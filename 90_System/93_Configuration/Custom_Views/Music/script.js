@@ -450,14 +450,18 @@ if (musicRoot) {
 
   // Clean only the old generated placeholder and the exact template questions.
   // Never remove user-written lyrics or personal reflections from existing notes.
-  async function musicCleanLegacySong() {
-    if(musicKind!=="song"||!musicFile||typeof musicApp?.vault?.process!=="function")return;
+  async function musicCleanLegacyJournal() {
+    if(!musicFile||typeof musicApp?.vault?.process!=="function")return;
     const boiler="## Lyrics\n\n> Add lyrics only when you have permission to store them. Otherwise, keep a link to an official or licensed lyrics source.\n\n";
     const prompts=new Set([
       "- What does this song mean to me?",
       "- Which theme, image, or idea stays with me?",
       "- What mood or memory does it bring up?",
-      "- Has my interpretation changed over time?"
+      "- Has my interpretation changed over time?",
+      "- Overall mood:",
+      "- Themes or ideas that connect the tracks:",
+      "- Favourite track and why:",
+      "- Personal memories or associations:"
     ]);
     try {
       await musicApp.vault.process(musicFile,full=>{
@@ -465,7 +469,7 @@ if (musicRoot) {
         if(anchor<0)return full;
         const header=full.slice(0,anchor+5);
         const body=full.slice(anchor+5);
-        const cleaned=body.replace(boiler,"").split("\n")
+        const cleaned=(musicKind==="song"?body.replace(boiler,""):body).split("\n")
           .filter(line=>!prompts.has(line.trim())).join("\n")
           .replace(/\n{4,}/g,"\n\n\n");
         return body===cleaned?full:header+cleaned;
@@ -493,6 +497,6 @@ if (musicRoot) {
         .finally(()=>musicRoot.classList?.remove?.("is-opening-editor"));
     });
   }
-  void musicCleanLegacySong();
+  void musicCleanLegacyJournal();
 
 }
