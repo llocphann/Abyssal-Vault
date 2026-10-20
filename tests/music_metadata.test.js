@@ -93,6 +93,7 @@ async function runMusicMetadataTests() {
     assert.ok(!note.includes("What does this song mean to me?"));
     assert.match(note, /LyricsFile: ""/);
     assert.match(note, /## Personal Reflections/);
+    assert.match(note, /What feeling or memory does this song leave with you/);
     assert.ok(!note.includes("actual lyric text"));
     assert.ok(state.requests.some(url => url.includes("musicbrainz.org/ws/2/recording/")));
   }
@@ -103,6 +104,7 @@ async function runMusicMetadataTests() {
     assert.match(note, /categories:\n  - "\[\[Albums\]\]"/);
     assert.match(note, /ReleaseGroupId: "group-1"/);
     assert.match(note, /## Album Impressions/);
+    assert.match(note, /What story does this album tell/);
     assert.match(note, /## Tracklist/);
     assert.equal(state.created.length, 2);
     assert.match(state.created[0].content, /Album: "\[\[Blue Hour\]\]"/);
