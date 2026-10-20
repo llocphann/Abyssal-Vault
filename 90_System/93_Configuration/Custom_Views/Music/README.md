@@ -53,3 +53,17 @@ The importer now tries Cover Art Archive release and release-group artwork befor
 - `Sync_Music_Custom_Views.md` is the authoritative sync entry point. At startup it replaces only `music-song-v1` and `music-album-v1`, places them ahead of default/broad matching views, saves them through Custom Views' `saveSettings`, and forces a re-render. While Obsidian remains open it watches changes to Music view source files and rechecks on opening a Music note.
 - **If an older view persists after pulling dev:** fully restart Obsidian, or run **Templater: Open insert template modal → Sync_Music_Custom_Views.md** from a scratch note. Reopen the Song/Album note. The enabled `03_Compatibility.css` snippet also hides retired Prompts and lyrics notices while the in-memory view remains stale.
 - The tracked `.obsidian/plugins/custom-views/data.json` is a generated snapshot. Authoritative Music Custom Views live in this directory, and live plugin settings may lag until synchronization runs.
+
+## Song and Album import progress
+
+The Song and Album folder templates use the same `tp.user.import_progress` five-step non-blocking Obsidian Notice as Games and Recipes. It shows elapsed time, step counter, progress bar, and the active operation.
+
+1. Search MusicBrainz; show Apple iTunes fallback when needed
+2. Wait for Song or Album selection
+3. Fetch recording/album metadata and tracklist
+4. Retrieve artwork and Song lyrics information
+5. Write the Song/Album note; Album imports update the same popup for each Song note created or reused
+
+An album's optional track creation is included within step 5, with messages such as `Creating Song notes (3/12): Track name`. The popup closes in a `finally` block on success, cancellation, provider errors or empty search results. Existing filled notes and intentionally blank templates do not initiate network import progress. This shows workflow milestones, not byte-transfer percentages.
+
+Run `node tests/music_metadata.test.js` to check real shared Notice mocking, correct five-stage progression, no-result/cancellation cleanup, iTunes fallback and Album track creation.
