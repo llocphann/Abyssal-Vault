@@ -108,6 +108,23 @@ async function runMusicMetadataTests() {
   }
 
   {
+    const state = makeTp({ kind: "album", query: "Blue Hour", songChoice: "select" });
+    const note = await importer(state.tp, "album");
+    assert.match(note, /## Tracklist/);
+    assert.equal(state.created.length, 1);
+    assert.match(state.created[0].content, /Title: "Quiet Night"/);
+    assert.ok(!state.created.some(item => item.content.includes('Title: "Silver Rain"')));
+  }
+
+  {
+    const state = makeTp({ kind: "album", query: "Blue Hour", songChoice: "none" });
+    const note = await importer(state.tp, "album");
+    assert.equal(state.created.length, 0);
+    assert.match(note, /## Album Impressions/);
+    assert.match(note, /- Quiet Night/);
+  }
+
+  {
     const state = makeTp({ respond: async url => {
       if (url.includes("/recording/?query=")) return { status: 200, json: { recordings: [] } };
       if (url.includes("itunes.apple.com/search")) return { status: 200, json: { results: [{
