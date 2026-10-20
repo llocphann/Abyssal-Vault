@@ -43,9 +43,8 @@ async function run(){
  assert.equal(elements["music-lyrics-text"].hidden,false);
  assert.ok(patches.some(p=>p.LyricsId==="76"));
  assert.ok(patches.every(p=>!Object.hasOwn(p,"Lyrics")));
- assert.equal(elements["music-find-artwork"].hidden,false);
- elements["music-find-artwork"].events.click();
- for(let n=0;n<30;n++)await Promise.resolve();
+ // Artwork backfill now starts automatically when the note opens with no Cover.
+ for(let n=0;n<48;n++)await Promise.resolve();
  assert.equal(elements["music-cover"].src,"https://is1-ssl.mzstatic.com/test-cover.jpg");
  assert.equal(elements["music-find-artwork"].hidden,true);
  assert.ok(patches.some(p=>p.Cover==="https://is1-ssl.mzstatic.com/test-cover.jpg"));
