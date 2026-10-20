@@ -18,6 +18,7 @@
         <button type="button" class="cv-music-fav" data-role="music-favourite" aria-pressed="false"><span aria-hidden="true">♡</span><span data-role="music-favourite-label">Add favourite</span></button>
         <a data-role="music-source-link" target="_blank" rel="noopener noreferrer" hidden>Open music source ↗</a>
         <button type="button" data-role="music-open-album" hidden>View album ↗</button>
+        <button type="button" data-role="music-find-artwork" hidden>Find artwork ↻</button>
       </div>
       <span class="cv-music-feedback" data-role="music-feedback" aria-live="polite"></span>
     </section>
@@ -28,6 +29,16 @@
       <div class="cv-music-content">{{file.content}}</div>
     </section>
     <aside class="cv-music-sidebar">
+      <section class="cv-music-panel cv-music-lyrics-panel">
+        <div class="cv-music-lyrics-head"><div><span class="cv-music-panel-kicker">LRCLIB · LYRICS LOOKUP</span><h2>Song lyrics</h2></div>
+          <button type="button" data-role="music-retry-lyrics">Refresh ↻</button></div>
+        <p class="cv-music-lyrics-status" data-role="music-lyrics-status" role="status">Searching lyrics…</p>
+        <pre class="cv-music-lyrics-text" data-role="music-lyrics-text" hidden></pre>
+        <div class="cv-music-lyrics-foot">
+          <span>Displayed temporarily; not copied into your Markdown note.</span>
+          <a data-role="music-lyrics-source" href="https://lrclib.net" target="_blank" rel="noopener noreferrer">Source: LRCLIB ↗</a>
+        </div>
+      </section>
       <section class="cv-music-panel">
         <span class="cv-music-panel-kicker">YOUR RECORD</span>
         <h2>Personal rating</h2>

@@ -221,4 +221,154 @@ if (musicRoot) {
   musicRenderTracklist();
   musicRenderFavourite();
   musicRenderRating();
+
+  /* Lyrics are loaded into the view, never inserted into Markdown. LRCLIB
+     grants public API access but does not grant us rights to redistribute
+     arbitrary copyrighted lyrics as files or committed vault content. */
+  const musicRemoteName = value => musicText(value).normalize("NFKC").toLowerCase()
+    .replace(/\([^)]*(?:feat|ft|remaster|version)[^)]*\)/gi,"")
+    .replace(/[^a-z0-9\u00c0-\u024f\u1e00-\u1eff]+/gi," ").trim();
+  const musicRemoteMatches=(left,right)=>{
+    const a=musicRemoteName(left),b=musicRemoteName(right);
+    return !!a&&!!b&&(a===b||(a.length>7&&b.length>7&&(a.startsWith(b+" ")||b.startsWith(a+" "))));
+  };
+  async function musicFetchJSON(url,timeout=12500) {
+    if(typeof fetch!=="function")throw Error("Browser fetch unavailable");
+    const controller=typeof AbortController!=="undefined"?new AbortController():null;
+    const timer=controller?setTimeout(()=>controller.abort(),timeout):null;
+    try {
+      const response=await fetch(url,{method:"GET",headers:{Accept:"application/json"},
+        ...(controller?{signal:controller.signal}:{})});
+      if(!response.ok)throw Error("HTTP "+response.status);
+      return await response.json();
+    } finally {if(timer!=null)clearTimeout(timer);}
+  }
+  async function musicLoadLyrics() {
+    if(musicKind!=="song")return;
+    const status=musicQ('[data-role="music-lyrics-status"]');
+    const display=musicQ('[data-role="music-lyrics-text"]');
+    const source=musicQ('[data-role="music-lyrics-source"]');
+    if(!status||!display)return;
+    status.textContent="Searching LRCLIB…";
+    display.hidden=true;
+    display.textContent="";
+    const title=musicText(musicGet("Title")||musicFile?.basename);
+    const artist=musicText(musicGet("Artist"));
+    const album=musicCleanWiki(musicGet("Album"));
+    const duration=Number(musicGet("Duration")||0);
+    if(!title||!artist){status.textContent="Add a Song title and artist to search lyrics.";return;}
+    const query="track_name="+encodeURIComponent(title)+"&artist_name="+encodeURIComponent(artist)+
+      (album?"&album_name="+encodeURIComponent(album):"")+
+      (duration>0&&duration<=3600?"&duration="+Math.round(duration):"");
+    let record=null;
+    try {
+      const id=Number(musicGet("LyricsId")||0);
+      if(Number.isSafeInteger(id)&&id>0) {
+        try{record=await musicFetchJSON("https://lrclib.net/api/get/"+id);}catch(_){}
+      }
+      if(!record) {
+        try{record=await musicFetchJSON("https://lrclib.net/api/get?"+query);}catch(_){}
+      }
+      const valid=item=>musicRemoteMatches(item?.trackName||item?.name,title)&&musicRemoteMatches(item?.artistName,artist);
+      if(!valid(record)) {
+        record=null;
+        const search=await musicFetchJSON("https://lrclib.net/api/search?track_name="+
+          encodeURIComponent(title)+"&artist_name="+encodeURIComponent(artist));
+        record=(Array.isArray(search)?search:[]).find(valid)||null;
+      }
+      if(!record) {status.textContent="No matching lyrics found on LRCLIB. Your personal Lyrics section remains editable.";return;}
+      if(source&&Number.isSafeInteger(Number(record.id))) {
+        source.href="https://lrclib.net/api/get/"+Number(record.id);
+      }
+      if(record.instrumental) {status.textContent="Instrumental — no lyrics.";return;}
+      const plain=musicText(record.plainLyrics);
+      const synced=musicText(record.syncedLyrics).replace(/^\[[\d:.]+\]\s*/gm,"");
+      const text=plain||synced;
+      if(!text){status.textContent="LRCLIB returned no lyric text for this recording.";return;}
+      // Untrusted API response stays plain text. Never use innerHTML.
+      display.textContent=text.slice(0,60000);
+      display.hidden=false;
+      status.textContent="Retrieved from LRCLIB · Read-only display";
+      if(record.id&&!musicGet("LyricsId")) {
+        // Preserve existing notes and personal lyrics. Only provenance fields.
+        const id=String(record.id);
+        try {
+          await musicUpdate("LyricsId",id);
+          await musicUpdate("LyricsUrl","https://lrclib.net/api/get/"+id);
+          musicFrontmatter.LyricsId=id;
+          musicFrontmatter.LyricsUrl="https://lrclib.net/api/get/"+id;
+        } catch(_) { /* Lyrics are still visible in this session. */ }
+      }
+    } catch(error) {
+      status.textContent="Lyrics lookup unavailable. Check your connection or use Refresh.";
+    }
+  }
+  const musicRetry=musicQ('[data-role="music-retry-lyrics"]');
+  if(musicRetry)musicRetry.addEventListener("click",()=>{void musicLoadLyrics();});
+  // Only attempt network access for the opened Song view.
+  if(musicKind==="song")void musicLoadLyrics();
+
+  async function musicFindArtwork() {
+    const button=musicQ('[data-role="music-find-artwork"]');
+    if(!button)return;
+    button.disabled=true;
+    musicFeedback("Searching music artwork…");
+    const title=musicText(musicGet("Title")||musicFile?.basename);
+    const artist=musicText(musicGet("Artist")||musicGet("AlbumArtist"));
+    const album=musicCleanWiki(musicGet("Album"));
+    try {
+      let cover="",source="",storeUrl="";
+      const key=musicText(musicGet("ReleaseGroupId"));
+      const release=musicKind==="album"?musicText(musicGet("MusicBrainzId")):"";
+      for(const url of [
+        ...(release?["https://coverartarchive.org/release/"+encodeURIComponent(release)]:[]),
+        ...(key?["https://coverartarchive.org/release-group/"+encodeURIComponent(key)]:[])
+      ]) {
+        try {
+          const data=await musicFetchJSON(url);
+          const images=Array.isArray(data.images)?data.images:[];
+          const image=images.find(x=>x?.front)||images[0];
+          const candidate=image?.thumbnails?.["500"]||image?.thumbnails?.large||image?.image;
+          if(/^https:\/\//i.test(musicText(candidate))) {
+            cover=candidate;source="Cover Art Archive";break;
+          }
+        }catch(_){}
+      }
+      if(!cover&&title&&artist) {
+        for(const country of ["VN","US"]){
+          const q=encodeURIComponent(title+" "+artist);
+          let data;
+          try{data=await musicFetchJSON("https://itunes.apple.com/search?term="+q+
+            "&entity="+(musicKind==="album"?"album":"song")+"&limit=30&country="+country);}catch(_){continue;}
+          const selected=(data.results||[]).find(item=>
+            musicRemoteMatches(musicKind==="album"?item.collectionName:item.trackName,title)&&
+            musicRemoteMatches(item.artistName,artist)&&
+            (musicKind==="album"||!album||musicRemoteMatches(item.collectionName,album)));
+          const art=musicText(selected?.artworkUrl100);
+          const store=musicText(musicKind==="album"?selected?.collectionViewUrl:selected?.trackViewUrl);
+          if(/^https:\/\//i.test(art)&&/^https:\/\//i.test(store)){
+            cover=art;source="Apple iTunes Search API";storeUrl=store;break;
+          }
+        }
+      }
+      if(!cover){musicFeedback("No matched artwork found. Try Templater: Music_Refresh_Metadata.");return;}
+      await musicUpdate("Cover",cover);
+      await musicUpdate("CoverSource",source);
+      if(storeUrl&&!musicGet("StoreUrl")) await musicUpdate("StoreUrl",storeUrl);
+      musicFrontmatter.Cover=cover;
+      musicFrontmatter.CoverSource=source;
+      if(storeUrl)musicFrontmatter.StoreUrl=storeUrl;
+      musicSetCover();
+      musicRenderMetadata();
+      musicFeedback("Cover updated from "+source+".");
+      button.hidden=true;
+    }catch(_){musicFeedback("Cover lookup blocked or unavailable. Try Templater: Music_Refresh_Metadata.");}
+    finally{button.disabled=false;}
+  }
+  const musicArtworkButton=musicQ('[data-role="music-find-artwork"]');
+  if(musicArtworkButton){
+    musicArtworkButton.hidden=!!musicGet("Cover");
+    musicArtworkButton.addEventListener("click",()=>{void musicFindArtwork();});
+  }
+
 }

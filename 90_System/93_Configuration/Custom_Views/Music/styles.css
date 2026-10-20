@@ -159,3 +159,33 @@
 @media (prefers-reduced-motion: reduce) {
   .cv-music *, .cv-music *::before, .cv-music *::after { transition:none!important; animation:none!important; }
 }
+
+
+/* Music metadata enrichment: on-demand album artwork and transient lyrics. */
+.cv-music .cv-music-lyrics-panel { min-width:0; }
+.cv-music .cv-music-lyrics-head {
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+}
+.cv-music .cv-music-lyrics-head .cv-music-panel-kicker { margin-bottom:5px; }
+.cv-music .cv-music-lyrics-head h2 { margin-bottom:0; }
+.cv-music .cv-music-lyrics-head button {
+  flex:0 0 auto; border:1px solid var(--music-border); border-radius:999px;
+  padding:6px 10px; background:transparent; box-shadow:none; color:var(--music-text);
+  font-size:.72rem; cursor:pointer;
+}
+.cv-music .cv-music-lyrics-head button:hover { border-color:var(--music-accent); background:var(--music-glow); }
+.cv-music .cv-music-lyrics-status { color:var(--music-muted); margin:14px 0 0; font-size:.78rem; line-height:1.5; }
+.cv-music .cv-music-lyrics-text {
+  max-height:380px; overflow:auto; margin:12px 0; padding:16px;
+  border:1px solid var(--music-border); border-radius:12px;
+  background:var(--music-elevated); color:var(--music-text);
+  white-space:pre-wrap; overflow-wrap:anywhere;
+  font-size:.82rem; line-height:1.8; font-family:var(--font-text,inherit);
+  user-select:text; scrollbar-width:thin;
+}
+.cv-music .cv-music-lyrics-foot {
+  display:flex; flex-wrap:wrap; align-items:center; gap:6px 12px; margin-top:12px;
+  color:var(--music-muted); font-size:.65rem; line-height:1.55;
+}
+.cv-music .cv-music-lyrics-foot a { color:var(--music-accent); text-decoration:none; }
+.cv-music .cv-music-lyrics-head button:focus-visible { outline:2px solid var(--music-accent); outline-offset:3px; }
