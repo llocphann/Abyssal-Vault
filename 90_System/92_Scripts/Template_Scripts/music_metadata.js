@@ -1,6 +1,6 @@
 module.exports = async function musicMetadata(tp, mode) {
   const refreshing = mode === "refresh";
-  const refreshPath = tp?.config?.target_file?.path || "";
+  const refreshPath = tp?.config?.target_file?.path || tp?.app?.workspace?.getActiveFile?.()?.path || "";
   const kind = mode === "album" || (refreshing && /\/Albums\//.test(refreshPath)) ? "album" : "song";
   const MUSIC_ROOT = "20_Personal_Life/28_Music_Tracker";
   const SONG_FOLDER = MUSIC_ROOT + "/Songs";
@@ -106,8 +106,11 @@ module.exports = async function musicMetadata(tp, mode) {
         const data=await requestJson(ITUNES+"/search?term="+encodeURIComponent(title+" "+artist)+
           "&entity="+(entity==="album"?"album":"song")+"&limit=30&country="+country);
         const items=(data.results||[]).filter(item=>matches(entity==="album"?item.collectionName:item.trackName,title)&&
-          matches(item.artistName,artist)&&(entity==="album"||!albumName||matches(item.collectionName,albumName)));
-        const item=items[0];
+          matches(item.artistName,artist));
+        // Preserve an exact album match when possible. For standalone songs,
+        // a verified artist/track match on another edition is preferable to no art.
+        const item=(entity==="song"&&albumName?
+          items.find(candidate=>matches(candidate.collectionName,albumName)):null)||items[0];
         const image=validImage(item?.artworkUrl100);
         const store=txt(entity==="album"?item?.collectionViewUrl:item?.trackViewUrl);
         if(image&&/^https:\/\//i.test(store))return {cover:image,coverSource:"Apple iTunes Search API",storeUrl:store};
@@ -819,7 +822,7 @@ module.exports = async function musicMetadata(tp, mode) {
 
   // Explicitly refresh an existing note without replacing personal content.
   if(refreshing) {
-    const file=target||tp.app.workspace?.getActiveFile?.();
+    const file=(target&&String(target.path||"").startsWith(MUSIC_ROOT+"/")?target:null)||tp.app.workspace?.getActiveFile?.();
     if(!file||!file.path.startsWith(MUSIC_ROOT+"/")||!/\/(Songs|Albums)\/[^/]+\.md$/i.test(file.path)) {
       notify("Open an existing Song or Album note before refreshing.");return "";
     }

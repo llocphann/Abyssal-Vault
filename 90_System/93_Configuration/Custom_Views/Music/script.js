@@ -41,7 +41,12 @@ if (musicRoot) {
     const url = musicSourceImage(musicGet("Cover"));
     if (!url) { image.hidden = true; fallback.hidden = false; return; }
     image.onload = () => { image.hidden = false; fallback.hidden = true; };
-    image.onerror = () => { image.hidden = true; fallback.hidden = false; };
+    image.onerror = () => {
+      image.hidden = true; fallback.hidden = false;
+      const repairButton=musicQ('[data-role="music-find-artwork"]');
+      if(repairButton) repairButton.hidden=false;
+      musicFeedback("Cover URL did not load. Use Find artwork to replace it.");
+    };
     image.src = url;
     image.hidden = false;
     fallback.hidden = true;
