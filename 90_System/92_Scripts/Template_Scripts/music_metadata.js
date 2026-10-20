@@ -177,7 +177,7 @@ module.exports = async function musicMetadata(tp, mode) {
   }
   function commonSongBody() {
     // Lyrics are saved as local text files, outside the personal Markdown journal.
-    // Do not insert writing prompts into the author's content.
+    // One editable question belongs in Markdown, not in a separate Prompts card.
     return ["", "## Personal Reflections", "", "> *What feeling or memory does this song leave with you? Which moment stands out most?*", "", "## Notes", ""].join("\n");
   }
   function plainLyricText(record) {
