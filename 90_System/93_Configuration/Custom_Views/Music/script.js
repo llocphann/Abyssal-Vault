@@ -272,15 +272,56 @@ if (musicRoot) {
       return await response.json();
     } finally {if(timer!=null&&typeof clearTimeout==="function")clearTimeout(timer);}
   }
+  const musicLyricsFolder="20_Personal_Life/28_Music_Tracker/Lyrics";
+  async function musicReadLyricsFile() {
+    const path=musicText(musicGet("LyricsFile"));
+    if(!path.startsWith(musicLyricsFolder+"/")||!/^.*\.txt$/i.test(path)||
+      path.split("/").includes("..")||!musicApp?.vault?.getAbstractFileByPath)return "";
+    const file=musicApp.vault.getAbstractFileByPath(path);
+    const read=musicApp.vault.cachedRead||musicApp.vault.read;
+    return file&&typeof read==="function"?musicText(await read.call(musicApp.vault,file)):"";
+  }
+  async function musicSaveLyricsFile(id,text) {
+    const number=Number(id);
+    if(!Number.isSafeInteger(number)||number<=0||!musicText(text)||
+      !musicApp?.vault?.create||!musicApp?.vault?.getAbstractFileByPath)return "";
+    const filename=musicLyricsFolder+"/LRCLIB-"+number+".txt";
+    try {
+      if(!musicApp.vault.getAbstractFileByPath(musicLyricsFolder)&&
+        typeof musicApp.vault.createFolder==="function")
+        await musicApp.vault.createFolder(musicLyricsFolder);
+      if(!musicApp.vault.getAbstractFileByPath(filename))
+        await musicApp.vault.create(filename,text.replace(/\r\n/g,"\n").trimEnd()+"\n");
+      if(!musicGet("LyricsFile")) {
+        await musicUpdate("LyricsFile",filename);
+        musicFrontmatter.LyricsFile=filename;
+      }
+      return filename;
+    }catch(error){
+      console.warn("[Music] Local lyrics save failed",error);
+      return musicApp.vault.getAbstractFileByPath(filename)?filename:"";
+    }
+  }
+
   async function musicLoadLyrics() {
     if(musicKind!=="song")return;
     const status=musicQ('[data-role="music-lyrics-status"]');
     const display=musicQ('[data-role="music-lyrics-text"]');
     const source=musicQ('[data-role="music-lyrics-source"]');
     if(!status||!display)return;
-    status.textContent="Searching LRCLIB…";
+    status.hidden=false;
+    status.textContent="Loading lyrics…";
     display.hidden=true;
     display.textContent="";
+    try {
+      const local=await musicReadLyricsFile();
+      if(local){
+        display.textContent=local;display.hidden=false;status.hidden=true;
+        const existingUrl=musicText(musicGet("LyricsUrl"));
+        if(source&&/^https:\/\//i.test(existingUrl))source.href=existingUrl;
+        return;
+      }
+    }catch(error){console.warn("[Music] Local lyrics read failed",error);}
     const title=musicText(musicGet("Title")||musicFile?.basename);
     const artist=musicText(musicGet("Artist"));
     const album=musicCleanWiki(musicGet("Album"));
@@ -305,7 +346,7 @@ if (musicRoot) {
           encodeURIComponent(title)+"&artist_name="+encodeURIComponent(artist));
         record=(Array.isArray(search)?search:[]).find(valid)||null;
       }
-      if(!record) {status.textContent="No matching lyrics found on LRCLIB. Your personal Lyrics section remains editable.";return;}
+      if(!record) {status.textContent="No matching lyrics found.";return;}
       if(source&&Number.isSafeInteger(Number(record.id))) {
         source.href="https://lrclib.net/api/get/"+Number(record.id);
       }
@@ -314,10 +355,12 @@ if (musicRoot) {
       const synced=musicText(record.syncedLyrics).replace(/^\[[\d:.]+\]\s*/gm,"");
       const text=plain||synced;
       if(!text){status.textContent="LRCLIB returned no lyric text for this recording.";return;}
-      // Untrusted API response stays plain text. Never use innerHTML.
-      display.textContent=text.slice(0,60000);
+      // Lyrics remain plain text in both the local asset and Custom View.
+      const local=await musicSaveLyricsFile(record.id,text);
+      display.textContent=local ? (await musicReadLyricsFile().catch(()=>""))||text : text;
       display.hidden=false;
-      status.textContent="Retrieved from LRCLIB · Read-only display";
+      if(local)status.hidden=true;
+      else status.textContent="Lyrics loaded; local save unavailable.";
       if(record.id&&!musicGet("LyricsId")) {
         // Preserve existing notes and personal lyrics. Only provenance fields.
         const id=String(record.id);
@@ -404,5 +447,52 @@ if (musicRoot) {
       void musicFindArtwork();
     }
   }
+
+  // Clean only the old generated placeholder and the exact template questions.
+  // Never remove user-written lyrics or personal reflections from existing notes.
+  async function musicCleanLegacySong() {
+    if(musicKind!=="song"||!musicFile||typeof musicApp?.vault?.process!=="function")return;
+    const boiler="## Lyrics\n\n> Add lyrics only when you have permission to store them. Otherwise, keep a link to an official or licensed lyrics source.\n\n";
+    const prompts=new Set([
+      "- What does this song mean to me?",
+      "- Which theme, image, or idea stays with me?",
+      "- What mood or memory does it bring up?",
+      "- Has my interpretation changed over time?"
+    ]);
+    try {
+      await musicApp.vault.process(musicFile,full=>{
+        const anchor=full.indexOf("\n---\n",3);
+        if(anchor<0)return full;
+        const header=full.slice(0,anchor+5);
+        const body=full.slice(anchor+5);
+        const cleaned=body.replace(boiler,"").split("\n")
+          .filter(line=>!prompts.has(line.trim())).join("\n")
+          .replace(/\n{4,}/g,"\n\n\n");
+        return body===cleaned?full:header+cleaned;
+      });
+    }catch(error){console.warn("[Music] Legacy journal cleanup failed",error);}
+  }
+  const musicPaper=musicQ('[data-role="music-paper-content"]');
+  if(musicPaper&&musicApp?.workspace&&musicFile){
+    musicPaper.addEventListener("click",event=>{
+      if(event.target?.closest?.('a,button,input,textarea,select,label,iframe,[contenteditable="true"],.internal-embed,.markdown-embed'))return;
+      const leaves=musicApp.workspace.getLeavesOfType?.("markdown")||[];
+      const leaf=leaves.find(item=>item.view?.file?.path===musicFile.path &&
+        item.view?.containerEl?.contains?.(musicRoot)) ||
+        leaves.find(item=>item.view?.file?.path===musicFile.path);
+      if(!leaf||typeof leaf.setViewState!=="function")return;
+      musicRoot.classList?.add?.("is-opening-editor");
+      const state=leaf.view?.getState?.()||{};
+      Promise.resolve(leaf.setViewState({
+        type:"markdown",active:true,
+        state:{...state,file:musicFile.path,mode:"source",source:false}
+      })).then(()=>{
+        musicApp.workspace.revealLeaf?.(leaf);
+        leaf.view?.editor?.focus?.();
+      }).catch(error=>console.warn("[Music] Could not enter Live Preview",error))
+        .finally(()=>musicRoot.classList?.remove?.("is-opening-editor"));
+    });
+  }
+  void musicCleanLegacySong();
 
 }
