@@ -76,7 +76,8 @@
   "enabled_templates_hotkeys": [],
   "startup_templates": [
     "90_System/91_Templates/Sync_Places_Custom_View.md",
-    "90_System/91_Templates/Sync_Settings_Custom_View.md"
+    "90_System/91_Templates/Sync_Settings_Custom_View.md",
+    "90_System/91_Templates/Sync_Music_Custom_Views.md"
   ],
   "intellisense_render": "1",
   "ignore_folders_on_creation": [],

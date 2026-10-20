@@ -12,7 +12,7 @@ formulas:
   music_card: |-
     if(
       categories.containsAny(link("Albums")),
-      html(
+      html((
         "<article class='music-album-card'>" +
           "<header class='music-card-heading'><div><span class='music-card-kicker'>ALBUM</span><h3 class='music-card-title'>{title}</h3><p class='music-card-artist'>{artist}</p></div>{heart}</header>" +
           "<div class='music-card-meta'><span>{year}</span><span>{tracks}</span><span>{duration}</span></div>" +
@@ -29,10 +29,10 @@ formulas:
         .replace("{duration}", if(Duration, (Duration / 60).round().toString() + " min", ""))
         .replace("{genres}", if(Genre, list(Genre).slice(0, 3).map("<span class='music-card-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
         .replace("{description}", escapeHTML(if(Description, Description.toString(), "Add your personal album impressions in the note.")))
-        .replace("{source}", if(StoreUrl, "<a class='music-card-link' href=\"" + escapeHTML(StoreUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Open music ↗</a>", if(SourceUrl, "<a class='music-card-link' href=\"" + escapeHTML(SourceUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Source ↗</a>", ""))),
+        .replace("{source}", if(StoreUrl, "<a class='music-card-link' href=\"" + escapeHTML(StoreUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Open music ↗</a>", if(SourceUrl, "<a class='music-card-link' href=\"" + escapeHTML(SourceUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Source ↗</a>", "")))),
       if(
         categories.containsAny(link("Songs")),
-        html(
+        html((
           "<article class='music-song-card'>" +
             "<header class='music-card-heading'><div><span class='music-card-kicker'>SONG</span><h3 class='music-card-title'>{title}</h3><p class='music-card-artist'>{artist}</p></div>{heart}</header>" +
             "<div class='music-card-meta'><span>{duration}</span><span>{track}</span><span>{year}</span></div>" +
@@ -51,7 +51,7 @@ formulas:
           .replace("{album}", escapeHTML(if(Album, Album.toString(), "Single release")).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1"))
           .replace("{genres}", if(Genre, list(Genre).slice(0, 3).map("<span class='music-card-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
           .replace("{description}", escapeHTML(if(Description, Description.toString(), "Add your personal reflections in the note.")))
-          .replace("{source}", if(StoreUrl, "<a class='music-card-link' href=\"" + escapeHTML(StoreUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Open music ↗</a>", if(SourceUrl, "<a class='music-card-link' href=\"" + escapeHTML(SourceUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Source ↗</a>", ""))),
+          .replace("{source}", if(StoreUrl, "<a class='music-card-link' href=\"" + escapeHTML(StoreUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Open music ↗</a>", if(SourceUrl, "<a class='music-card-link' href=\"" + escapeHTML(SourceUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Source ↗</a>", "")))),
         null
       )
     )

@@ -1,0 +1,32 @@
+// Offline structural smoke tests; no Obsidian vault writes or remote API calls.
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const root = path.join(__dirname, "..");
+const base = fs.readFileSync(path.join(root, "20_Personal_Life/28_Music_Tracker/Music_Tracker.base"),"utf8");
+const musicDir = path.join(root, "90_System/93_Configuration/Custom_Views/Music");
+const songHtml = fs.readFileSync(path.join(musicDir,"Song.html"),"utf8");
+const albumHtml = fs.readFileSync(path.join(musicDir,"Album.html"),"utf8");
+const css = fs.readFileSync(path.join(musicDir,"styles.css"),"utf8");
+const js = fs.readFileSync(path.join(musicDir,"script.js"),"utf8");
+const plugin = JSON.parse(fs.readFileSync(path.join(root,".obsidian/plugins/custom-views/data.json"),"utf8"));
+const templater = JSON.parse(fs.readFileSync(path.join(root,".obsidian/plugins/templater-obsidian/data.json"),"utf8"));
+assert.ok(base.includes("html(("), "HTML formula wrapping should happen after replacement");
+assert.match(base, /\.replace\("\{source\}"[\s\S]*?\)\)\)\),/);
+assert.match(songHtml, /{{file\.content}}/);
+assert.match(albumHtml, /{{file\.content}}/);
+assert.match(albumHtml, /data-role="music-tracklist"/);
+assert.match(songHtml, /data-role="music-open-album"/);
+assert.match(css, /prefers-reduced-motion/);
+new Function("tp",js);
+for (const [id,kind] of [["music-song-v1","song"],["music-album-v1","album"]]) {
+  const view = plugin.views.find(v => v.id === id);
+  assert.ok(view,"Missing Custom View: "+id);
+  assert.equal(view.rules.conditions[0].value.endsWith("/"+(kind==="song"?"Songs":"Albums")),true);
+  assert.equal(view.showProperties,false);
+  assert.ok(view.template.includes("{{file.content}}"));
+  assert.ok(view.css.includes(".cv-music"));
+  assert.ok(view.js.includes("processFrontMatter"));
+}
+assert.ok(templater.startup_templates.includes("90_System/91_Templates/Sync_Music_Custom_Views.md"));
+console.log("Music Base HTML and Custom Views smoke tests passed.");
