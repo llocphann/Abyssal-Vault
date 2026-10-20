@@ -1,5 +1,7 @@
 module.exports = async function musicMetadata(tp, mode) {
-  const kind = mode === "album" ? "album" : "song";
+  const refreshing = mode === "refresh";
+  const refreshPath = tp?.config?.target_file?.path || "";
+  const kind = mode === "album" || (refreshing && /\/Albums\//.test(refreshPath)) ? "album" : "song";
   const MUSIC_ROOT = "20_Personal_Life/28_Music_Tracker";
   const SONG_FOLDER = MUSIC_ROOT + "/Songs";
   const ALBUM_FOLDER = MUSIC_ROOT + "/Albums";
@@ -16,7 +18,7 @@ module.exports = async function musicMetadata(tp, mode) {
   }
   // Album-generated Song notes already contain metadata. Preserve them if the
   // folder template is triggered by create_new().
-  if (existingContent.trim()) return existingContent;
+  if (existingContent.trim() && !refreshing) return existingContent;
 
   const untitled = !originalTitle || /^Untitled(?: \d+)?$/i.test(originalTitle);
   const today = tp.date.now("YYYY-MM-DD");
@@ -79,18 +81,76 @@ module.exports = async function musicMetadata(tp, mode) {
     lastMusicBrainzRequest = Date.now();
     return requestJson(url, { "User-Agent": USER_AGENT });
   }
-  async function coverForRelease(releaseId) {
-    if (!releaseId) return "";
+  const validImage = value => /^https:\/\/[a-z0-9.-]+\//i.test(txt(value)) ? txt(value) : "";
+  const normName = value => txt(value).normalize("NFKC").toLowerCase()
+    .replace(/\([^)]*(?:feat|ft|remaster|version)[^)]*\)/gi,"")
+    .replace(/[^a-z0-9\u00c0-\u024f\u1e00-\u1eff]+/gi," ").trim();
+  const matches = (a,b) => {
+    const x=normName(a),y=normName(b);
+    return !!x&&!!y&&(x===y||(x.length>7&&y.length>7&&(x.startsWith(y+" ")||y.startsWith(x+" "))));
+  };
+  async function archiveCover(type, id) {
+    if(!/^[a-z0-9-]{3,64}$/i.test(txt(id))) return "";
     try {
-      const data = await requestJson(COVER_ART + "/release/" + encodeURIComponent(releaseId), { "User-Agent": USER_AGENT });
-      const images = Array.isArray(data.images) ? data.images : [];
-      const chosen = images.find(image => image && image.front) || images[0];
-      if (!chosen) return "";
-      const thumbnails = chosen.thumbnails || {};
-      return txt(thumbnails["500"] || thumbnails.large || thumbnails["1200"] || chosen.image);
-    } catch (_) {
-      return "";
+      const data=await requestJson(COVER_ART+"/"+type+"/"+encodeURIComponent(id),{"User-Agent":USER_AGENT});
+      const images=Array.isArray(data.images)?data.images:[];
+      const image=images.find(item=>item?.front)||images[0]||{};
+      const thumbs=image.thumbnails||{};
+      return validImage(thumbs["500"]||thumbs.large||thumbs["1200"]||image.image);
+    } catch (_) {return "";}
+  }
+  async function appleArtwork(title,artist,entity,albumName) {
+    if(!txt(title)||!txt(artist))return null;
+    for(const country of ["VN","US"]) {
+      try {
+        const data=await requestJson(ITUNES+"/search?term="+encodeURIComponent(title+" "+artist)+
+          "&entity="+(entity==="album"?"album":"song")+"&limit=30&country="+country);
+        const items=(data.results||[]).filter(item=>matches(entity==="album"?item.collectionName:item.trackName,title)&&
+          matches(item.artistName,artist)&&(entity==="album"||!albumName||matches(item.collectionName,albumName)));
+        const item=items[0];
+        const image=validImage(item?.artworkUrl100);
+        const store=txt(entity==="album"?item?.collectionViewUrl:item?.trackViewUrl);
+        if(image&&/^https:\/\//i.test(store))return {cover:image,coverSource:"Apple iTunes Search API",storeUrl:store};
+      } catch (_) {}
     }
+    return null;
+  }
+  async function resolveArtwork({releaseIds=[],groupIds=[],title,artist,albumName,entity}) {
+    for(const id of unique(releaseIds).slice(0,4)) {
+      const cover=await archiveCover("release",id);
+      if(cover)return {cover,coverSource:"Cover Art Archive",storeUrl:""};
+    }
+    for(const id of unique(groupIds).slice(0,3)) {
+      const cover=await archiveCover("release-group",id);
+      if(cover)return {cover,coverSource:"Cover Art Archive",storeUrl:""};
+    }
+    return await appleArtwork(title,artist,entity,albumName)||{cover:"",coverSource:"",storeUrl:""};
+  }
+  async function lookupLyrics(song) {
+    const title=txt(song?.title),artist=txt(song?.artist);
+    if(!title||!artist)return {id:"",url:"",status:"unavailable"};
+    const seconds=Math.round(Number(song.durationMs||0)/1000);
+    const query="track_name="+encodeURIComponent(title)+"&artist_name="+encodeURIComponent(artist)+
+      (song.album?"&album_name="+encodeURIComponent(txt(song.album).replace(/^\[\[|\]\]$/g,"")):"");
+    const normalize=record=>{
+      if(!record||!matches(record.trackName||record.name,title)||!matches(record.artistName,artist))return null;
+      const id=Number(record.id);
+      if(!Number.isSafeInteger(id)||id<=0)return null;
+      return {id:String(id),url:"https://lrclib.net/api/get/"+id,
+        status:record.instrumental?"instrumental":(record.plainLyrics||record.syncedLyrics?"available":"unavailable")};
+    };
+    try {
+      const data=await requestJson("https://lrclib.net/api/get?"+query+
+        (seconds>=1&&seconds<=3600?"&duration="+seconds:""));
+      const record=normalize(data);
+      if(record)return record;
+    } catch (_) {}
+    try {
+      const data=await requestJson("https://lrclib.net/api/search?"+query);
+      const found=(Array.isArray(data)?data:[]).map(normalize).find(Boolean);
+      if(found)return found;
+    } catch (_) {}
+    return {id:"",url:"",status:"not_found"};
   }
 
   function pushList(lines, key, values) {
@@ -150,6 +210,10 @@ module.exports = async function musicMetadata(tp, mode) {
     pushList(lines, "Genre", data.genres);
     lines.push(
       "Cover: " + yaml(data.cover),
+      "CoverSource: " + yaml(data.coverSource),
+      "LyricsId: " + yaml(data.lyricsId),
+      "LyricsUrl: " + yaml(data.lyricsUrl),
+      "LyricsStatus: " + yaml(data.lyricsStatus || "pending"),
       "Favourite: false",
       "PersonalRating: 0",
       "MusicBrainzId: " + yaml(data.musicBrainzId),
@@ -184,6 +248,7 @@ module.exports = async function musicMetadata(tp, mode) {
         "TrackCount: 0",
         "Duration: 0",
         'Cover: ""',
+        'CoverSource: ""',
         "Tracklist: []",
         "Favourite: false",
         "PersonalRating: 0",
@@ -228,6 +293,10 @@ module.exports = async function musicMetadata(tp, mode) {
       "DiscNumber: 0",
       "Genre: []",
       'Cover: ""',
+      'CoverSource: ""',
+      'LyricsId: ""',
+      'LyricsUrl: ""',
+      'LyricsStatus: "pending"',
       "Favourite: false",
       "PersonalRating: 0",
       'MusicBrainzId: ""',
@@ -437,7 +506,10 @@ module.exports = async function musicMetadata(tp, mode) {
     const labelInfo = (release["label-info"] || []).map(entry => entry && entry.label && entry.label.name).filter(Boolean);
     const date = txt(release.date || candidate.date || group["first-release-date"]);
     const genres = genreNames(release).length ? genreNames(release) : genreNames(group);
-    const cover = await coverForRelease(releaseId);
+    const artwork=await resolveArtwork({
+      releaseIds:[releaseId],groupIds:[group.id],title:txt(release.title||candidate.title),
+      artist:creditName(release["artist-credit"])||candidate.artist,entity:"album"
+    });
     return {
       title: txt(release.title || candidate.title),
       artist: creditName(release["artist-credit"]) || candidate.artist,
@@ -447,7 +519,8 @@ module.exports = async function musicMetadata(tp, mode) {
       genres: genres,
       trackCount: tracks.length || Number(candidate.trackCount || 0),
       durationMs: tracks.reduce((sum, track) => sum + Number(track.durationMs || 0), 0),
-      cover: cover,
+      cover: artwork.cover,
+      coverSource: artwork.coverSource,
       description: txt(release.disambiguation || group.disambiguation),
       musicBrainzId: releaseId,
       releaseGroupId: txt(group.id),
@@ -456,7 +529,7 @@ module.exports = async function musicMetadata(tp, mode) {
       format: unique((release.media || []).map(medium => medium && medium.format)).join(", "),
       source: "MusicBrainz",
       sourceUrl: releaseId ? "https://musicbrainz.org/release/" + releaseId : "",
-      storeUrl: "",
+      storeUrl: artwork.storeUrl,
       appleCollectionId: "",
       tracks: tracks
     };
@@ -497,7 +570,8 @@ module.exports = async function musicMetadata(tp, mode) {
       genres: unique([album.primaryGenreName || candidate.genre]),
       trackCount: tracks.length || Number(album.trackCount || candidate.trackCount || 0),
       durationMs: tracks.reduce((sum, track) => sum + Number(track.durationMs || 0), 0),
-      cover: "",
+      cover: validImage(album.artworkUrl100||candidate.item?.artworkUrl100),
+      coverSource: "Apple iTunes Search API",
       description: "",
       musicBrainzId: "",
       releaseGroupId: "",
@@ -522,8 +596,12 @@ module.exports = async function musicMetadata(tp, mode) {
     }
     const releases = recording.releases || candidate.releases || [];
     const release = releases.find(item => item && item.id) || {};
-    const releaseId = txt(release.id);
-    const cover = releaseId ? await coverForRelease(releaseId) : "";
+    const albumTitle=txt(release.title);
+    const artist=creditName(recording["artist-credit"])||candidate.artist;
+    const artwork=await resolveArtwork({
+      releaseIds:releases.map(item=>item?.id),groupIds:releases.map(item=>item?.["release-group"]?.id),
+      title:txt(recording.title||candidate.title),artist,albumName:albumTitle,entity:"song"
+    });
     const date = txt(release.date || recording["first-release-date"] || candidate.date);
     const recordingId = txt(recording.id || candidate.id);
     return {
@@ -537,7 +615,8 @@ module.exports = async function musicMetadata(tp, mode) {
       trackNumber: 0,
       discNumber: 0,
       genres: genreNames(recording),
-      cover: cover,
+      cover: artwork.cover,
+      coverSource: artwork.coverSource,
       musicBrainzId: recordingId,
       isrc: unique(recording.isrcs || [])[0] || "",
       appleTrackId: "",
@@ -545,7 +624,7 @@ module.exports = async function musicMetadata(tp, mode) {
       description: txt(recording.disambiguation),
       source: "MusicBrainz",
       sourceUrl: recordingId ? "https://musicbrainz.org/recording/" + recordingId : "",
-      storeUrl: ""
+      storeUrl: artwork.storeUrl
     };
   }
 
@@ -563,7 +642,8 @@ module.exports = async function musicMetadata(tp, mode) {
       trackNumber: Number(item.trackNumber || candidate.trackNumber || 0),
       discNumber: Number(item.discNumber || candidate.discNumber || 0),
       genres: unique([item.primaryGenreName || candidate.genre]),
-      cover: "",
+      cover: validImage(item.artworkUrl100||candidate.item?.artworkUrl100),
+      coverSource: "Apple iTunes Search API",
       musicBrainzId: "",
       isrc: txt(item.isrc),
       appleTrackId: String(item.trackId || candidate.id || ""),
@@ -647,6 +727,10 @@ module.exports = async function musicMetadata(tp, mode) {
         discNumber: track.discNumber,
         genres: track.genres && track.genres.length ? track.genres : album.genres,
         cover: album.cover,
+        coverSource: album.coverSource,
+        lyricsId: "",
+        lyricsUrl: "",
+        lyricsStatus: "pending",
         musicBrainzId: track.musicBrainzId,
         isrc: track.isrc,
         appleTrackId: track.appleTrackId,
@@ -694,6 +778,7 @@ module.exports = async function musicMetadata(tp, mode) {
     pushTracklist(lines, tracklist);
     lines.push(
       "Cover: " + yaml(album.cover),
+      "CoverSource: " + yaml(album.coverSource),
       "Favourite: false",
       "PersonalRating: 0",
       "MusicBrainzId: " + yaml(album.musicBrainzId),
@@ -730,6 +815,49 @@ module.exports = async function musicMetadata(tp, mode) {
     });
     lines.push("", "## Notes", "");
     return lines.join("\n");
+  }
+
+  // Explicitly refresh an existing note without replacing personal content.
+  if(refreshing) {
+    const file=target||tp.app.workspace?.getActiveFile?.();
+    if(!file||!file.path.startsWith(MUSIC_ROOT+"/")||!/\/(Songs|Albums)\/[^/]+\.md$/i.test(file.path)) {
+      notify("Open an existing Song or Album note before refreshing.");return "";
+    }
+    if(typeof tp.app.fileManager?.processFrontMatter!=="function") {notify("Frontmatter editing unavailable.");return "";}
+    const fm=tp.app.metadataCache?.getFileCache?.(file)?.frontmatter||{};
+    const field=key=>fm[key]??fm[key.toLowerCase()]??"";
+    const title=txt(field("Title")||file.basename),artist=txt(field("Artist")||field("AlbumArtist"));
+    const albumName=txt(field("Album")).replace(/^\[\[|\]\]$/g,"");
+    const patch={};
+    if(!txt(field("Cover"))&&title&&artist) {
+      let releaseIds=[],groupIds=[];
+      if(kind==="album") {
+        releaseIds=[txt(field("MusicBrainzId"))];groupIds=[txt(field("ReleaseGroupId"))];
+      } else if(field("MusicBrainzId")) {
+        try {
+          const record=await musicBrainzJson(MUSICBRAINZ+"/recording/"+encodeURIComponent(txt(field("MusicBrainzId")))+"?inc=releases&fmt=json");
+          releaseIds=(record.releases||[]).map(item=>item.id);
+          groupIds=(record.releases||[]).map(item=>item["release-group"]?.id);
+        } catch (_) {}
+      }
+      const art=await resolveArtwork({releaseIds,groupIds,title,artist,albumName,entity:kind});
+      if(art.cover) {
+        patch.Cover=art.cover;patch.CoverSource=art.coverSource;
+        if(art.storeUrl&&!field("StoreUrl"))patch.StoreUrl=art.storeUrl;
+      }
+    }
+    if(kind==="song"&&!txt(field("LyricsId"))) {
+      const lyrics=await lookupLyrics({title,artist,album:albumName,durationMs:Number(field("Duration")||0)*1000});
+      if(lyrics.id){patch.LyricsId=lyrics.id;patch.LyricsUrl=lyrics.url;}
+      patch.LyricsStatus=lyrics.status;
+    }
+    if(Object.keys(patch).length) {
+      await tp.app.fileManager.processFrontMatter(file,draft=>{
+        for(const [key,value] of Object.entries(patch))if(!draft[key]&&!draft[key.toLowerCase()])draft[key]=value;
+      });
+      notify("Music metadata refreshed: "+Object.keys(patch).join(", "));
+    } else notify("Music refresh completed. No additional artwork or lyrics record found.");
+    return "";
   }
 
   if (target && target.path && !String(target.path).startsWith((kind === "album" ? ALBUM_FOLDER : SONG_FOLDER) + "/")) {
@@ -774,7 +902,7 @@ module.exports = async function musicMetadata(tp, mode) {
       song = chosen.source === "musicbrainz" ? {
         title: chosen.title, artist: chosen.artist, album: txt(chosen.releases && chosen.releases[0]?.title),
         albumArtist: chosen.artist, releaseDate: chosen.date, durationMs: chosen.length,
-        genres: [], cover: "", musicBrainzId: chosen.id, source: "MusicBrainz",
+        genres: [], cover: "", coverSource: "", musicBrainzId: chosen.id, source: "MusicBrainz",
         sourceUrl: "https://musicbrainz.org/recording/" + chosen.id, storeUrl: ""
       } : songFromITunes(chosen);
       notify("Some Song metadata was unavailable; the available fields were kept.");
@@ -792,6 +920,10 @@ module.exports = async function musicMetadata(tp, mode) {
     if (filename !== originalTitle) {
       try { await tp.file.rename(filename); } catch (_) { notify("Metadata imported, but the Song filename could not be renamed."); }
     }
+    try {
+      const lyrics=await lookupLyrics(song);
+      song.lyricsId=lyrics.id; song.lyricsUrl=lyrics.url; song.lyricsStatus=lyrics.status;
+    } catch (_) {song.lyricsStatus="unavailable";}
     return renderSong(song, albumNote ? albumNote.basename : "");
   }
 

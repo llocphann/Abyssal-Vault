@@ -21,3 +21,7 @@ External music links and external covers require HTTPS. Album tracklist entries 
 ## Verification
 
 After pulling \`dev\`, reload Obsidian or run the Music sync template. Create a Song and an Album note, check both Custom Views in Reading and Live Preview, toggle Favourite, set ratings, confirm track links, and test external covers. Run \`node tests/music_views.test.js\` and \`node tests/music_metadata.test.js\` from the repo root. UI layout still requires Owner acceptance on the installed desktop.
+
+## Artwork and lyrics enrichment
+
+The importer now tries Cover Art Archive release and release-group artwork before using a strictly matched Apple iTunes artwork URL. Apple artwork is linked to its official listing, not downloaded. Lyrics identity comes from LRCLIB, while copyrighted lyric text is fetched temporarily in Song Custom View rather than written into Markdown. For existing notes use Templater's `Music_Refresh_Metadata.md` on the open note; it only fills missing Cover/Lyrics source fields, never replaces personal reflections.
