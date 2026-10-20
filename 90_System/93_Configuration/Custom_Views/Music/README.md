@@ -38,7 +38,7 @@ The importer now tries Cover Art Archive release and release-group artwork befor
 
 ## Local lyrics files and paper editing (2026-10-20)
 
-- New Song notes no longer contain a \`## Lyrics\` section or prewritten journal questions. Album note templates also omit prewritten question prompts. This does not delete personal entries.
+- New Song notes contain a single editable question under `## Personal Reflections`, while Album notes contain one under `## Album Impressions`. There is no Lyrics placeholder or separate Prompts section. Existing personal entries are preserved.
 - With the owner's permission to keep lyrics locally, LRCLIB text is saved as a separate \`.txt\` asset at \`20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-<id>.txt\`. Its path is stored in \`LyricsFile\`. If the asset exists, it is not overwritten; the panel loads the local text first, including offline. If local saving fails, the panel says so instead of claiming success.
 - The Song Lyrics panel no longer shows the temporary/read-only copy notices. The original LRCLIB source link remains available for attribution.
 - Clicking the Song or Album writing-paper content (not links or form controls) switches the matching Obsidian Markdown leaf to Live Preview (\`mode=source\`, \`source=false\`).
@@ -48,7 +48,7 @@ The importer now tries Cover Art Archive release and release-group artwork befor
 ## Compact journals and source synchronization (2026-10-20)
 
 - The **Song Lyrics** panel is now simply **Lyrics**, with Refresh and a small source link. The retired "Read-only display" status and "Displayed temporarily" notice are not used.
-- There is **no separate Prompts card**. The Song journal offers two questions directly on the writing paper when `## Personal Reflections` has no prose. The Album journal does the same for `## Album Impressions`. These questions are visual hints, **not saved in Markdown**; they disappear once that section contains written reflections.
+- There is **no separate Prompts card or HTML overlay**. A short question is written directly into the Markdown under `## Personal Reflections` (Songs) or `## Album Impressions` (Albums), so it remains visible and editable in Live Preview. On older notes, source migration adds it only when that section is completely blank. It never duplicates a question or overwrites authored reflections. Because it is Markdown, the user may edit or remove the question when ready to write.
 - The journal headings no longer repeat lengthy instructions. The editable Markdown content and local LyricsFile logic are unchanged.
 - `Sync_Music_Custom_Views.md` is the authoritative sync entry point. At startup it replaces only `music-song-v1` and `music-album-v1`, places them ahead of default/broad matching views, saves them through Custom Views' `saveSettings`, and forces a re-render. While Obsidian remains open it watches changes to Music view source files and rechecks on opening a Music note.
 - **If an older view persists after pulling dev:** fully restart Obsidian, or run **Templater: Open insert template modal → Sync_Music_Custom_Views.md** from a scratch note. Reopen the Song/Album note. The enabled `03_Compatibility.css` snippet also hides retired Prompts and lyrics notices while the in-memory view remains stale.
