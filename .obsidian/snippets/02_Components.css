@@ -2538,6 +2538,8 @@ background:var(--bases-bg-alt);
     & .bases-group-heading::before {
         content: "00";
         display: grid;
+        grid-column: 1;
+        grid-row: 1;
         place-items: center;
         box-sizing: border-box;
         width: 34px;
@@ -2565,6 +2567,9 @@ background:var(--bases-bg-alt);
     & .bases-group-heading::after {
         content: "";
         position: static;
+        grid-column: 3;
+        grid-row: 1;
+        align-self: center;
         width: 100%;
         min-width: 56px;
         height: 7px;
@@ -2580,6 +2585,12 @@ background:var(--bases-bg-alt);
 
     & .bases-group-property {
         display: none !important;
+    }
+
+    & .bases-group-heading > .bases-group-value {
+        grid-column: 2;
+        grid-row: 1;
+        align-self: center;
     }
 
     & .bases-group-value,
