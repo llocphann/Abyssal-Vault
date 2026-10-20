@@ -104,6 +104,12 @@ properties:
     displayName: Apple collection ID
   ISRC:
     displayName: ISRC
+  LyricsFile:
+    displayName: Lyrics (local text file)
+  LyricsUrl:
+    displayName: Lyrics source
+  LyricsStatus:
+    displayName: Lyrics status
   Label:
     displayName: Label
   Country:
@@ -179,6 +185,9 @@ views:
       - MusicBrainzId
       - ISRC
       - AppleTrackId
+      - LyricsFile
+      - LyricsUrl
+      - LyricsStatus
   - type: table
     name: Albums Data
     filters:
