@@ -142,10 +142,21 @@ if(syncWindow){
       if(!names.has(view?.getAttribute("data-view-name")))return;
       if(syncWindow.matchMedia?.("(hover: none), (max-width: 700px)")?.matches)return;
       const rect=item.getBoundingClientRect();
-      const availableRight=(doc.documentElement?.clientWidth||syncWindow.innerWidth)-rect.right;
-      const availableLeft=rect.left;
-      const preferred=Math.min(325,Math.max(268, syncWindow.innerWidth*.26));
-      item.dataset.musicPeekSide=availableRight>=preferred+12||availableRight>=availableLeft?"right":"left";
+      const pane=item.closest(".workspace-leaf-content") ||
+        item.closest(".workspace-leaf");
+      const bounds=pane?.getBoundingClientRect?.();
+      const viewportWidth=doc.documentElement?.clientWidth||syncWindow.innerWidth;
+      const edgeLeft=Math.max(0,bounds?.left??0);
+      const edgeRight=Math.min(viewportWidth,bounds?.right??viewportWidth);
+      const availableRight=Math.max(0,edgeRight-rect.right);
+      const availableLeft=Math.max(0,rect.left-edgeLeft);
+      const side=availableRight>=availableLeft?"right":"left";
+      item.dataset.musicPeekSide=side;
+      const room=side==="right"?availableRight:availableLeft;
+      // The drawer is kept within the Bases workspace pane (not just
+      // browser viewport, which may include Calendar or DevTools panes).
+      const size=Math.max(185,Math.min(325,room-10));
+      item.style?.setProperty?.("--music-peek-drawer-width",size+"px");
     };
     doc.addEventListener("pointerover",chooseSide,true);
     doc.addEventListener("focusin",chooseSide,true);
