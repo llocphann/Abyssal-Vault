@@ -4,8 +4,8 @@ formulas:
       categories.containsAny(link("Albums"), link("Songs")),
       if(
         Cover,
-        html("<img class='music-card-art-image' src=\"" + escapeHTML(Cover.toString()) + "\" alt=\"Music cover art\" loading=\"lazy\" />"),
-        html("<div class='music-card-art-placeholder' aria-hidden='true'>♫</div>")
+        image(Cover),
+        icon("disc-3")
       ),
       null
     )
