@@ -10,7 +10,7 @@ class El{
  addEventListener(k,v){this.events[k]=v}
 }
 async function run(){
- const names="music-cover music-cover-fallback music-title music-artist music-year music-duration music-track music-tracks music-genres music-description music-source-link music-open-album music-details music-tracklist music-track-count music-favourite music-favourite-label music-feedback music-rating-value music-lyrics-status music-lyrics-text music-lyrics-source music-retry-lyrics music-find-artwork".split(" ");
+ const names="music-cover music-cover-fallback music-title music-artist music-year music-duration music-track music-tracks music-genres music-description music-source-link music-open-album music-details music-tracklist music-track-count music-favourite music-favourite-label music-feedback music-rating-value music-lyrics-status music-lyrics-text music-lyrics-source music-retry-lyrics music-find-artwork music-paper-content".split(" ");
  const elements=Object.fromEntries(names.map(n=>[n,new El]));
  elements["music-favourite"].append(new El("span"));
  const doc={createElement:tag=>new El(tag)},root=new El;root.dataset.musicKind="song";root.ownerDocument=doc;
@@ -63,6 +63,19 @@ async function run(){
  assert.ok(calls.some(url=>url.startsWith("https://lrclib.net/api/get?")));
  assert.ok(calls.some(url=>url.startsWith("https://itunes.apple.com/search?")));
  // Re-open the note offline: local lyrics remain available without HTTP.
+ const leafState=[];
+ let focused=false;
+ const leaf={view:{file,containerEl:{contains:()=>true},getState:()=>({file:file.path,mode:"preview",source:false}),
+    editor:{focus:()=>{focused=true;}}},
+   setViewState:async state=>{leafState.push(state);}};
+ tp.app.workspace.getLeavesOfType=()=>[leaf];
+ tp.app.workspace.revealLeaf=async()=>{};
+ elements["music-paper-content"].events.click({target:{closest:()=>null}});
+ for(let n=0;n<12;n++)await Promise.resolve();
+ assert.equal(leafState.length,1);
+ assert.equal(leafState[0].state.mode,"source");
+ assert.equal(leafState[0].state.source,false);
+ assert.equal(focused,true);
  const beforeOfflineCalls=calls.length;
  tp.frontmatter.LyricsFile="20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-76.txt";
  new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
