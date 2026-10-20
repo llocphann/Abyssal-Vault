@@ -5,6 +5,7 @@ module.exports = async function musicMetadata(tp, mode) {
   const MUSIC_ROOT = "20_Personal_Life/28_Music_Tracker";
   const SONG_FOLDER = MUSIC_ROOT + "/Songs";
   const ALBUM_FOLDER = MUSIC_ROOT + "/Albums";
+  const LYRICS_FOLDER = MUSIC_ROOT + "/Lyrics";
   const MUSICBRAINZ = "https://musicbrainz.org/ws/2";
   const COVER_ART = "https://coverartarchive.org";
   const ITUNES = "https://itunes.apple.com";
@@ -140,6 +141,7 @@ module.exports = async function musicMetadata(tp, mode) {
       const id=Number(record.id);
       if(!Number.isSafeInteger(id)||id<=0)return null;
       return {id:String(id),url:"https://lrclib.net/api/get/"+id,
+        text:plainLyricText(record),
         status:record.instrumental?"instrumental":(record.plainLyrics||record.syncedLyrics?"available":"unavailable")};
     };
     try {
@@ -174,22 +176,30 @@ module.exports = async function musicMetadata(tp, mode) {
     values.forEach(value => lines.push("  - " + yaml(value)));
   }
   function commonSongBody() {
-    return [
-      "",
-      "## Lyrics",
-      "",
-      "> Add lyrics only when you have permission to store them. Otherwise, keep a link to an official or licensed lyrics source.",
-      "",
-      "## Personal Reflections",
-      "",
-      "- What does this song mean to me?",
-      "- Which theme, image, or idea stays with me?",
-      "- What mood or memory does it bring up?",
-      "- Has my interpretation changed over time?",
-      "",
-      "## Notes",
-      ""
-    ].join("\n");
+    // Lyrics are saved as local text files, outside the personal Markdown journal.
+    // Do not insert writing prompts into the author's content.
+    return ["", "## Personal Reflections", "", "## Notes", ""].join("\n");
+  }
+  function plainLyricText(record) {
+    if (!record || record.instrumental) return "";
+    return txt(record.plainLyrics || txt(record.syncedLyrics).replace(/^\[[\d:.]+\]\s*/gm, ""));
+  }
+  async function persistLyrics(lyrics) {
+    if (!lyrics?.id || !lyrics.text || typeof tp.app.vault?.create !== "function") return "";
+    const id = Number(lyrics.id);
+    if (!Number.isSafeInteger(id) || id < 1) return "";
+    const path = LYRICS_FOLDER + "/LRCLIB-" + id + ".txt";
+    // Do not overwrite user-modified local lyrics. Existing files are canonical.
+    if (tp.app.vault.getAbstractFileByPath(path)) return path;
+    try {
+      await ensureFolder(LYRICS_FOLDER);
+      await tp.app.vault.create(path, lyrics.text.replace(/\r\n/g, "\n") + "\n");
+      return path;
+    } catch (error) {
+      if (tp.app.vault.getAbstractFileByPath(path)) return path;
+      notify("Song lyrics could not be saved locally; they remain available in the view.");
+      return "";
+    }
   }
   function renderSong(data, albumNoteName) {
     const title = txt(data.title) || fallbackTitle;
@@ -216,6 +226,7 @@ module.exports = async function musicMetadata(tp, mode) {
       "CoverSource: " + yaml(data.coverSource),
       "LyricsId: " + yaml(data.lyricsId),
       "LyricsUrl: " + yaml(data.lyricsUrl),
+      "LyricsFile: " + yaml(data.lyricsFile),
       "LyricsStatus: " + yaml(data.lyricsStatus || "pending"),
       "Favourite: false",
       "PersonalRating: 0",
@@ -299,6 +310,7 @@ module.exports = async function musicMetadata(tp, mode) {
       'CoverSource: ""',
       'LyricsId: ""',
       'LyricsUrl: ""',
+      'LyricsFile: ""',
       'LyricsStatus: "pending"',
       "Favourite: false",
       "PersonalRating: 0",
@@ -733,6 +745,7 @@ module.exports = async function musicMetadata(tp, mode) {
         coverSource: album.coverSource,
         lyricsId: "",
         lyricsUrl: "",
+        lyricsFile: "",
         lyricsStatus: "pending",
         musicBrainzId: track.musicBrainzId,
         isrc: track.isrc,
@@ -851,7 +864,10 @@ module.exports = async function musicMetadata(tp, mode) {
     }
     if(kind==="song"&&!txt(field("LyricsId"))) {
       const lyrics=await lookupLyrics({title,artist,album:albumName,durationMs:Number(field("Duration")||0)*1000});
-      if(lyrics.id){patch.LyricsId=lyrics.id;patch.LyricsUrl=lyrics.url;}
+      if(lyrics.id){
+        patch.LyricsId=lyrics.id;patch.LyricsUrl=lyrics.url;
+        if(!field("LyricsFile")) patch.LyricsFile=await persistLyrics(lyrics);
+      }
       patch.LyricsStatus=lyrics.status;
     }
     if(Object.keys(patch).length) {
@@ -926,6 +942,7 @@ module.exports = async function musicMetadata(tp, mode) {
     try {
       const lyrics=await lookupLyrics(song);
       song.lyricsId=lyrics.id; song.lyricsUrl=lyrics.url; song.lyricsStatus=lyrics.status;
+      song.lyricsFile=await persistLyrics(lyrics);
     } catch (_) {song.lyricsStatus="unavailable";}
     return renderSong(song, albumNote ? albumNote.basename : "");
   }
