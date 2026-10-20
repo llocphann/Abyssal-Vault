@@ -401,7 +401,7 @@ module.exports = async function musicMetadata(tp, mode) {
     }
   }
 
-  async function searchCandidates(query) {
+  async function searchCandidates(query, progress) {
     let candidates = [];
     let musicBrainzFailed = false;
     try {
@@ -439,6 +439,7 @@ module.exports = async function musicMetadata(tp, mode) {
     }
     if (candidates.length) return candidates;
 
+    progress?.update(1, "MusicBrainz returned no match. Searching Apple iTunes...");
     notify(musicBrainzFailed
       ? "MusicBrainz is unavailable. Trying Apple iTunes metadata..."
       : "No MusicBrainz match found. Trying Apple iTunes metadata...");
@@ -482,7 +483,7 @@ module.exports = async function musicMetadata(tp, mode) {
     }
   }
 
-  async function albumFromMusicBrainz(candidate) {
+  async function albumFromMusicBrainz(candidate, progress) {
     let release = candidate.item || {};
     try {
       release = await musicBrainzJson(MUSICBRAINZ + "/release/" + encodeURIComponent(candidate.id) +
@@ -518,6 +519,7 @@ module.exports = async function musicMetadata(tp, mode) {
     const labelInfo = (release["label-info"] || []).map(entry => entry && entry.label && entry.label.name).filter(Boolean);
     const date = txt(release.date || candidate.date || group["first-release-date"]);
     const genres = genreNames(release).length ? genreNames(release) : genreNames(group);
+    progress?.update(4, "Looking up album artwork...");
     const artwork=await resolveArtwork({
       releaseIds:[releaseId],groupIds:[group.id],title:txt(release.title||candidate.title),
       artist:creditName(release["artist-credit"])||candidate.artist,entity:"album"
@@ -598,7 +600,7 @@ module.exports = async function musicMetadata(tp, mode) {
     };
   }
 
-  async function songFromMusicBrainz(candidate) {
+  async function songFromMusicBrainz(candidate, progress) {
     let recording = candidate.item || {};
     try {
       recording = await musicBrainzJson(MUSICBRAINZ + "/recording/" + encodeURIComponent(candidate.id) +
@@ -610,6 +612,7 @@ module.exports = async function musicMetadata(tp, mode) {
     const release = releases.find(item => item && item.id) || {};
     const albumTitle=txt(release.title);
     const artist=creditName(recording["artist-credit"])||candidate.artist;
+    progress?.update(4, "Looking up song artwork...");
     const artwork=await resolveArtwork({
       releaseIds:releases.map(item=>item?.id),groupIds:releases.map(item=>item?.["release-group"]?.id),
       title:txt(recording.title||candidate.title),artist,albumName:albumTitle,entity:"song"
@@ -674,7 +677,7 @@ module.exports = async function musicMetadata(tp, mode) {
     return "[" + provider + "] " + candidate.title + " · " + (candidate.artist || "Unknown artist") + date + tracks;
   }
 
-  async function createSongNotes(album) {
+  async function createSongNotes(album, progress) {
     const links = new Map();
     const tracks = album.tracks || [];
     if (!tracks.length) {
@@ -686,6 +689,7 @@ module.exports = async function musicMetadata(tp, mode) {
       { value: "select", label: "Choose songs manually" },
       { value: "none", label: "Create the Album note only" }
     ];
+    progress?.update(5, "Choose which album tracks to create...");
     let modeChoice = "none";
     try {
       const picked = await tp.system.suggester(options.map(option => option.label),
@@ -713,10 +717,15 @@ module.exports = async function musicMetadata(tp, mode) {
       if (!Array.isArray(selectedTracks)) selectedTracks = [];
     }
 
+    progress?.update(5, "Preparing " + selectedTracks.length + " Song note(s)...");
     await ensureFolder(SONG_FOLDER);
     let createdCount = 0;
     let reusedCount = 0;
+    let processedCount = 0;
     for (const track of selectedTracks) {
+      processedCount += 1;
+      progress?.update(5, "Creating Song notes (" + processedCount + "/" +
+        selectedTracks.length + "): " + txt(track.title));
       const identity = txt(track.musicBrainzId || track.appleTrackId);
       const identityKey = track.musicBrainzId ? "MusicBrainzId" : "AppleTrackId";
       const existing = identity ? findByIdentity(SONG_FOLDER, identityKey, identity) : null;
@@ -891,13 +900,24 @@ module.exports = async function musicMetadata(tp, mode) {
   }
   if (!query) return renderBlank();
 
+  // Use the same non-blocking five-step Notice as Games and Recipes.
+  // It tracks workflow milestones, not individual bytes transferred.
+  const progress = typeof tp.user?.import_progress === "function"
+    ? tp.user.import_progress(tp, {
+        title: kind === "album" ? "Album Import" : "Song Import",
+        totalSteps: 5
+      })
+    : { update: () => {}, close: () => {} };
+  try {
+  progress.update(1, "Searching MusicBrainz...");
   let candidates = [];
-  try { candidates = await searchCandidates(query); } catch (_) { candidates = []; }
+  try { candidates = await searchCandidates(query, progress); } catch (_) { candidates = []; }
   if (!candidates.length) {
     notify("No matching music metadata was found. Creating a blank " + (kind === "album" ? "Album" : "Song") + " note.");
     return renderBlank();
   }
 
+  progress.update(2, "Waiting for " + (kind === "album" ? "album" : "song") + " selection...");
   let chosen = null;
   try {
     chosen = await tp.system.suggester(candidates.map(candidateLabel), candidates, false,
@@ -905,11 +925,13 @@ module.exports = async function musicMetadata(tp, mode) {
   } catch (_) {}
   if (!chosen) return renderBlank();
 
+  progress.update(3, "Fetching " + (kind === "album" ? "album and tracklist" : "song") +
+    " metadata from " + (chosen.source === "musicbrainz" ? "MusicBrainz" : "Apple iTunes") + "...");
   if (kind === "song") {
     let song;
     try {
       song = chosen.source === "musicbrainz"
-        ? await songFromMusicBrainz(chosen)
+        ? await songFromMusicBrainz(chosen, progress)
         : songFromITunes(chosen);
     } catch (_) {
       song = chosen.source === "musicbrainz" ? {
@@ -920,6 +942,7 @@ module.exports = async function musicMetadata(tp, mode) {
       } : songFromITunes(chosen);
       notify("Some Song metadata was unavailable; the available fields were kept.");
     }
+    progress.update(4, "Checking artwork and searching LRCLIB lyrics...");
     const identity = txt(song.musicBrainzId || song.appleTrackId);
     const identityKey = song.musicBrainzId ? "MusicBrainzId" : "AppleTrackId";
     const existing = identity ? findByIdentity(SONG_FOLDER, identityKey, identity) : null;
@@ -938,18 +961,20 @@ module.exports = async function musicMetadata(tp, mode) {
       song.lyricsId=lyrics.id; song.lyricsUrl=lyrics.url; song.lyricsStatus=lyrics.status;
       song.lyricsFile=await persistLyrics(lyrics);
     } catch (_) {song.lyricsStatus="unavailable";}
+    progress.update(5, "Writing Song note...");
     return renderSong(song, albumNote ? albumNote.basename : "");
   }
 
   let album;
   try {
     album = chosen.source === "musicbrainz"
-      ? await albumFromMusicBrainz(chosen)
+      ? await albumFromMusicBrainz(chosen, progress)
       : await albumFromITunes(chosen);
   } catch (_) {
     notify("Album details were unavailable. Creating a blank Album note.");
     return renderBlank();
   }
+  progress.update(4, "Checking album artwork and tracklist...");
   const existingAlbum = album.musicBrainzId
     ? findByIdentity(ALBUM_FOLDER, "MusicBrainzId", album.musicBrainzId)
     : (album.appleCollectionId ? findByIdentity(ALBUM_FOLDER, "AppleCollectionId", album.appleCollectionId) : null);
@@ -964,6 +989,11 @@ module.exports = async function musicMetadata(tp, mode) {
   if (filename !== originalTitle) {
     try { await tp.file.rename(filename); } catch (_) { notify("Metadata imported, but the Album filename could not be renamed."); }
   }
-  const links = await createSongNotes(album);
+  progress.update(5, "Preparing Album note and Song notes...");
+  const links = await createSongNotes(album, progress);
+  progress.update(5, "Writing Album note...");
   return renderAlbum(album, links);
+  } finally {
+    progress.close();
+  }
 };
