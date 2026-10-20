@@ -25,3 +25,12 @@ After pulling \`dev\`, reload Obsidian or run the Music sync template. Create a 
 ## Artwork and lyrics enrichment
 
 The importer now tries Cover Art Archive release and release-group artwork before using a strictly matched Apple iTunes artwork URL. Apple artwork is linked to its official listing, not downloaded. Lyrics identity comes from LRCLIB, while copyrighted lyric text is fetched temporarily in Song Custom View rather than written into Markdown. For existing notes use Templater's `Music_Refresh_Metadata.md` on the open note; it only fills missing Cover/Lyrics source fields, never replaces personal reflections.
+
+
+## Native artwork and Journal-style notebook (2026-10-20)
+
+- **Bases artwork:** Uses Obsidian's \`image(Cover)\` instead of interpolating a raw \`<img>\` tag. Missing covers display an \`icon("disc-3")\` placeholder. Do not hide the \`formula.music_art\` property.
+- **Automatic cover recovery:** Opening a Song/Album note with no \`Cover\` performs a single background metadata lookup. If a remote cover fails to load, the view offers the **Find artwork** action for retry. Matching song title + artist is required; an exact album match is preferred but not mandatory. The metadata importer still supports manual \`Music_Refresh_Metadata.md\` on an existing note.
+- **CORS handling:** \`Sync_Music_Custom_Views.md\` registers a request bridge using Obsidian's \`requestUrl\` API, restricted to Cover Art Archive, iTunes, LRCLIB and MusicBrainz. This runs with Templater's startup templates. Restart/reload Obsidian after pulling this commit; an existing view instance may be using cached plugin JavaScript.
+- **Journal parity:** Both Song and Album notes wrap the native \`{{file.content}}\` in a lined-paper view with the same \`--vault-note-paper-*\` variables, ruled lines, redacted margin, paper edge and shadow used in the Journal Custom View. \`Lyrics\` from LRCLIB stays separate from this editable Markdown paper.
+- **Check:** Open \`Music_Tracker.base\`, then open an existing Song such as "Everybody Loves Somebody" and allow the background lookup to finish. If artwork remains absent, run Templater's \`Music_Refresh_Metadata.md\` and check the \`Cover\` and \`StoreUrl\` frontmatter properties. Remote provider availability and playback service license terms can still cause some images to be unavailable.
