@@ -25,7 +25,10 @@
   <main class="cv-music-layout">
     <section class="cv-music-journal">
       <header class="cv-music-section-heading"><span>THE RECORD · THE STORY</span><h2>Album journal</h2><p>Personal impressions, track-by-track notes, and reflections live in your Markdown.</p></header>
-      <div class="cv-music-content">{{file.content}}</div>
+      <div class="cv-music-paper" data-role="music-paper">
+        <span class="cv-music-paper-label" aria-hidden="true">ALBUM NOTES · ABYSSAL</span>
+        <div class="cv-music-content" data-role="music-paper-content">{{file.content}}</div>
+      </div>
     </section>
     <aside class="cv-music-sidebar">
       <section class="cv-music-panel">
