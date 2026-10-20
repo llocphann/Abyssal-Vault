@@ -244,7 +244,10 @@ if (musicRoot) {
   };
   async function musicFetchJSON(url,timeout=12500) {
     // Browser fetch may be blocked by CORS inside the Obsidian app:// origin.
-    // Prefer requestUrl (Obsidian API) when exposed into this trusted view.
+    // The Templater startup sync provides a host-allowlisted, CORS-free bridge.
+    const bridge=musicContext?.activeWindow?.__abyssalMusicRequest ||
+      musicRoot.ownerDocument?.defaultView?.__abyssalMusicRequest;
+    if(typeof bridge==="function")return bridge(url);
     let requestUrlFn=musicContext?.obsidian?.requestUrl || musicContext?.requestUrl;
     if(typeof requestUrlFn!=="function") {
       try {
