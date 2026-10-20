@@ -302,3 +302,9 @@
   .cv-music .cv-music-paper .cv-music-content { padding: 56px 20px 70px 50px; }
   .cv-music .cv-music-paper-label { font-size: .54rem; }
 }
+
+
+/* Clicking the paper opens the matching note in Obsidian Live Preview. */
+.cv-music .cv-music-paper .cv-music-content { cursor: text; }
+.cv-music .cv-music-paper .cv-music-content :is(a,button,input,textarea) { cursor: pointer; }
+.cv-music.is-opening-editor .cv-music-paper .cv-music-content { cursor: progress; }
