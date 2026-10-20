@@ -14,7 +14,7 @@ Calling \`html("...").replace(...)\` returns plain text, which renders as raw ta
 
 ## Notes UI
 
-The Album view shows a cover-first hero, metadata, personal rating, favourite toggle, linked tracklist, and editable Album journal. The Song view shows cover art, metadata, album navigation, personal rating and favourite controls, and an editable Markdown journal for lyrics and reflections. Buttons save via Obsidian \`processFrontMatter\`. The original \`{{file.content}}\` is retained so native Live Preview remains usable.
+The Album view shows a cover-first hero, metadata, personal rating, favourite toggle, linked tracklist, and editable Album journal. The Song view shows cover art, metadata, album navigation, personal rating and favourite controls, and an editable Markdown journal for personal reflections. Buttons save via Obsidian \`processFrontMatter\`. The original \`{{file.content}}\` is retained so native Live Preview remains usable.
 
 External music links and external covers require HTTPS. Album tracklist entries using \`[[Song name]]\` open the linked note. Other entries stay readable as plain text. Do not embed third-party full lyrics without permission.
 
@@ -24,7 +24,7 @@ After pulling \`dev\`, reload Obsidian or run the Music sync template. Create a 
 
 ## Artwork and lyrics enrichment
 
-The importer now tries Cover Art Archive release and release-group artwork before using a strictly matched Apple iTunes artwork URL. Apple artwork is linked to its official listing, not downloaded. Lyrics identity comes from LRCLIB, while copyrighted lyric text is fetched temporarily in Song Custom View rather than written into Markdown. For existing notes use Templater's `Music_Refresh_Metadata.md` on the open note; it only fills missing Cover/Lyrics source fields, never replaces personal reflections.
+The importer now tries Cover Art Archive release and release-group artwork before using a strictly matched Apple iTunes artwork URL. Apple artwork is linked to its official listing, not downloaded. Lyrics are resolved through LRCLIB and saved into separate local .txt files, rather than being inserted into Song Markdown. For existing notes use Templater's `Music_Refresh_Metadata.md` on the open note; it only fills missing Cover/Lyrics metadata and local LyricsFile, never replaces personal reflections.
 
 
 ## Native artwork and Journal-style notebook (2026-10-20)
@@ -34,3 +34,13 @@ The importer now tries Cover Art Archive release and release-group artwork befor
 - **CORS handling:** \`Sync_Music_Custom_Views.md\` registers a request bridge using Obsidian's \`requestUrl\` API, restricted to Cover Art Archive, iTunes, LRCLIB and MusicBrainz. This runs with Templater's startup templates. Restart/reload Obsidian after pulling this commit; an existing view instance may be using cached plugin JavaScript.
 - **Journal parity:** Both Song and Album notes wrap the native \`{{file.content}}\` in a lined-paper view with the same \`--vault-note-paper-*\` variables, ruled lines, redacted margin, paper edge and shadow used in the Journal Custom View. \`Lyrics\` from LRCLIB stays separate from this editable Markdown paper.
 - **Check:** Open \`Music_Tracker.base\`, then open an existing Song such as "Everybody Loves Somebody" and allow the background lookup to finish. If artwork remains absent, run Templater's \`Music_Refresh_Metadata.md\` and check the \`Cover\` and \`StoreUrl\` frontmatter properties. Remote provider availability and playback service license terms can still cause some images to be unavailable.
+
+
+## Local lyrics files and paper editing (2026-10-20)
+
+- New Song notes no longer contain a \`## Lyrics\` section or prewritten journal questions. Album note templates also omit prewritten question prompts. This does not delete personal entries.
+- With the owner's permission to keep lyrics locally, LRCLIB text is saved as a separate \`.txt\` asset at \`20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-<id>.txt\`. Its path is stored in \`LyricsFile\`. If the asset exists, it is not overwritten; the panel loads the local text first, including offline. If local saving fails, the panel says so instead of claiming success.
+- The Song Lyrics panel no longer shows the temporary/read-only copy notices. The original LRCLIB source link remains available for attribution.
+- Clicking the Song or Album writing-paper content (not links or form controls) switches the matching Obsidian Markdown leaf to Live Preview (\`mode=source\`, \`source=false\`).
+- Opening an older note cleans up only the exact generated Lyrics placeholder and the exact prewritten prompt lines. Personal lyrics or notes are preserved rather than silently deleted. Any substantive legacy lyrics in Markdown can be moved manually into a local asset if desired.
+- Reload Obsidian after pulling to let Templater's startup \`Sync_Music_Custom_Views.md\` synchronize the authoritative HTML/CSS/JS. The committed plugin data snapshot may be older until startup sync runs.
