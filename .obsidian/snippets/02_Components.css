@@ -5052,3 +5052,467 @@ background:var(--bases-bg-alt);
     padding-inline: 9px;
   }
 }
+
+
+/* ==============================================================================
+                              Music Tracker Base Cards
+   ============================================================================== */
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) {
+  --music-card-bg: color-mix(in srgb, var(--background-secondary) 88%, var(--background-primary) 12%);
+  --music-card-bg-hover: color-mix(in srgb, var(--background-secondary-alt) 82%, var(--background-primary) 18%);
+  --music-card-border: color-mix(in srgb, var(--interactive-accent) 22%, var(--background-modifier-border) 78%);
+  --music-card-border-hover: color-mix(in srgb, var(--interactive-accent) 60%, var(--background-modifier-border) 40%);
+  --music-card-muted: var(--text-muted);
+  --music-card-radius: 18px;
+  --bases-cards-group-padding: 12px;
+  --bases-cards-background: transparent;
+  --bases-cards-cover-background: transparent;
+  --bases-cards-shadow: none;
+  --bases-cards-shadow-hover: none;
+  --bases-cards-line-height: 0px;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .bases-cards-property:not([data-property]) {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .bases-cards-label {
+  display: none !important;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .bases-cards-item {
+  position: relative !important;
+  display: grid !important;
+  grid-template-columns: minmax(92px, 36%) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0 !important;
+  min-width: 0 !important;
+  min-height: 178px;
+  padding: clamp(10px, 3.5cqi, 16px) !important;
+  overflow: hidden !important;
+  border: 1px solid var(--music-card-border) !important;
+  border-radius: var(--music-card-radius) !important;
+  background: var(--music-card-bg) !important;
+  box-shadow: 0 12px 30px color-mix(in srgb, var(--shadow) 22%, transparent) !important;
+  transition: border-color .22s ease, background .22s ease, box-shadow .22s ease, transform .22s ease !important;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .bases-cards-item:hover,
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .bases-cards-item:focus-within {
+  z-index: 5;
+  border-color: var(--music-card-border-hover) !important;
+  background: var(--music-card-bg-hover) !important;
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--shadow) 34%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--interactive-accent) 9%, transparent) inset !important;
+  transform: translateY(-2px);
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .bases-cards-property[data-property="formula.music_art"] {
+  grid-column: 1;
+  grid-row: 1;
+  display: block !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .bases-cards-property[data-property="formula.music_art"] :is(.bases-cards-line, .bases-rendered-value) {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  background: transparent !important;
+  white-space: normal !important;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-art-image {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 145px;
+  object-fit: cover !important;
+  object-position: center;
+  border: 1px solid color-mix(in srgb, var(--music-card-border) 78%, transparent);
+  border-radius: 13px;
+  background: var(--background-secondary-alt);
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-art-placeholder {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-height: 145px;
+  place-items: center;
+  border: 1px solid var(--music-card-border);
+  border-radius: 13px;
+  background:
+    radial-gradient(circle at 25% 20%, color-mix(in srgb, var(--interactive-accent) 24%, transparent), transparent 55%),
+    linear-gradient(145deg, var(--background-secondary-alt), var(--background-primary));
+  color: var(--interactive-accent);
+  font-size: clamp(2.2rem, 9cqi, 4rem);
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .bases-cards-property[data-property="formula.music_card"] {
+  grid-column: 2;
+  grid-row: 1;
+  display: block !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 0 0 14px !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .bases-cards-property[data-property="formula.music_card"] :is(.bases-cards-line, .bases-rendered-value) {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+  border: 0 !important;
+  background: transparent !important;
+  white-space: normal !important;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 9px;
+  min-width: 0;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-heading > div {
+  min-width: 0;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-kicker {
+  display: block;
+  margin: 0 0 5px;
+  color: var(--music-card-muted);
+  font-size: .62rem;
+  font-weight: 750;
+  letter-spacing: .15em;
+  line-height: 1.2;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-title {
+  margin: 0;
+  color: var(--text-normal);
+  font-size: clamp(.95rem, 4cqi, 1.12rem);
+  font-weight: 760;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-artist {
+  margin: 4px 0 0;
+  color: var(--music-card-muted);
+  font-size: .82rem;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-heart {
+  flex: 0 0 auto;
+  color: #f472b6;
+  font-size: 1.25rem;
+  line-height: 1;
+  text-shadow: 0 0 16px color-mix(in srgb, #f472b6 24%, transparent);
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 11px;
+  margin-top: 10px;
+  color: var(--music-card-muted);
+  font-size: .73rem;
+  line-height: 1.35;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 9px;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 3px 8px;
+  border: 1px solid color-mix(in srgb, var(--interactive-accent) 17%, var(--background-modifier-border) 83%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--interactive-accent) 9%, var(--background-secondary));
+  color: var(--text-normal);
+  font-size: .66rem;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-album {
+  margin: 8px 0 0;
+  color: var(--music-card-muted);
+  font-size: .74rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  margin: 9px 0 0;
+  color: var(--music-card-muted);
+  font-size: .76rem;
+  line-height: 1.48;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 27px;
+  padding: 5px 10px;
+  border: 1px solid var(--music-card-border);
+  border-radius: 999px;
+  color: var(--text-normal);
+  font-size: .7rem;
+  font-weight: 650;
+  text-decoration: none;
+  transition: border-color .18s ease, background .18s ease, color .18s ease;
+}
+
+.bases-view:is(
+  [data-view-name="Music Library"],
+  [data-view-name="Favourite Songs"],
+  [data-view-name="Favourite Albums"]
+) .music-card-link:hover {
+  border-color: var(--music-card-border-hover);
+  background: color-mix(in srgb, var(--interactive-accent) 12%, transparent);
+  color: var(--text-normal);
+}
+
+/* Favourite Albums keeps the cover-first compact grid. Hover reveals detail. */
+.bases-view[data-view-name="Favourite Albums"] .bases-cards-item:has(.music-album-card) {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: auto auto !important;
+  min-height: 0;
+  padding: 0 !important;
+}
+
+.bases-view[data-view-name="Favourite Albums"] .bases-cards-property[data-property="formula.music_art"] {
+  grid-column: 1;
+  grid-row: 1;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden !important;
+}
+
+.bases-view[data-view-name="Favourite Albums"] .bases-cards-property[data-property="formula.music_art"] :is(.bases-cards-line, .bases-rendered-value) {
+  height: 100% !important;
+}
+
+.bases-view[data-view-name="Favourite Albums"] .music-card-art-image,
+.bases-view[data-view-name="Favourite Albums"] .music-card-art-placeholder {
+  min-height: 0;
+  aspect-ratio: 1 / 1;
+  border: 0;
+  border-radius: 0;
+}
+
+.bases-view[data-view-name="Favourite Albums"] .bases-cards-property[data-property="formula.music_card"] {
+  grid-column: 1;
+  grid-row: 2;
+  padding: 13px 15px 16px !important;
+}
+
+.bases-view[data-view-name="Favourite Albums"] .music-card-description,
+.bases-view[data-view-name="Favourite Albums"] .music-card-actions {
+  display: none;
+  opacity: 0;
+}
+
+.bases-view[data-view-name="Favourite Albums"] .bases-cards-item:hover .music-card-description,
+.bases-view[data-view-name="Favourite Albums"] .bases-cards-item:focus-within .music-card-description {
+  display: -webkit-box;
+  opacity: 1;
+}
+
+.bases-view[data-view-name="Favourite Albums"] .bases-cards-item:hover .music-card-actions,
+.bases-view[data-view-name="Favourite Albums"] .bases-cards-item:focus-within .music-card-actions {
+  display: flex;
+  opacity: 1;
+}
+
+@media (max-width: 620px) {
+  .bases-view:is(
+    [data-view-name="Music Library"],
+    [data-view-name="Favourite Songs"]
+  ) .bases-cards-item {
+    grid-template-columns: minmax(78px, 31%) minmax(0, 1fr);
+    min-height: 150px;
+    padding: 9px !important;
+  }
+
+  .bases-view:is(
+    [data-view-name="Music Library"],
+    [data-view-name="Favourite Songs"]
+  ) .bases-cards-property[data-property="formula.music_card"] {
+    padding-left: 10px !important;
+  }
+
+  .bases-view:is(
+    [data-view-name="Music Library"],
+    [data-view-name="Favourite Songs"]
+  ) .music-card-description {
+    -webkit-line-clamp: 2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bases-view:is(
+    [data-view-name="Music Library"],
+    [data-view-name="Favourite Songs"],
+    [data-view-name="Favourite Albums"]
+  ) .bases-cards-item,
+  .bases-view:is(
+    [data-view-name="Music Library"],
+    [data-view-name="Favourite Songs"],
+    [data-view-name="Favourite Albums"]
+  ) .music-card-link {
+    transition: none !important;
+  }
+}

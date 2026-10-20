@@ -83,6 +83,15 @@ Automation scripts live under `90_System/92_Scripts`. They are divided broadly i
 - **Google Books fallback** — explicit Google-to-Open-Library notifications for unavailable/empty searches, ISBN-verified metadata/cover recovery, request timeouts, and an English five-step progress bar with elapsed time.
 - **Tests** — `node tests/book_metadata.test.js`; setup guide: `docs/systems/Book-Auto-Import.md`.
 
+## music_metadata.js
+
+- **Free metadata sources** — uses MusicBrainz and Cover Art Archive, with Apple iTunes Search API as a no-key fallback.
+- **Song import** — retrieves artist, album, release date, duration, genre, ISRC, source links, and available cover art.
+- **Album import** — retrieves release metadata and tracklists, then offers automatic or selective Song-note creation.
+- **Rate limiting** — spaces MusicBrainz requests and sends a descriptive User-Agent.
+- **Artwork handling** — stores external Cover Art Archive URLs; it does not cache Apple artwork or audio previews.
+- **Lyrics and reflection** — provides editable Lyrics and Personal Reflections sections without importing full copyrighted lyrics.
+
 ## `tmdb_media.js`
 
 - **Progress integration** — Movie and TV templates show shared workflow progress while this script caches local poster/backdrop files.

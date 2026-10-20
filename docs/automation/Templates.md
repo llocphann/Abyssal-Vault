@@ -83,6 +83,14 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 - **Personal state** — initializes `Status`, `CurrentPage`, reading dates and `Rating` without inventing personal activity.
 - **Safe fallback** — preserves existing nonempty notes; failed search/cancellation creates a blank template, while detected duplicate records are not generated.
 
+## Album_Template.md and Song_Template.md
+
+- **Automatic metadata** — MusicBrainz is queried first; the no-key Apple iTunes Search API is used when MusicBrainz has no usable results.
+- **Album track creation** — offers create-all, choose-tracks, or album-only modes. Existing Song notes are reused by provider identity.
+- **Song reflection structure** — creates a Lyrics section and prompts for personal reflections without fetching or embedding full copyrighted lyrics.
+- **Cover art** — uses remote Cover Art Archive artwork when available instead of downloading or caching store artwork.
+- **Safe fallback** — preserves nonempty notes, keeps available metadata when a provider fails, and avoids duplicate records.
+
 ## `Place_Template.md`
 
 - **Folder detection** — infers semantic type from the destination folder.

@@ -1,0 +1,210 @@
+formulas:
+  music_art: |-
+    if(
+      categories.containsAny(link("Albums"), link("Songs")),
+      if(
+        Cover,
+        html("<img class='music-card-art-image' src=\"" + escapeHTML(Cover.toString()) + "\" alt=\"Music cover art\" loading=\"lazy\" />"),
+        html("<div class='music-card-art-placeholder' aria-hidden='true'>♫</div>")
+      ),
+      null
+    )
+  music_card: |-
+    if(
+      categories.containsAny(link("Albums")),
+      html(
+        "<article class='music-album-card'>" +
+          "<header class='music-card-heading'><div><span class='music-card-kicker'>ALBUM</span><h3 class='music-card-title'>{title}</h3><p class='music-card-artist'>{artist}</p></div>{heart}</header>" +
+          "<div class='music-card-meta'><span>{year}</span><span>{tracks}</span><span>{duration}</span></div>" +
+          "<div class='music-card-tags'>{genres}</div>" +
+          "<p class='music-card-description'>{description}</p>" +
+          "<div class='music-card-actions'>{source}</div>" +
+        "</article>"
+      )
+        .replace("{title}", escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+        .replace("{artist}", escapeHTML(if(Artist, Artist.toString(), if(AlbumArtist, AlbumArtist.toString(), "Unknown artist"))))
+        .replace("{heart}", if(Favourite, "<span class='music-card-heart' aria-label='Favourite'>♥</span>", ""))
+        .replace("{year}", if(Year, Year.toString(), if(ReleaseDate, ReleaseDate.toString().slice(0, 4), "Year unknown")))
+        .replace("{tracks}", if(TrackCount, TrackCount.toString() + " tracks", "Tracklist unavailable"))
+        .replace("{duration}", if(Duration, (Duration / 60).round().toString() + " min", ""))
+        .replace("{genres}", if(Genre, list(Genre).slice(0, 3).map("<span class='music-card-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
+        .replace("{description}", escapeHTML(if(Description, Description.toString(), "Add your personal album impressions in the note.")))
+        .replace("{source}", if(StoreUrl, "<a class='music-card-link' href=\"" + escapeHTML(StoreUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Open music ↗</a>", if(SourceUrl, "<a class='music-card-link' href=\"" + escapeHTML(SourceUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Source ↗</a>", ""))),
+      if(
+        categories.containsAny(link("Songs")),
+        html(
+          "<article class='music-song-card'>" +
+            "<header class='music-card-heading'><div><span class='music-card-kicker'>SONG</span><h3 class='music-card-title'>{title}</h3><p class='music-card-artist'>{artist}</p></div>{heart}</header>" +
+            "<div class='music-card-meta'><span>{duration}</span><span>{track}</span><span>{year}</span></div>" +
+            "<p class='music-card-album'>{album}</p>" +
+            "<div class='music-card-tags'>{genres}</div>" +
+            "<p class='music-card-description'>{description}</p>" +
+            "<div class='music-card-actions'>{source}</div>" +
+          "</article>"
+        )
+          .replace("{title}", escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+          .replace("{artist}", escapeHTML(if(Artist, Artist.toString(), "Unknown artist")))
+          .replace("{heart}", if(Favourite, "<span class='music-card-heart' aria-label='Favourite'>♥</span>", ""))
+          .replace("{duration}", if(Duration, (Duration / 60).floor().toString() + ":" + if(Duration % 60 < 10, "0", "") + (Duration % 60).round().toString(), ""))
+          .replace("{track}", if(TrackNumber, "Track " + TrackNumber.toString(), "Single"))
+          .replace("{year}", if(Year, Year.toString(), if(ReleaseDate, ReleaseDate.toString().slice(0, 4), "")))
+          .replace("{album}", escapeHTML(if(Album, Album.toString(), "Single release")).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1"))
+          .replace("{genres}", if(Genre, list(Genre).slice(0, 3).map("<span class='music-card-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
+          .replace("{description}", escapeHTML(if(Description, Description.toString(), "Add your personal reflections in the note.")))
+          .replace("{source}", if(StoreUrl, "<a class='music-card-link' href=\"" + escapeHTML(StoreUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Open music ↗</a>", if(SourceUrl, "<a class='music-card-link' href=\"" + escapeHTML(SourceUrl.toString()) + "\" target=\"_blank\" rel=\"noopener noreferrer\">Source ↗</a>", ""))),
+        null
+      )
+    )
+properties:
+  Title:
+    displayName: Title
+  Artist:
+    displayName: Artist
+  Album:
+    displayName: Album
+  AlbumArtist:
+    displayName: Album artist
+  Genre:
+    displayName: Genres
+  Year:
+    displayName: Year
+  ReleaseDate:
+    displayName: Release date
+  Duration:
+    displayName: Duration (seconds)
+  TrackNumber:
+    displayName: Track
+  DiscNumber:
+    displayName: Disc
+  TrackCount:
+    displayName: Tracks
+  Favourite:
+    displayName: Favourite
+  PersonalRating:
+    displayName: Personal rating
+  Cover:
+    displayName: Cover art URL
+  Description:
+    displayName: Description
+  Tracklist:
+    displayName: Tracklist
+  Source:
+    displayName: Metadata source
+  SourceUrl:
+    displayName: Source URL
+  StoreUrl:
+    displayName: Music link
+  MusicBrainzId:
+    displayName: MusicBrainz ID
+  ReleaseGroupId:
+    displayName: Release group ID
+  AppleTrackId:
+    displayName: Apple track ID
+  AppleCollectionId:
+    displayName: Apple collection ID
+  ISRC:
+    displayName: ISRC
+  Label:
+    displayName: Label
+  Country:
+    displayName: Country
+  Format:
+    displayName: Format
+views:
+  - type: cards
+    name: Music Library
+    filters:
+      and:
+        - categories.containsAny(link("Songs"), link("Albums"))
+    groupBy:
+      property: categories
+      direction: ASC
+    order:
+      - formula.music_art
+      - formula.music_card
+    sort:
+      - property: file.name
+        direction: ASC
+    cardSize: 300
+  - type: cards
+    name: Favourite Songs
+    filters:
+      and:
+        - categories.containsAny(link("Songs"))
+        - Favourite == true
+    order:
+      - formula.music_art
+      - formula.music_card
+    sort:
+      - property: Title
+        direction: ASC
+    cardSize: 300
+  - type: cards
+    name: Favourite Albums
+    filters:
+      and:
+        - categories.containsAny(link("Albums"))
+        - Favourite == true
+    order:
+      - formula.music_art
+      - formula.music_card
+    sort:
+      - property: Title
+        direction: ASC
+    cardSize: 250
+  - type: table
+    name: Songs Data
+    filters:
+      and:
+        - categories.containsAny(link("Songs"))
+    order:
+      - file.name
+      - Title
+      - Artist
+      - Album
+      - AlbumArtist
+      - Genre
+      - Year
+      - ReleaseDate
+      - Duration
+      - TrackNumber
+      - DiscNumber
+      - Favourite
+      - PersonalRating
+      - Cover
+      - Description
+      - Source
+      - SourceUrl
+      - StoreUrl
+      - MusicBrainzId
+      - ISRC
+      - AppleTrackId
+  - type: table
+    name: Albums Data
+    filters:
+      and:
+        - categories.containsAny(link("Albums"))
+    order:
+      - file.name
+      - Title
+      - Artist
+      - AlbumArtist
+      - Genre
+      - Year
+      - ReleaseDate
+      - TrackCount
+      - Duration
+      - Favourite
+      - PersonalRating
+      - Cover
+      - Description
+      - Tracklist
+      - Label
+      - Country
+      - Format
+      - Source
+      - SourceUrl
+      - StoreUrl
+      - MusicBrainzId
+      - ReleaseGroupId
+      - AppleCollectionId
