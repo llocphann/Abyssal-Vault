@@ -178,7 +178,7 @@ module.exports = async function musicMetadata(tp, mode) {
   function commonSongBody() {
     // Lyrics are saved as local text files, outside the personal Markdown journal.
     // Do not insert writing prompts into the author's content.
-    return ["", "## Personal Reflections", "", "## Notes", ""].join("\n");
+    return ["", "## Personal Reflections", "", "> *What feeling or memory does this song leave with you? Which moment stands out most?*", "", "## Notes", ""].join("\n");
   }
   function plainLyricText(record) {
     if (!record || record.instrumental) return "";
@@ -280,6 +280,8 @@ module.exports = async function musicMetadata(tp, mode) {
         "---",
         "",
         "## Album Impressions",
+        "",
+        "> *What story does this album tell? Which track stays with you, and why?*",
         "",
         "## Tracklist",
         "",
@@ -806,6 +808,8 @@ module.exports = async function musicMetadata(tp, mode) {
       "---",
       "",
       "## Album Impressions",
+      "",
+      "> *What story does this album tell? Which track stays with you, and why?*",
       "",
       "## Tracklist",
       ""
