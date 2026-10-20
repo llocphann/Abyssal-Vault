@@ -1,6 +1,7 @@
 async function runMusicMetadataTests() {
   const assert = require("node:assert/strict");
   const importer = require("../90_System/92_Scripts/Template_Scripts/music_metadata.js");
+  const progressFactory = require("../90_System/92_Scripts/Template_Scripts/import_progress.js");
   const SONGS = "20_Personal_Life/28_Music_Tracker/Songs";
   const ALBUMS = "20_Personal_Life/28_Music_Tracker/Albums";
 
@@ -9,6 +10,13 @@ async function runMusicMetadataTests() {
     const requests = [];
     const created = [];
     const notices = [];
+    const progressEvents = [];
+    const node = () => ({
+      style: {}, empty() {}, setText(value) { this.text = value; },
+      setAttribute(key, value) { this[key] = value; },
+      createDiv(o = {}) { const child = node(); child.text = o.text || ""; return child; },
+      createEl(name) { const child = node(); child.name = name; return child; }
+    });
     const folders = new Set([ "20_Personal_Life", "20_Personal_Life/28_Music_Tracker", SONGS, ALBUMS ]);
     const files = [];
     const target = { path: (opts.kind === "album" ? ALBUMS : SONGS) + "/Untitled.md", name: "Untitled.md", stat: { size: 0, ctime: 42 } };
@@ -27,7 +35,17 @@ async function runMusicMetadataTests() {
       },
       date: { now: format => format === "YYYY-MM-DD" ? "2026-10-20" : "20261020-190000" },
       obsidian: {
-        Notice: class { constructor(message) { notices.push(message); } },
+        Notice: class {
+          constructor(message, duration) {
+            this.message = message;
+            this.duration = duration;
+            this.hidden = false;
+            this.noticeEl = node();
+            notices.push(this);
+          }
+          hide() { this.hidden = true; }
+          setMessage(message) { this.message = message; }
+        },
         requestUrl: async request => {
           requests.push(request.url);
           if (opts.respond) return opts.respond(request.url);
@@ -60,9 +78,26 @@ async function runMusicMetadataTests() {
           throw new Error("Unexpected URL: " + request.url);
         }
       },
+      user: opts.noProgress ? {} : {
+        import_progress(context, options) {
+          progressEvents.push({kind:"open",title:options.title,total:options.totalSteps});
+          const ui = progressFactory(context, options);
+          return {
+            update(step, message) {
+              progressEvents.push({kind:"step",step,message});
+              ui.update(step,message);
+            },
+            close() {
+              progressEvents.push({kind:"close"});
+              ui.close();
+            }
+          };
+        }
+      },
       system: {
-        prompt: async () => opts.query || "Quiet Night",
+        prompt: async () => opts.query === "" ? "" : opts.query || "Quiet Night",
         suggester: async (labels, items, throwOnCancel, placeholder) => {
+          if (opts.cancelSelection && placeholder !== "How should song notes be created?") return null;
           if (placeholder === "How should song notes be created?") return opts.songChoice || "all";
           return items[0];
         },
@@ -80,7 +115,20 @@ async function runMusicMetadataTests() {
         fileManager: { trashFile: async () => {} }
       }
     };
-    return { tp, requests, created, notices, files };
+    return { tp, requests, created, notices, files, progressEvents };
+  }
+
+  function checkProgress(state, title, finalStep = 5) {
+    assert.equal(state.progressEvents[0]?.kind,"open");
+    assert.equal(state.progressEvents[0]?.title,title);
+    assert.equal(state.progressEvents[0]?.total,5);
+    assert.equal(state.progressEvents.filter(event => event.kind==="close").length,1);
+    const steps = state.progressEvents.filter(event => event.kind==="step").map(event => event.step);
+    assert.equal(steps.at(-1),finalStep);
+    assert.deepEqual([...new Set(steps)],[...Array(finalStep)].map((_,i)=>i+1));
+    const ui = state.notices.filter(n => n.duration === 0);
+    assert.equal(ui.length,1);
+    assert.equal(ui[0].hidden,true);
   }
 
   {
@@ -96,6 +144,8 @@ async function runMusicMetadataTests() {
     assert.match(note, /What feeling or memory does this song leave with you/);
     assert.ok(!note.includes("actual lyric text"));
     assert.ok(state.requests.some(url => url.includes("musicbrainz.org/ws/2/recording/")));
+    checkProgress(state,"Song Import");
+    assert.ok(state.progressEvents.some(event => event.message?.includes("lyrics")));
   }
 
   {
@@ -110,6 +160,9 @@ async function runMusicMetadataTests() {
     assert.match(state.created[0].content, /Album: "\[\[Blue Hour\]\]"/);
     assert.ok(!state.created[0].content.includes("## Lyrics"));
     assert.match(state.created[0].content, /## Personal Reflections/);
+    checkProgress(state,"Album Import");
+    assert.ok(state.progressEvents.some(event => event.message?.includes("Creating Song notes (1/2)")));
+    assert.ok(state.progressEvents.some(event => event.message?.includes("Creating Song notes (2/2)")));
   }
 
   {
@@ -119,6 +172,8 @@ async function runMusicMetadataTests() {
     assert.equal(state.created.length, 1);
     assert.match(state.created[0].content, /Title: "Quiet Night"/);
     assert.ok(!state.created.some(item => item.content.includes('Title: "Silver Rain"')));
+    checkProgress(state,"Album Import");
+    assert.ok(state.progressEvents.some(event => event.message?.includes("Creating Song notes (1/1)")));
   }
 
   {
@@ -127,6 +182,7 @@ async function runMusicMetadataTests() {
     assert.equal(state.created.length, 0);
     assert.match(note, /## Album Impressions/);
     assert.match(note, /- Quiet Night/);
+    checkProgress(state,"Album Import");
   }
 
   {
@@ -144,9 +200,40 @@ async function runMusicMetadataTests() {
     assert.match(note, /AppleTrackId: "99"/);
     assert.match(note, /StoreUrl: "https:\/\/music.apple.com\/test"/);
     assert.match(note, /Cover: ""/);
+    checkProgress(state,"Song Import");
+    assert.ok(state.progressEvents.some(event => event.message?.includes("Apple iTunes")));
   }
 
-  console.log("Music metadata tests passed.");
+  {
+    const state = makeTp({ kind:"album", cancelSelection:true, query:"Blue Hour" });
+    const note = await importer(state.tp,"album");
+    assert.match(note,/## Album Impressions/);
+    checkProgress(state,"Album Import",2);
+  }
+  {
+    const state = makeTp({respond:async url => {
+      if(url.includes("/recording/?query="))return {status:200,json:{recordings:[]}};
+      if(url.includes("itunes.apple.com/search?"))return {status:200,json:{results:[]}};
+      throw Error("Unexpected no-match URL " + url);
+    }});
+    const note = await importer(state.tp,"song");
+    assert.match(note,/## Personal Reflections/);
+    checkProgress(state,"Song Import",1);
+  }
+  {
+    const state = makeTp({noProgress:true});
+    const note = await importer(state.tp,"song");
+    assert.match(note,/## Personal Reflections/);
+    assert.equal(state.progressEvents.length,0);
+  }
+  {
+    const state = makeTp({query:""});
+    const note = await importer(state.tp,"song");
+    assert.match(note,/## Personal Reflections/);
+    assert.equal(state.progressEvents.length,0);
+  }
+
+  console.log("Music metadata and import progress tests passed.");
 }
 
 runMusicMetadataTests().catch(error => { console.error(error); process.exitCode = 1; });
