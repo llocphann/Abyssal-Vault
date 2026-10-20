@@ -87,7 +87,7 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 
 - **Automatic metadata** — MusicBrainz is queried first; the no-key Apple iTunes Search API is used when MusicBrainz has no usable results.
 - **Album track creation** — offers create-all, choose-tracks, or album-only modes. Existing Song notes are reused by provider identity.
-- **Song reflection structure** — creates a Lyrics section and prompts for personal reflections without fetching or embedding full copyrighted lyrics.
+- **Song reflection structure** — creates empty Personal Reflections and Notes sections, with no prewritten lyric placeholder or journal questions. LRCLIB lyrics are stored in separate local text assets when available.
 - **Cover art** — uses remote Cover Art Archive artwork when available instead of downloading or caching store artwork.
 - **Safe fallback** — preserves nonempty notes, keeps available metadata when a provider fails, and avoids duplicate records.
 
