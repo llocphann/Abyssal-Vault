@@ -34,6 +34,7 @@ if (musicRoot) {
     const file = musicApp.metadataCache.getFirstLinkpathDest(candidate, musicFile.path);
     return file ? musicApp.vault.getResourcePath(file) : "";
   }
+  let musicArtworkRecoveryAttempted=false;
   function musicSetCover() {
     const image = musicQ('[data-role="music-cover"]');
     const fallback = musicQ('[data-role="music-cover-fallback"]');
@@ -42,10 +43,14 @@ if (musicRoot) {
     if (!url) { image.hidden = true; fallback.hidden = false; return; }
     image.onload = () => { image.hidden = false; fallback.hidden = true; };
     image.onerror = () => {
-      image.hidden = true; fallback.hidden = false;
+      image.hidden=true; fallback.hidden=false;
       const repairButton=musicQ('[data-role="music-find-artwork"]');
-      if(repairButton) repairButton.hidden=false;
-      musicFeedback("Cover URL did not load. Use Find artwork to replace it.");
+      if(repairButton)repairButton.hidden=false;
+      musicFeedback("Cover did not load. Looking for an alternative…");
+      if(!musicArtworkRecoveryAttempted && /^https:\/\//i.test(url)) {
+        musicArtworkRecoveryAttempted=true;
+        void musicFindArtwork();
+      }
     };
     image.src = url;
     image.hidden = false;
@@ -238,15 +243,31 @@ if (musicRoot) {
     return !!a&&!!b&&(a===b||(a.length>7&&b.length>7&&(a.startsWith(b+" ")||b.startsWith(a+" "))));
   };
   async function musicFetchJSON(url,timeout=12500) {
-    if(typeof fetch!=="function")throw Error("Browser fetch unavailable");
+    // Browser fetch may be blocked by CORS inside the Obsidian app:// origin.
+    // Prefer requestUrl (Obsidian API) when exposed into this trusted view.
+    let requestUrlFn=musicContext?.obsidian?.requestUrl || musicContext?.requestUrl;
+    if(typeof requestUrlFn!=="function") {
+      try {
+        if(typeof require==="function") requestUrlFn=require("obsidian")?.requestUrl;
+      } catch(_) { /* CommonJS may not be available in Custom Views runtime. */ }
+    }
+    if(typeof requestUrlFn==="function") {
+      const response=await requestUrlFn({url,method:"GET",headers:{Accept:"application/json"}});
+      if(response.status>=400)throw Error("HTTP "+response.status);
+      if(response.json!=null)return response.json;
+      return JSON.parse(response.text||"{}");
+    }
+    const fetchImpl=musicContext?.activeWindow?.fetch?.bind(musicContext.activeWindow) ||
+      (typeof fetch==="function"?fetch:null);
+    if(!fetchImpl)throw Error("HTTP unavailable; run Templater Music_Refresh_Metadata.");
     const controller=typeof AbortController!=="undefined"?new AbortController():null;
-    const timer=controller?setTimeout(()=>controller.abort(),timeout):null;
+    const timer=controller&&typeof setTimeout==="function"?setTimeout(()=>controller.abort(),timeout):null;
     try {
-      const response=await fetch(url,{method:"GET",headers:{Accept:"application/json"},
+      const response=await fetchImpl(url,{method:"GET",headers:{Accept:"application/json"},
         ...(controller?{signal:controller.signal}:{})});
       if(!response.ok)throw Error("HTTP "+response.status);
       return await response.json();
-    } finally {if(timer!=null)clearTimeout(timer);}
+    } finally {if(timer!=null&&typeof clearTimeout==="function")clearTimeout(timer);}
   }
   async function musicLoadLyrics() {
     if(musicKind!=="song")return;
@@ -345,10 +366,11 @@ if (musicRoot) {
           let data;
           try{data=await musicFetchJSON("https://itunes.apple.com/search?term="+q+
             "&entity="+(musicKind==="album"?"album":"song")+"&limit=30&country="+country);}catch(_){continue;}
-          const selected=(data.results||[]).find(item=>
+          const candidates=(data.results||[]).filter(item=>
             musicRemoteMatches(musicKind==="album"?item.collectionName:item.trackName,title)&&
-            musicRemoteMatches(item.artistName,artist)&&
-            (musicKind==="album"||!album||musicRemoteMatches(item.collectionName,album)));
+            musicRemoteMatches(item.artistName,artist));
+          const selected=(musicKind==="song"&&album?
+            candidates.find(item=>musicRemoteMatches(item.collectionName,album)):null)||candidates[0];
           const art=musicText(selected?.artworkUrl100);
           const store=musicText(musicKind==="album"?selected?.collectionViewUrl:selected?.trackViewUrl);
           if(/^https:\/\//i.test(art)&&/^https:\/\//i.test(store)){
@@ -374,6 +396,10 @@ if (musicRoot) {
   if(musicArtworkButton){
     musicArtworkButton.hidden=!!musicGet("Cover");
     musicArtworkButton.addEventListener("click",()=>{void musicFindArtwork();});
+    if(!musicGet("Cover") && musicGet("Artist") && (musicGet("Title") || musicFile?.basename)) {
+      musicArtworkRecoveryAttempted=true;
+      void musicFindArtwork();
+    }
   }
 
 }
