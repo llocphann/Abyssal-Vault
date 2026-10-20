@@ -34,7 +34,8 @@ async function run(kind) {
     "music-year", "music-duration", "music-track", "music-tracks",
     "music-genres", "music-description", "music-source-link",
     "music-open-album", "music-details", "music-tracklist", "music-track-count",
-    "music-favourite", "music-favourite-label", "music-feedback", "music-rating-value"
+    "music-favourite", "music-favourite-label", "music-feedback", "music-rating-value",
+    "music-writing-guide"
   ];
   const elements = Object.fromEntries(roles.map(role => [role, new Element()]));
   elements["music-favourite"].append(new Element("span"), new Element("span"));
@@ -81,9 +82,14 @@ async function run(kind) {
   };
   const context = {
     container: { querySelector: () => root },
-    app, file, frontmatter, activeDocument: document
+    app, file, frontmatter, activeDocument: document,
+    bodyContent: kind === "album"
+      ? "## Album Impressions\n\n## Tracklist\n\n- Test Song\n"
+      : "## Personal Reflections\n\n## Notes\n"
   };
   new Function("tp", runtime)(context);
+  assert.equal(elements["music-writing-guide"].hidden, false,
+    "Blank reflection sections should show inline writing questions");
 
   assert.equal(elements["music-title"].textContent, file.basename);
   assert.equal(elements["music-artist"].textContent, "Test Artist");
@@ -108,6 +114,12 @@ async function run(kind) {
     elements["music-open-album"].onclick();
     assert.deepEqual(opened, [{target:"Test Album", from:file.path}]);
   }
+  context.bodyContent = kind === "album"
+    ? "## Album Impressions\n\nThe final song changes everything.\n\n## Tracklist\n"
+    : "## Personal Reflections\n\nI remember listening on the train.\n\n## Notes\n";
+  new Function("tp", runtime)(context);
+  assert.equal(elements["music-writing-guide"].hidden, true,
+    "Writing questions should disappear for an authored reflection");
 }
 (async () => {
   await run("album");
