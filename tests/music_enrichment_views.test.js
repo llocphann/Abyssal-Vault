@@ -85,6 +85,25 @@ async function run(){
  assert.equal(elements["music-lyrics-status"].hidden,true);
  assert.equal(elements["music-lyrics-text"].textContent.trim(),"Fictional lyrics fixture line.");
  assert.equal(calls.length,beforeOfflineCalls);
+ // Legacy scaffold cleanup is exact-match only; authored reflections survive.
+ const generatedReminder="> Add lyrics only when you have permission to store them. Otherwise, keep a link to an official or licensed lyrics source.";
+ let noteText="---\nTitle: Quiet Night\n---\n\n## Lyrics\n\n"+
+   generatedReminder+"\n\n## Personal Reflections\n\n"+
+   "- What does this song mean to me?\n"+
+   "This is my own reflection and must be preserved.\n\n## Notes\n\n";
+ const previouslyCachedRead=tp.app.vault.cachedRead;
+ tp.app.vault.cachedRead=async f=>f.path===file.path?noteText:previouslyCachedRead(f);
+ tp.app.vault.process=async (_file,modify)=>{noteText=modify(noteText);return noteText;};
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,async()=>{throw Error("Offline: existing lyrics file should load");},undefined,undefined,undefined
+ );
+ for(let n=0;n<36;n++)await Promise.resolve();
+ assert.ok(!noteText.includes("## Lyrics"));
+ assert.ok(!noteText.includes(generatedReminder));
+ assert.ok(!noteText.includes("What does this song mean to me?"));
+ assert.ok(noteText.includes("This is my own reflection and must be preserved."));
+ assert.ok(noteText.includes("## Personal Reflections"));
+
  // Simulate an old note without a LyricsFile; check the metadata bridge.
  tp.frontmatter.LyricsFile="";
  localFiles.clear();
