@@ -308,3 +308,34 @@
 .cv-music .cv-music-paper .cv-music-content { cursor: text; }
 .cv-music .cv-music-paper .cv-music-content :is(a,button,input,textarea) { cursor: pointer; }
 .cv-music.is-opening-editor .cv-music-paper .cv-music-content { cursor: progress; }
+
+
+/* 2026-10: concise prompts live inside the paper, never as sidebar cards. */
+.cv-music .cv-music-writing-guide {
+  margin: clamp(58px, 6cqi, 82px) clamp(26px, 4.3cqi, 58px) 0 clamp(72px, 7.2cqi, 98px);
+  border-inline-start: 2px solid color-mix(in srgb, var(--interactive-accent) 45%, transparent);
+  padding: 0 0 0 13px;
+  color: var(--text-muted);
+  font-size: .8rem;
+  font-style: italic;
+  line-height: 1.65;
+}
+.cv-music .cv-music-writing-guide[hidden] { display: none !important; }
+.cv-music .cv-music-writing-guide p { margin: 0; }
+.cv-music .cv-music-paper:has(.cv-music-writing-guide:not([hidden])) .cv-music-content {
+  min-height: calc(100% - 100px);
+  padding-top: 20px;
+}
+.cv-music .cv-music-section-heading { margin-block-end: 12px; }
+.cv-music .cv-music-section-heading > p { display: none; }
+.cv-music .cv-music-prompt-panel { display: none !important; }
+.cv-music .cv-music-lyrics-foot > span { display: none !important; }
+.cv-music .cv-music-lyrics-panel:has(.cv-music-lyrics-text:not([hidden])) .cv-music-lyrics-status {
+  display: none !important;
+}
+@media (max-width: 540px) {
+  .cv-music .cv-music-writing-guide {
+    margin: 56px 20px 0 50px;
+    padding-inline-start: 10px;
+  }
+}
