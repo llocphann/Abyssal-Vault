@@ -34,46 +34,92 @@ try {
 }
 
 async function waitForCustomViews() {
-  for (let n = 0; n < 30; n++) {
-    const plugin = app.plugins.getPlugin?.("custom-views") ?? app.plugins.plugins?.["custom-views"];
-    if (plugin?.settings?.views) return plugin;
-    await new Promise(resolve => setTimeout(resolve, 150));
+  for(let attempt=0;attempt<40;attempt++){
+    const plugin=app.plugins.getPlugin?.("custom-views") ??
+      app.plugins.plugins?.["custom-views"];
+    if(plugin?.settings?.views)return plugin;
+    await new Promise(resolve=>setTimeout(resolve,150));
   }
   return null;
 }
-try {
-  const plugin = await waitForCustomViews();
-  if (!plugin) {
-    console.warn("[Music] Custom Views plugin not ready. Music view sync skipped.");
-    return;
-  }
-  const read = path => app.vault.adapter.read(root + "/" + path);
-  const [css, js, songTemplate, albumTemplate, songDescriptor, albumDescriptor] = await Promise.all([
-    read("styles.css"), read("script.js"), read("Song.html"), read("Album.html"),
-    read("song-view.json"), read("album-view.json")
-  ]);
-  new Function("tp", js);
-  const entries = [
-    { ...JSON.parse(albumDescriptor), template: albumTemplate.trimEnd(), css: css.trimEnd(), js: js.trimEnd() },
-    { ...JSON.parse(songDescriptor), template: songTemplate.trimEnd(), css: css.trimEnd(), js: js.trimEnd() }
-  ];
-  const ownedIds = new Set(entries.map(entry => entry.id));
-  const oldViews = plugin.settings.views;
-  const previous = entries.map(entry => oldViews.find(item => item?.id === entry.id));
-  const unchanged = entries.every((entry, index) =>
-    previous[index] && JSON.stringify(previous[index]) === JSON.stringify(entry));
-  if (!unchanged || previous.some(view => !view)) {
-    const others = oldViews.filter(item => !ownedIds.has(item?.id));
-    // Music-specific folder rules are independent of the existing Media/Book views.
-    const before = others.findIndex(item => item?.id === "default-1");
-    if (before < 0) others.unshift(...entries);
-    else others.splice(before, 0, ...entries);
-    plugin.settings.views = others;
-    await plugin.saveSettings();
-    plugin.refreshAllViews?.();
-    console.info("[Music] Music Song and Album Custom Views synchronized.");
-  }
-} catch (error) {
-  console.error("[Music] Music Custom Views startup synchronization failed:", error);
+const sourceFiles=["Song.html","Album.html","styles.css","script.js","song-view.json","album-view.json"];
+let lastSourceVersion="";
+function musicSourceVersion() {
+  return sourceFiles.map(file=>{
+    const info=app.vault.getAbstractFileByPath(root+"/"+file)?.stat;
+    return (info?.mtime||0)+":"+(info?.size||0);
+  }).join("|");
 }
+let running=null;
+async function synchronizeMusicViews() {
+  if(running)return running;
+  running=(async()=>{
+    const plugin=await waitForCustomViews();
+    if(!plugin){
+      console.warn("[Music] Custom Views plugin is not ready. Music sync skipped.");
+      return false;
+    }
+    const read=file=>app.vault.adapter.read(root+"/"+file);
+    const [songHtml,albumHtml,css,js,songJSON,albumJSON]=await Promise.all(sourceFiles.map(read));
+    new Function("tp",js);
+    const entries=[
+      {...JSON.parse(songJSON),template:songHtml.trimEnd(),css:css.trimEnd(),js:js.trimEnd()},
+      {...JSON.parse(albumJSON),template:albumHtml.trimEnd(),css:css.trimEnd(),js:js.trimEnd()}
+    ];
+    const own=new Set(entries.map(entry=>entry.id));
+    const retained=plugin.settings.views.filter(view=>!own.has(view?.id));
+    // Folder-specific Music views must precede broad/default matchers.
+    const next=[...entries,...retained];
+    const changed=JSON.stringify(next)!==JSON.stringify(plugin.settings.views);
+    if(changed){
+      plugin.settings.views=next;
+      await plugin.saveSettings();
+      console.info("[Music] Song/Album Custom Views updated from source.");
+    }
+    // Re-render even when values are identical, to clear an in-memory view
+    // instance that was created before the source files were pulled.
+    plugin.refreshAllViews?.();
+    lastSourceVersion=musicSourceVersion();
+    return true;
+  })();
+  try{return await running;}
+  catch(error){
+    console.error("[Music] Source sync failed:",error);
+    return false;
+  }finally{running=null;}
+}
+const synced=await synchronizeMusicViews();
+// Live source sync while Obsidian remains open. A manual Templater run also
+// forces re-render; listeners are de-duplicated between invocations.
+const syncWindow=app.workspace?.containerEl?.ownerDocument?.defaultView;
+if(syncWindow){
+  const key="__abyssalMusicSyncSubscriptions";
+  const previous=syncWindow[key];
+  if(previous){
+    for(const ref of previous.refs||[]){
+      try{app.vault.offref(ref);}catch(_){}
+      try{app.workspace.offref(ref);}catch(_){}
+    }
+    if(previous.timer)clearTimeout(previous.timer);
+  }
+  const state={refs:[],timer:null};
+  const schedule=()=>{
+    if(state.timer)clearTimeout(state.timer);
+    state.timer=setTimeout(()=>{
+      state.timer=null;
+      void synchronizeMusicViews();
+    },350);
+  };
+  const changedFile=app.vault.on("modify",file=>{
+    if(sourceFiles.some(name=>file?.path===root+"/"+name))schedule();
+  });
+  if(changedFile)state.refs.push(changedFile);
+  const opened=app.workspace.on("file-open",file=>{
+    if(!file?.path?.startsWith("20_Personal_Life/28_Music_Tracker/"))return;
+    if(musicSourceVersion()!==lastSourceVersion)schedule();
+  });
+  if(opened)state.refs.push(opened);
+  syncWindow[key]=state;
+}
+if(!synced)console.warn("[Music] Music views remain unsynced; run the Sync_Music_Custom_Views template after plugins load.");
 %>
