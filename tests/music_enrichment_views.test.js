@@ -17,6 +17,8 @@ async function run(){
  root.querySelector=s=>elements[s.match(/^\[data-role="([^"]+)"\]$/)?.[1]]||null;
  root.querySelectorAll=()=>[];
  const calls=[],patches=[];
+ const localFiles=new Map();
+ const directories=new Set(["20_Personal_Life/28_Music_Tracker","20_Personal_Life/28_Music_Tracker/Songs"]);
  const fetchMock=async url=>{
   calls.push(url);
   if(url.startsWith("https://lrclib.net/api/get?"))return {ok:true,json:async()=>({
@@ -31,13 +33,22 @@ async function run(){
  const file={basename:"Quiet Night",path:"20_Personal_Life/28_Music_Tracker/Songs/Quiet Night.md"};
  const tp={container:{querySelector:()=>root},file,activeDocument:doc,
   frontmatter:{Title:"Quiet Night",Artist:"Test Artist",Album:"Blue Hour",Duration:210,Cover:""},
-  app:{metadataCache:{getFirstLinkpathDest:()=>null},vault:{getResourcePath:()=>""},
+  app:{metadataCache:{getFirstLinkpathDest:()=>null},vault:{
+    getResourcePath:()=>"",
+    getAbstractFileByPath:path=>localFiles.has(path)||directories.has(path)?{path}:null,
+    createFolder:async path=>directories.add(path),
+    create:async(path,contents)=>{localFiles.set(path,contents);return {path};},
+    cachedRead:async file=>localFiles.get(file.path)||""
+   },
    fileManager:{processFrontMatter:async(_,cb)=>{const patch={};cb(patch);patches.push(patch)}},
    workspace:{openLinkText:()=>{}}}
  };
  new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(tp,fetchMock,undefined,undefined,undefined);
  for(let n=0;n<24;n++)await Promise.resolve();
- assert.equal(elements["music-lyrics-status"].textContent,"Retrieved from LRCLIB · Read-only display");
+ assert.equal(elements["music-lyrics-status"].hidden,true);
+ assert.ok([...localFiles.keys()].some(path=>path.endsWith("/LRCLIB-76.txt")));
+ assert.ok([...localFiles.values()].some(value=>value.includes("Fictional lyrics fixture line.")));
+ assert.ok(patches.some(p=>typeof p.LyricsFile==="string" && p.LyricsFile.endsWith("LRCLIB-76.txt")));
  assert.equal(elements["music-lyrics-text"].textContent,"Fictional lyrics fixture line.");
  assert.equal(elements["music-lyrics-source"].href,"https://lrclib.net/api/get/76");
  assert.equal(elements["music-lyrics-text"].hidden,false);
@@ -51,6 +62,19 @@ async function run(){
  assert.ok(patches.some(p=>p.StoreUrl==="https://music.apple.com/song/123"));
  assert.ok(calls.some(url=>url.startsWith("https://lrclib.net/api/get?")));
  assert.ok(calls.some(url=>url.startsWith("https://itunes.apple.com/search?")));
+ // Re-open the note offline: local lyrics remain available without HTTP.
+ const beforeOfflineCalls=calls.length;
+ tp.frontmatter.LyricsFile="20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-76.txt";
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,async()=>{throw Error("Offline mode must not fetch lyrics");},undefined,undefined,undefined
+ );
+ for(let n=0;n<36;n++)await Promise.resolve();
+ assert.equal(elements["music-lyrics-status"].hidden,true);
+ assert.equal(elements["music-lyrics-text"].textContent.trim(),"Fictional lyrics fixture line.");
+ assert.equal(calls.length,beforeOfflineCalls);
+ // Simulate an old note without a LyricsFile; check the metadata bridge.
+ tp.frontmatter.LyricsFile="";
+ localFiles.clear();
  // With an allowlisted Obsidian request bridge, no browser fetch is needed.
  const bridgeCalls=[];
  tp.activeWindow={__abyssalMusicRequest:async url=>{
