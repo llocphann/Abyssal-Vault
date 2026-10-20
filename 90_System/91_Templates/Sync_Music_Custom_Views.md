@@ -121,5 +121,37 @@ if(syncWindow){
   if(opened)state.refs.push(opened);
   syncWindow[key]=state;
 }
+
+/* Music Base hover cards may sit at the gallery's right edge. Choose which
+ * direction their floating drawer should open at pointer/focus time. Native
+ * Base cards keep their layout slot fixed, so siblings never reflow. */
+if(syncWindow){
+  const doc=app.workspace?.containerEl?.ownerDocument;
+  const key="__abyssalMusicPeekListeners";
+  const previous=syncWindow[key];
+  if(previous?.doc&&previous?.handler){
+    previous.doc.removeEventListener("pointerover",previous.handler,true);
+    previous.doc.removeEventListener("focusin",previous.handler,true);
+  }
+  if(doc?.addEventListener){
+    const names=new Set(["Music Library","Favourite Songs","Favourite Albums"]);
+    const chooseSide=event=>{
+      const item=event.target?.closest?.(".bases-cards-item:has(.music-peek-card)");
+      if(!item)return;
+      const view=item.closest(".bases-view");
+      if(!names.has(view?.getAttribute("data-view-name")))return;
+      if(syncWindow.matchMedia?.("(hover: none), (max-width: 700px)")?.matches)return;
+      const rect=item.getBoundingClientRect();
+      const availableRight=(doc.documentElement?.clientWidth||syncWindow.innerWidth)-rect.right;
+      const availableLeft=rect.left;
+      const preferred=Math.min(325,Math.max(268, syncWindow.innerWidth*.26));
+      item.dataset.musicPeekSide=availableRight>=preferred+12||availableRight>=availableLeft?"right":"left";
+    };
+    doc.addEventListener("pointerover",chooseSide,true);
+    doc.addEventListener("focusin",chooseSide,true);
+    syncWindow[key]={doc,handler:chooseSide};
+  }
+}
+
 if(!synced)console.warn("[Music] Music views remain unsynced; run the Sync_Music_Custom_Views template after plugins load.");
 %>
