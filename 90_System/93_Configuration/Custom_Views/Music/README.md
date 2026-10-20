@@ -44,3 +44,12 @@ The importer now tries Cover Art Archive release and release-group artwork befor
 - Clicking the Song or Album writing-paper content (not links or form controls) switches the matching Obsidian Markdown leaf to Live Preview (\`mode=source\`, \`source=false\`).
 - Opening an older note cleans up exact generated placeholder text and unchanged prompt lines. When an existing Lyrics section contains substantive text, it first moves that text into a separate `Lyrics/Personal-<song name>.txt` asset and links it through LyricsFile, then removes the section. If writing fails or the destination contains different content, the original Lyrics section is left untouched. Personal reflections are preserved.
 - Reload Obsidian after pulling to let Templater's startup \`Sync_Music_Custom_Views.md\` synchronize the authoritative HTML/CSS/JS. The committed plugin data snapshot may be older until startup sync runs.
+
+## Compact journals and source synchronization (2026-10-20)
+
+- The **Song Lyrics** panel is now simply **Lyrics**, with Refresh and a small source link. The retired "Read-only display" status and "Displayed temporarily" notice are not used.
+- There is **no separate Prompts card**. The Song journal offers two questions directly on the writing paper when `## Personal Reflections` has no prose. The Album journal does the same for `## Album Impressions`. These questions are visual hints, **not saved in Markdown**; they disappear once that section contains written reflections.
+- The journal headings no longer repeat lengthy instructions. The editable Markdown content and local LyricsFile logic are unchanged.
+- `Sync_Music_Custom_Views.md` is the authoritative sync entry point. At startup it replaces only `music-song-v1` and `music-album-v1`, places them ahead of default/broad matching views, saves them through Custom Views' `saveSettings`, and forces a re-render. While Obsidian remains open it watches changes to Music view source files and rechecks on opening a Music note.
+- **If an older view persists after pulling dev:** fully restart Obsidian, or run **Templater: Open insert template modal → Sync_Music_Custom_Views.md** from a scratch note. Reopen the Song/Album note. The enabled `03_Compatibility.css` snippet also hides retired Prompts and lyrics notices while the in-memory view remains stale.
+- The tracked `.obsidian/plugins/custom-views/data.json` is a generated snapshot. Authoritative Music Custom Views live in this directory, and live plugin settings may lag until synchronization runs.
