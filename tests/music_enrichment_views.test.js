@@ -104,6 +104,33 @@ async function run(){
  assert.ok(noteText.includes("This is my own reflection and must be preserved."));
  assert.ok(noteText.includes("## Personal Reflections"));
 
+ // A manually populated Lyrics section is migrated to a separate local
+ // text asset before being removed from the note, without losing reflections.
+ noteText="---\nTitle: Quiet Night\n---\n\n## Lyrics\n\n"+
+   "My personally transcribed lyric line.\n\n## Personal Reflections\n\n"+
+   "This reflection must survive lyrics migration.\n";
+ tp.frontmatter.LyricsFile="20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-76.txt";
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,async()=>{throw Error("Lyrics are available locally");},undefined,undefined,undefined
+ );
+ for(let n=0;n<80;n++)await Promise.resolve();
+ assert.ok(!noteText.includes("## Lyrics"));
+ assert.ok(noteText.includes("This reflection must survive lyrics migration."));
+ const personalPath=[...localFiles.keys()].find(path=>path.includes("/Personal-Quiet Night.txt"));
+ assert.ok(personalPath);
+ assert.ok(localFiles.get(personalPath).includes("My personally transcribed lyric line."));
+ assert.ok(patches.some(p=>p.LyricsFile===personalPath));
+ // Never overwrite an existing *different* personal transcription.
+ noteText="---\nTitle: Quiet Night\n---\n\n## Lyrics\n\n"+
+   "A different handwritten line.\n\n## Personal Reflections\n\nKeep this note.\n";
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,async()=>{throw Error("Lyrics are available locally");},undefined,undefined,undefined
+ );
+ for(let n=0;n<80;n++)await Promise.resolve();
+ assert.ok(noteText.includes("## Lyrics"));
+ assert.ok(noteText.includes("A different handwritten line."));
+ assert.ok(localFiles.get(personalPath).includes("My personally transcribed lyric line."));
+
  // Simulate an old note without a LyricsFile; check the metadata bridge.
  tp.frontmatter.LyricsFile="";
  localFiles.clear();
