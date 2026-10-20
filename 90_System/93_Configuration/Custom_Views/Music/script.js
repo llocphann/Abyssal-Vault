@@ -448,8 +448,57 @@ if (musicRoot) {
     }
   }
 
-  // Clean only the old generated placeholder and the exact template questions.
-  // Never remove user-written lyrics or personal reflections from existing notes.
+  // Move any hand-written legacy Lyrics section to an independent local file
+  // before removing it from the journal. On a conflict or write failure, keep
+  // the original section intact. Imported lyrics already use LRCLIB-id files.
+  async function musicMigrateWrittenLyrics(current) {
+    if(musicKind!=="song"||typeof musicApp?.vault?.create!=="function"||
+      typeof musicApp?.vault?.process!=="function"||!current)return false;
+    const marker=/(^|\n)## Lyrics[^\n]*\n/g;
+    const heading=marker.exec(current);
+    if(!heading)return false;
+    const start=heading.index+(heading[1]?1:0);
+    const bodyStart=heading.index+heading[0].length;
+    const nextHeading=current.indexOf("\n## ",bodyStart);
+    const end=nextHeading<0?current.length:nextHeading;
+    const section=current.slice(start,end);
+    const body=current.slice(bodyStart,end).trim();
+    const placeholder="> Add lyrics only when you have permission to store them. Otherwise, keep a link to an official or licensed lyrics source.";
+    if(!body||body===placeholder)return false;
+
+    // Distinguish personally transcribed lyrics from a shared LRCLIB file.
+    const safeName=(musicText(musicFile.basename)||"Song")
+      .replace(/[\\\/:*?"<>|#]/g,"-").replace(/\s+/g," ").slice(0,90);
+    const filename=musicLyricsFolder+"/Personal-"+safeName+".txt";
+    const text=body.replace(/\r\n/g,"\n").trimEnd()+"\n";
+    try {
+      if(!musicApp.vault.getAbstractFileByPath(musicLyricsFolder)&&
+        typeof musicApp.vault.createFolder==="function")
+        await musicApp.vault.createFolder(musicLyricsFolder);
+      const previous=musicApp.vault.getAbstractFileByPath(filename);
+      if(previous){
+        const read=musicApp.vault.cachedRead||musicApp.vault.read;
+        if(typeof read!=="function"||(await read.call(musicApp.vault,previous))!==text){
+          console.warn("[Music] Personal lyrics file conflict; preserving Markdown section.");
+          return false;
+        }
+      }else await musicApp.vault.create(filename,text);
+      await musicUpdate("LyricsFile",filename);
+      musicFrontmatter.LyricsFile=filename;
+      await musicApp.vault.process(musicFile,full=>{
+        if(!full.includes(section))return full;
+        return full.replace(section,"").replace(/\n{4,}/g,"\n\n\n");
+      });
+      void musicLoadLyrics();
+      return true;
+    }catch(error){
+      console.warn("[Music] Personal lyrics migration not completed; original note preserved.",error);
+      return false;
+    }
+  }
+
+  // Clean only the exact generated boilerplate and unchanged prompt lines.
+  // Never remove user-written reflections or lyrics on a failed migration.
   async function musicCleanLegacyJournal() {
     if(!musicFile||typeof musicApp?.vault?.process!=="function")return;
     const boiler="## Lyrics\n\n> Add lyrics only when you have permission to store them. Otherwise, keep a link to an official or licensed lyrics source.\n\n";
@@ -465,10 +514,11 @@ if (musicRoot) {
     ]);
     try {
       const read=musicApp.vault.cachedRead||musicApp.vault.read;
-      if(typeof read==="function"){
-        const current=await read.call(musicApp.vault,musicFile);
-        if(!current.includes(boiler)&&![...prompts].some(line=>current.includes(line)))return;
-      }
+      if(typeof read!=="function")return;
+      const current=await read.call(musicApp.vault,musicFile);
+      if(!current||(!current.includes(boiler)&&![...prompts].some(line=>current.includes(line))&&
+        !/(^|\n)## Lyrics[^\n]*\n/.test(current)))return;
+      const migrated=await musicMigrateWrittenLyrics(current);
       await musicApp.vault.process(musicFile,full=>{
         const anchor=full.indexOf("\n---\n",3);
         if(anchor<0)return full;
