@@ -14,17 +14,19 @@ const templater = JSON.parse(fs.readFileSync(path.join(root,".obsidian/plugins/t
 const sync = fs.readFileSync(path.join(root,"90_System/91_Templates/Sync_Music_Custom_Views.md"),"utf8");
 const compatibilityCss = fs.readFileSync(path.join(root,".obsidian/snippets/03_Compatibility.css"),"utf8");
 assert.ok(base.includes("html(("), "HTML formula wrapping should happen after replacement");
-assert.match(base, /image\(Cover\)/, "Native image renderer must display Music covers");
-assert.match(base, /icon\("disc-3"\)/, "Missing artwork must have a native icon fallback");
+assert.equal((base.match(/image: note\.Cover/g)||[]).length, 3, "Use Media Base native Cover renderer in every cards view");
+assert.ok(!base.includes("formula.music_art"), "Do not render artwork in a text formula");
 const musicBaseCss = fs.readFileSync(path.join(root,".obsidian/snippets/02_Components.css"),"utf8");
 assert.match(base, /music-peek-card music-peek-song/);
 assert.match(base, /music-peek-card music-peek-album/);
 assert.equal((base.match(/cardSize: 250/g)||[]).length,3);
 assert.ok(!base.includes("music-song-card")&&!base.includes("music-album-card"));
-assert.match(musicBaseCss, /\.music-peek-detail\s*\{[\s\S]*?position: absolute !important/);
+assert.match(musicBaseCss, /data-property="formula.music_details"/);
 assert.match(musicBaseCss, /data-music-peek-side="left"/);
 assert.match(musicBaseCss, /prefers-reduced-motion/);
 assert.match(musicBaseCss, /hover: none/);
+assert.equal((base.match(/- formula.music_details/g)||[]).length, 3);
+assert.equal((base.match(/imageAspectRatio: 1/g)||[]).length, 3);
 assert.match(sync, /__abyssalMusicPeekListeners/);
 
 assert.match(base, /\.replace\("\{source\}"[\s\S]*?\)\)\)\),/);
