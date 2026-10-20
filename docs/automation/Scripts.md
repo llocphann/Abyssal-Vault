@@ -90,7 +90,7 @@ Automation scripts live under `90_System/92_Scripts`. They are divided broadly i
 - **Album import** — retrieves release metadata and tracklists, then offers automatic or selective Song-note creation.
 - **Rate limiting** — spaces MusicBrainz requests and sends a descriptive User-Agent.
 - **Artwork handling** — stores external Cover Art Archive URLs; it does not cache Apple artwork or audio previews.
-- **Lyrics and reflection** — provides editable Lyrics and Personal Reflections sections without importing full copyrighted lyrics.
+- **Local lyrics and reflection** — stores permitted LRCLIB lyric text in vault-local Lyrics/LRCLIB-ID.txt files, exposes LyricsFile in frontmatter, and keeps Personal Reflections/Notes in Markdown.
 
 ## `tmdb_media.js`
 
