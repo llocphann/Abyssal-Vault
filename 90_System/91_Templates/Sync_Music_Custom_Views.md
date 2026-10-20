@@ -2,6 +2,37 @@
 /* Startup sync from authoritative Music Custom Views source files.
    The plugin data snapshot is also committed so the views are available immediately. */
 const root = "90_System/93_Configuration/Custom_Views/Music";
+
+/* Same-origin-free HTTP bridge for Music Custom Views. Registered at Templater
+ * startup; restrict outbound calls to publicly accessible Music metadata
+ * providers. No credentials, headers from notes, or arbitrary hosts. */
+try {
+  const win = app.workspace?.containerEl?.ownerDocument?.defaultView;
+  const request = tp.obsidian?.requestUrl;
+  if (win && typeof request === "function") {
+    win.__abyssalMusicRequest = async url => {
+      const parsed = new URL(String(url));
+      const allowed = new Set([
+        "coverartarchive.org", "itunes.apple.com", "lrclib.net",
+        "musicbrainz.org"
+      ]);
+      if (parsed.protocol !== "https:" || !allowed.has(parsed.hostname)) {
+        throw new Error("Music request rejected: provider not allowlisted");
+      }
+      const result = await request({
+        url: parsed.toString(), method: "GET",
+        headers: { Accept: "application/json" }
+      });
+      if (result.status < 200 || result.status >= 300) {
+        throw new Error("Music metadata HTTP " + result.status);
+      }
+      return result.json != null ? result.json : JSON.parse(result.text || "{}");
+    };
+  }
+} catch (error) {
+  console.warn("[Music] Could not initialize Obsidian request bridge:", error);
+}
+
 async function waitForCustomViews() {
   for (let n = 0; n < 30; n++) {
     const plugin = app.plugins.getPlugin?.("custom-views") ?? app.plugins.plugins?.["custom-views"];
