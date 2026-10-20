@@ -67,3 +67,14 @@ The Song and Album folder templates use the same `tp.user.import_progress` five-
 An album's optional track creation is included within step 5, with messages such as `Creating Song notes (3/12): Track name`. The popup closes in a `finally` block on success, cancellation, provider errors or empty search results. Existing filled notes and intentionally blank templates do not initiate network import progress. This shows workflow milestones, not byte-transfer percentages.
 
 Run `node tests/music_metadata.test.js` to check real shared Notice mocking, correct five-stage progression, no-result/cancellation cleanup, iTunes fallback and Album track creation.
+
+
+## Music Base compact cards and hover drawer
+
+`Music_Tracker.base` now renders the same **250px cover-first compact card** in Music Library, Favourite Songs and Favourite Albums. The native `image(Cover)` formula remains responsible for album/song artwork; `icon("disc-3")` is the fallback. The `formula.music_card` HTML includes two complementary regions: a short title/artist/genre/year caption and a detail pane containing metadata, description and available music links.
+
+On desktop hover or keyboard focus, `.music-peek-detail` slides out beside the card. It is **absolutely positioned** so the underlying Obsidian Bases grid retains its original card widths; opening one card does not move other cards. The Templater startup script `Sync_Music_Custom_Views.md` registers a lightweight delegated pointer/focus handler which flips the drawer toward the side with available screen space. The handler is de-duplicated on reload. If that startup script has not run, the drawer opens to the right.
+
+The external **Listen** anchor is included only when the note has a music link. The card itself is the existing Obsidian action to open the Song or Album note and, for Albums, inspect its tracklist. No fake local playback controls are introduced. Touch screens and narrow windows keep a compact card that opens its note; reduced-motion preferences disable sliding transitions.
+
+After pulling `dev`, reload Obsidian and ensure `02_Components.css` is enabled in Appearance → CSS snippets. To check the hover placement handler, the existing Templater startup template must also be enabled. Test with an album card on the right edge of the Music Library gallery; its drawer should open left rather than be cut off by the viewport. You can run `node tests/music_base_peek.test.js` to test formulas, both categories and the panel's pointer/focus direction logic without writing to the vault.
