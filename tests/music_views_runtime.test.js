@@ -34,8 +34,7 @@ async function run(kind) {
     "music-year", "music-duration", "music-track", "music-tracks",
     "music-genres", "music-description", "music-source-link",
     "music-open-album", "music-details", "music-tracklist", "music-track-count",
-    "music-favourite", "music-favourite-label", "music-feedback", "music-rating-value",
-    "music-writing-guide"
+    "music-favourite", "music-favourite-label", "music-feedback", "music-rating-value"
   ];
   const elements = Object.fromEntries(roles.map(role => [role, new Element()]));
   elements["music-favourite"].append(new Element("span"), new Element("span"));
@@ -51,9 +50,16 @@ async function run(kind) {
   root.querySelectorAll = selector => selector === "[data-music-rate]" ? ratings : [];
   const written = [];
   const opened = [];
+  let noteText = kind === "album"
+    ? "---\nTitle: Test Album\n---\n\n## Album Impressions\n\n## Tracklist\n\n- Test Song\n"
+    : "---\nTitle: Test Song\n---\n\n## Personal Reflections\n\n## Notes\n";
   const app = {
     metadataCache: { getFirstLinkpathDest: () => null },
-    vault: { getResourcePath: () => "" },
+    vault: {
+      getResourcePath: () => "",
+      cachedRead: async () => noteText,
+      process: async (_file, modify) => { noteText = modify(noteText); return noteText; }
+    },
     fileManager: { processFrontMatter: async (file, fn) => {
       const patch = {};
       fn(patch);
@@ -88,8 +94,15 @@ async function run(kind) {
       : "## Personal Reflections\n\n## Notes\n"
   };
   new Function("tp", runtime)(context);
-  assert.equal(elements["music-writing-guide"].hidden, false,
-    "Blank reflection sections should show inline writing questions");
+  for (let i = 0; i < 20; i++) await Promise.resolve();
+  const question = kind === "album"
+    ? "What story does this album tell? Which track stays with you, and why?"
+    : "What feeling or memory does this song leave with you? Which moment stands out most?";
+  assert.ok(noteText.includes(question), "Empty journal gains its Markdown question");
+  const snapshot=noteText;
+  new Function("tp", runtime)(context);
+  for (let i = 0; i < 20; i++) await Promise.resolve();
+  assert.equal(noteText,snapshot,"Repeated view openings must be idempotent");
 
   assert.equal(elements["music-title"].textContent, file.basename);
   assert.equal(elements["music-artist"].textContent, "Test Artist");
@@ -114,12 +127,12 @@ async function run(kind) {
     elements["music-open-album"].onclick();
     assert.deepEqual(opened, [{target:"Test Album", from:file.path}]);
   }
-  context.bodyContent = kind === "album"
-    ? "## Album Impressions\n\nThe final song changes everything.\n\n## Tracklist\n"
-    : "## Personal Reflections\n\nI remember listening on the train.\n\n## Notes\n";
+  noteText=kind === "album"
+    ? "---\nTitle: Test Album\n---\n\n## Album Impressions\n\nThe final song changes everything.\n\n## Tracklist\n"
+    : "---\nTitle: Test Song\n---\n\n## Personal Reflections\n\nI remember listening on the train.\n\n## Notes\n";
   new Function("tp", runtime)(context);
-  assert.equal(elements["music-writing-guide"].hidden, true,
-    "Writing questions should disappear for an authored reflection");
+  for (let i = 0; i < 20; i++) await Promise.resolve();
+  assert.ok(!noteText.includes(question), "Authored reflections must not be overwritten");
 }
 (async () => {
   await run("album");
