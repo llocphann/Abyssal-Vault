@@ -497,12 +497,33 @@ if (musicRoot) {
     }
   }
 
-  // Clean only the exact generated boilerplate and unchanged prompt lines.
-  // Never remove user-written reflections or lyrics on a failed migration.
-  async function musicCleanLegacyJournal() {
-    if(!musicFile||typeof musicApp?.vault?.process!=="function")return;
+  // Markdown, not an HTML overlay, is the single source of truth for writing
+  // questions so they remain visible after switching to Live Preview.
+  const musicJournalQuestion=musicKind==="song"
+    ? "> *What feeling or memory does this song leave with you? Which moment stands out most?*"
+    : "> *What story does this album tell? Which track stays with you, and why?*";
+  const musicJournalHeading=musicKind==="song"?"Personal Reflections":"Album Impressions";
+
+  function musicAddQuestionWhenEmpty(body) {
+    const lines=body.split(/\r?\n/);
+    const start=lines.findIndex(line=>line.trim()==="## "+musicJournalHeading);
+    if(start<0)return body;
+    let next=start+1;
+    while(next<lines.length&&!/^#{1,2}\s+/.test(lines[next]))next++;
+    // Never modify a written reflection or add a second copy of the question.
+    if(lines.slice(start+1,next).some(line=>line.trim().length>0))return body;
+    lines.splice(start+1,next-start-1,"",musicJournalQuestion,"");
+    return lines.join("\n");
+  }
+
+  function musicCleanJournalSource(full) {
+    // Never migrate or alter invalid/unrecognized YAML notes.
+    const anchor=full.indexOf("\n---\n",3);
+    if(anchor<0)return full;
+    const front=full.slice(0,anchor+5);
+    const body=full.slice(anchor+5);
     const boiler="## Lyrics\n\n> Add lyrics only when you have permission to store them. Otherwise, keep a link to an official or licensed lyrics source.\n\n";
-    const prompts=new Set([
+    const legacy=new Set([
       "- What does this song mean to me?",
       "- Which theme, image, or idea stays with me?",
       "- What mood or memory does it bring up?",
@@ -512,47 +533,30 @@ if (musicRoot) {
       "- Favourite track and why:",
       "- Personal memories or associations:"
     ]);
+    let next=musicKind==="song"?body.replace(boiler,""):body;
+    next=next.split(/\r?\n/).filter(line=>!legacy.has(line.trim())).join("\n");
+    if(next!==body)next=next.replace(/\n{4,}/g,"\n\n\n");
+    next=musicAddQuestionWhenEmpty(next);
+    return next===body?full:front+next;
+  }
+
+  async function musicCleanLegacyJournal() {
+    if(!musicFile||typeof musicApp?.vault?.process!=="function")return;
+    if(!musicFile.path?.startsWith("20_Personal_Life/28_Music_Tracker/"))return;
     try {
       const read=musicApp.vault.cachedRead||musicApp.vault.read;
       if(typeof read!=="function")return;
       const current=await read.call(musicApp.vault,musicFile);
-      if(!current||(!current.includes(boiler)&&![...prompts].some(line=>current.includes(line))&&
-        !/(^|\n)## Lyrics[^\n]*\n/.test(current)))return;
-      const migrated=await musicMigrateWrittenLyrics(current);
-      await musicApp.vault.process(musicFile,full=>{
-        const anchor=full.indexOf("\n---\n",3);
-        if(anchor<0)return full;
-        const header=full.slice(0,anchor+5);
-        const body=full.slice(anchor+5);
-        const cleaned=(musicKind==="song"?body.replace(boiler,""):body).split("\n")
-          .filter(line=>!prompts.has(line.trim())).join("\n")
-          .replace(/\n{4,}/g,"\n\n\n");
-        return body===cleaned?full:header+cleaned;
-      });
-    }catch(error){console.warn("[Music] Legacy journal cleanup failed",error);}
+      if(!current)return;
+      // Preserve authored lyrics; migrate them before removing only the
+      // generated placeholder. Any conflict leaves the source intact.
+      const heading=/(^|\n)## Lyrics[^\n]*\n/.test(current);
+      if(heading&&musicKind==="song")await musicMigrateWrittenLyrics(current);
+      const latest=await read.call(musicApp.vault,musicFile);
+      if(musicCleanJournalSource(latest)===latest)return;
+      await musicApp.vault.process(musicFile,musicCleanJournalSource);
+    }catch(error){console.warn("[Music] Could not update reflection guidance",error);}
   }
-  // The short questions are on-paper hints, not additional Markdown. Hide
-  // them once the matching reflection section contains authored content.
-  function musicRenderWritingGuide() {
-    const guide=musicQ('[data-role="music-writing-guide"]');
-    if(!guide)return;
-    const body=String(musicContext?.bodyContent||"");
-    const name=musicKind==="song"?"Personal Reflections":"Album Impressions";
-    const lines=body.split(/\r?\n/);
-    let inside=false,found=false;
-    const written=[];
-    for(const line of lines) {
-      if(/^##\s+/.test(line)){
-        if(inside)break;
-        if(new RegExp("^##\\s+"+name+"\\s*$","i").test(line)){
-          inside=true;found=true;
-        }
-      }else if(inside)written.push(line);
-    }
-    const value=written.join("\n").replace(/<!--[\s\S]*?-->/g,"").trim();
-    guide.hidden=found&&value.length>0;
-  }
-  musicRenderWritingGuide();
 
   const musicPaper=musicQ('[data-role="music-paper-content"]');
   if(musicPaper&&musicApp?.workspace&&musicFile){
