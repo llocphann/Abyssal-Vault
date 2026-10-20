@@ -464,6 +464,11 @@ if (musicRoot) {
       "- Personal memories or associations:"
     ]);
     try {
+      const read=musicApp.vault.cachedRead||musicApp.vault.read;
+      if(typeof read==="function"){
+        const current=await read.call(musicApp.vault,musicFile);
+        if(!current.includes(boiler)&&![...prompts].some(line=>current.includes(line)))return;
+      }
       await musicApp.vault.process(musicFile,full=>{
         const anchor=full.indexOf("\n---\n",3);
         if(anchor<0)return full;
