@@ -29,7 +29,9 @@ assert.equal((base.match(/- formula.music_details/g)||[]).length, 3);
 assert.equal((base.match(/imageAspectRatio: 1/g)||[]).length, 3);
 assert.match(sync, /__abyssalMusicPeekListeners/);
 
-assert.match(base, /\.replace\("\{source\}"[\s\S]*?\)\)\)\),/);
+assert.match(base, /\.replace\(\/\\\{title\\\}\/g,/);
+assert.match(base, /\.replace\(\/\\\{artist\\\}\/g,/);
+assert.match(base, /\.replace\(\/\\\{heart\\\}\/g,/);
 assert.match(songHtml, /{{file\.content}}/);
 assert.match(albumHtml, /{{file\.content}}/);
 assert.match(songHtml, /class="cv-music-paper"/, "Song notes must contain Journal-style paper");
