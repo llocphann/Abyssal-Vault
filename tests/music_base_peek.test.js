@@ -1,65 +1,67 @@
-// Offline tests for Music Base compact card + hover peek on dev.
-const assert = require("node:assert/strict");
-const fs = require("node:fs");
-const path = require("node:path");
-const root = path.join(__dirname, "..");
-const base = fs.readFileSync(path.join(root, "20_Personal_Life/28_Music_Tracker/Music_Tracker.base"),"utf8");
-const css = fs.readFileSync(path.join(root, ".obsidian/snippets/02_Components.css"),"utf8");
-const sync = fs.readFileSync(path.join(root, "90_System/91_Templates/Sync_Music_Custom_Views.md"),"utf8");
+// Music Base Media-parity regression: native cover and separate hover property.
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const root=path.join(__dirname,"..");
+const base=fs.readFileSync(path.join(root,"20_Personal_Life/28_Music_Tracker/Music_Tracker.base"),"utf8");
+const css=fs.readFileSync(path.join(root,".obsidian/snippets/02_Components.css"),"utf8");
+const sync=fs.readFileSync(path.join(root,"90_System/91_Templates/Sync_Music_Custom_Views.md"),"utf8");
+const media=fs.readFileSync(path.join(root,"20_Personal_Life/25_Media_Tracker/Media_Tracker.base"),"utf8");
 
-assert.match(base,/image\(Cover\)/);
-assert.match(base,/icon\("disc-3"\)/);
+assert.match(media,/image: note\.cover/);
+assert.equal((base.match(/image: note\.Cover/g)||[]).length,3);
+assert.equal((base.match(/imageAspectRatio: 1/g)||[]).length,3);
+assert.equal((base.match(/- formula\.music_details/g)||[]).length,3);
+assert.equal((base.match(/- formula\.music_card/g)||[]).length,3);
+assert.ok(!base.includes("formula.music_art"));
 assert.equal((base.match(/cardSize: 250/g)||[]).length,3);
-assert.ok(!base.includes("music-song-card")&&!base.includes("music-album-card"));
-assert.ok(base.includes("music-peek-card music-peek-album"));
-assert.ok(base.includes("music-peek-card music-peek-song"));
-assert.ok(base.includes(".replace(/\\{title\\}/g,"));
-assert.ok(base.includes(".replace(/\\{artist\\}/g,"));
-assert.ok(base.includes(".replace(/\\{heart\\}/g,"));
-assert.ok(!base.includes("Add your personal reflections in the note."));
-assert.match(css,/\.music-peek-detail\s*\{\s*position: absolute !important/);
+assert.match(css,/\.bases-cards-cover/);
+assert.match(css,/data-property="formula.music_details"/);
+assert.match(css,/position: absolute !important/);
+assert.match(css,/:is\(:hover,:focus-within\)/);
 assert.match(css,/data-music-peek-side="left"/);
-assert.match(css,/pointer-events: none/);
 assert.match(css,/prefers-reduced-motion/);
-assert.match(css,/\(hover: none\)/);
-assert.match(css,/z-index: 80 !important/);
 
-const expression = base.slice(base.indexOf("  music_card: |-"),base.indexOf("properties:"))
-  .replace(/^  music_card: \|-\n/,"")
-  .split("\n").map(line=>line.slice(4)).join("\n").replace(/\bif\(/g,"cond(");
-const fake = {
-  cond: (check,yes,no)=>check?yes:no,
-  link: x=>x,
-  html: x=>x,
-  list:()=>({slice:()=>({map:rendered=>({join:()=>rendered})})}),
-  escapeHTML: x=>String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"),
-  value: {toString:()=>"Dream Pop"}
-};
-const evalFormula=new Function(...Object.keys(fake),
-  "categories","Title","Artist","AlbumArtist","Year","ReleaseDate","Duration","TrackCount","TrackNumber",
-  "Description","StoreUrl","SourceUrl","Genre","Favourite","Album","file","return "+expression);
-const originalRound=Number.prototype.round, originalFloor=Number.prototype.floor;
+function evaluator(name){
+ const start=base.indexOf("  "+name+": |-\n");
+ const end=name==="music_card"
+   ?base.indexOf("  music_details: |-\n",start)
+   :base.indexOf("properties:",start);
+ assert.ok(start>=0&&end>start);
+ const expr=base.slice(start,end).replace("  "+name+": |-\n","")
+   .split("\n").map(s=>s.slice(4)).join("\n").replace(/\bif\(/g,"cond(");
+ const mock={cond:(a,b,c)=>a?b:c,link:x=>x,html:x=>x,
+   list:()=>({slice:()=>({map:value=>({join:()=>value})})}),
+   escapeHTML:x=>String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/"/g,"&quot;"),
+   value:{toString:()=>"Dream Pop"}};
+ const fn=new Function(...Object.keys(mock),"categories","Title","Artist","AlbumArtist",
+   "Year","ReleaseDate","Duration","TrackCount","TrackNumber","Description",
+   "StoreUrl","SourceUrl","Genre","Favourite","Album","file","return "+expr);
+ return kind=>fn(...Object.values(mock),{containsAny:(...cats)=>cats.includes(kind)},
+   kind==="Albums"?"In Our Bones":"X's","AURORA","",2023,"2023-01-01",
+   210,12,1,"An emotional journey","https://music.apple.com/example","",
+   "Dream Pop",true,"In Our Bones",{basename:"Fallback"});
+}
+const oldRound=Number.prototype.round, oldFloor=Number.prototype.floor;
 Number.prototype.round=function(){return Math.round(this)};
 Number.prototype.floor=function(){return Math.floor(this)};
 try {
-  for(const kind of ["Albums","Songs"]){
-    const name=kind==="Albums"?"In Our Bones":"X's";
-    const output=evalFormula(...Object.values(fake),
-      {containsAny:(...values)=>values.includes(kind)},
-      name,"AURORA","",2023,"2023-01-01",210,12,1,"Test description",
-      "https://music.apple.com/test","","Dream Pop",true,"In Our Bones",{basename:"fallback"});
-    assert.match(output,/music-peek-detail/);
-    assert.match(output,/music-peek-compact/);
-    assert.match(output,/class='music-peek-heart'/);
-    assert.ok(output.includes(name));
-    assert.match(output,/Dream Pop/);
-    assert.match(output,/Listen ↗/);
-    assert.ok(!/\{(?:title|artist|compactGenres|compactYear|year|heart|tracks|duration|genres|source|album|track|description)\}/.test(output));
-    assert.ok(!output.includes('href="javascript:'));
-  }
+ for(const kind of ["Albums","Songs"]){
+   const compact=evaluator("music_card")(kind);
+   const detail=evaluator("music_details")(kind);
+   assert.match(compact,/music-peek-card/);
+   assert.ok(!compact.includes("music-peek-detail"));
+   assert.match(detail,/music-peek-detail/);
+   assert.ok(!detail.includes("music-peek-card"));
+   assert.match(detail,/Listen ↗/);
+   assert.match(detail,/An emotional journey/);
+   assert.match(compact,/Dream Pop/);
+   assert.match(compact,/music-peek-heart/);
+   assert.ok(!/\{(?:title|artist|heart|year|duration|track|genres|description|source)\}/.test(compact+detail));
+ }
 }finally {
- if(originalRound)Number.prototype.round=originalRound;else delete Number.prototype.round;
- if(originalFloor)Number.prototype.floor=originalFloor;else delete Number.prototype.floor;
+ if(oldRound)Number.prototype.round=oldRound;else delete Number.prototype.round;
+ if(oldFloor)Number.prototype.floor=oldFloor;else delete Number.prototype.floor;
 }
 
 async function runStartup() {
