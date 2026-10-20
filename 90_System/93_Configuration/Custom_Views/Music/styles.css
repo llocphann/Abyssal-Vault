@@ -189,3 +189,116 @@
 }
 .cv-music .cv-music-lyrics-foot a { color:var(--music-accent); text-decoration:none; }
 .cv-music .cv-music-lyrics-head button:focus-visible { outline:2px solid var(--music-accent); outline-offset:3px; }
+
+
+/* Journal parity: use the same ruled paper variables and shape as Daily Folio. */
+.cv-music {
+  --cvm-paper-line: var(--vault-note-paper-line, 30px);
+  --cvm-paper-margin-x: var(--vault-note-paper-margin-x, 44px);
+  --cvm-paper: var(--vault-note-paper,
+    color-mix(in srgb, var(--background-primary) 82%, var(--background-secondary) 18%));
+  --cvm-paper-rule: var(--vault-note-paper-rule,
+    color-mix(in srgb, var(--interactive-accent) 24%, transparent));
+  --cvm-paper-margin-rule: var(--vault-note-paper-margin-rule,
+    color-mix(in srgb, var(--interactive-accent) 24%, transparent));
+}
+.cv-music .cv-music-paper {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  min-height: clamp(650px, 78vh, 940px);
+  overflow: hidden;
+  border: 1px solid var(--vault-note-paper-edge, var(--background-modifier-border-hover, var(--music-border)));
+  border-radius: 3px 6px 5px 2px;
+  background: var(--vault-note-paper-background,
+    linear-gradient(
+      90deg,
+      transparent 0 var(--cvm-paper-margin-x),
+      var(--cvm-paper-margin-rule) var(--cvm-paper-margin-x) calc(var(--cvm-paper-margin-x) + 1px),
+      transparent calc(var(--cvm-paper-margin-x) + 1px)
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 calc(var(--cvm-paper-line) - 7px),
+      color-mix(in srgb, var(--cvm-paper-rule) 55%, transparent)
+        calc(var(--cvm-paper-line) - 7px) calc(var(--cvm-paper-line) - 5px),
+      transparent calc(var(--cvm-paper-line) - 5px) var(--cvm-paper-line)
+    ),
+    var(--cvm-paper)
+  );
+  box-shadow:
+    0 18px 42px color-mix(in srgb, var(--shadow, #000) 22%, transparent),
+    inset 12px 0 30px color-mix(in srgb, var(--shadow, #000) 3%, transparent);
+}
+.cv-music .cv-music-paper::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 5px;
+  pointer-events: none;
+  background: linear-gradient(90deg,
+    color-mix(in srgb, var(--shadow, #000) 12%, transparent), transparent);
+}
+.cv-music .cv-music-paper::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text-normal) 4%, transparent);
+}
+.cv-music .cv-music-paper-label {
+  position: absolute;
+  top: 17px;
+  right: clamp(18px, 3cqi, 34px);
+  z-index: 2;
+  color: color-mix(in srgb, var(--text-muted) 58%, transparent);
+  font-size: .61rem;
+  font-weight: 600;
+  letter-spacing: .16em;
+  pointer-events: none;
+}
+.cv-music .cv-music-paper .cv-music-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 100%;
+  min-height: inherit;
+  margin: 0;
+  padding: clamp(56px, 6cqi, 82px) clamp(26px, 4.3cqi, 58px)
+    clamp(70px, 7cqi, 100px) clamp(72px, 7.2cqi, 98px);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent !important;
+  line-height: var(--cvm-paper-line);
+  overflow-wrap: anywhere;
+  font-family: var(--font-text);
+}
+.cv-music .cv-music-paper .cv-music-content :is(.markdown-rendered-content, .markdown-preview-view, .markdown-preview-sizer, .markdown-preview-section) {
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+}
+.cv-music .cv-music-paper .cv-music-content :is(p, li) {
+  line-height: var(--cvm-paper-line);
+}
+.cv-music .cv-music-paper .cv-music-content :is(img, video, canvas, svg, iframe, pre, table) {
+  max-width: 100%;
+}
+.cv-music .cv-music-paper .cv-music-content table {
+  display: block;
+  overflow-x: auto;
+}
+.cv-music .cv-music-paper .cv-music-content > :first-child,
+.cv-music .cv-music-paper .cv-music-content .markdown-preview-section > :first-child {
+  margin-top: 0;
+}
+@media (max-width: 540px) {
+  .cv-music .cv-music-paper { min-height: 600px; }
+  .cv-music .cv-music-paper .cv-music-content { padding: 56px 20px 70px 50px; }
+  .cv-music .cv-music-paper-label { font-size: .54rem; }
+}
