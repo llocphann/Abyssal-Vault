@@ -19,15 +19,18 @@ assert.ok(!base.includes("formula.music_art"), "Do not render artwork in a text 
 const musicBaseCss = fs.readFileSync(path.join(root,".obsidian/snippets/02_Components.css"),"utf8");
 assert.match(base, /music-peek-card music-peek-song/);
 assert.match(base, /music-peek-card music-peek-album/);
-assert.equal((base.match(/cardSize: 250/g)||[]).length,3);
+assert.equal((base.match(/cardSize:\s*\d+/g)||[]).length,3);
 assert.ok(!base.includes("music-song-card")&&!base.includes("music-album-card"));
 assert.match(musicBaseCss, /data-property="formula.music_details"/);
-assert.match(musicBaseCss, /data-music-peek-side="left"/);
+assert.doesNotMatch(musicBaseCss, /data-music-peek-side="left"/);
 assert.match(musicBaseCss, /prefers-reduced-motion/);
 assert.match(musicBaseCss, /hover: none/);
 assert.equal((base.match(/- formula.music_details/g)||[]).length, 3);
 assert.equal((base.match(/imageAspectRatio: 1/g)||[]).length, 3);
-assert.match(sync, /__abyssalMusicPeekListeners/);
+assert.match(sync, /delete syncWindow\[key\]/);
+assert.match(sync, /removeEventListener\?\.\("pointerover"/);
+assert.match(sync, /removeEventListener\?\.\("focusin"/);
+assert.doesNotMatch(sync, /const chooseSide\s*=/);
 
 assert.match(base, /\.replace\(\/\\\{title\\\}\/g,/);
 assert.match(base, /\.replace\(\/\\\{artist\\\}\/g,/);

@@ -58,6 +58,8 @@ async function runMusicMetadataTests() {
             id: "recording-1", title: "Quiet Night", "artist-credit": [{ name: "Test Artist" }],
             length: 210000, "first-release-date": "2024-05-01", isrcs: ["USAAA2400001"],
             genres: [{ name: "Dream Pop" }],
+            relations: [{type:"performance",work:{language:"eng",languages:["eng"],
+              relations:[{type:"composer",artist:{name:"Fixture Composer"}}]}}],
             releases: [{ id: "release-1", title: "Blue Hour", date: "2024-05-01", "artist-credit": [{ name: "Test Artist" }] }]
           } };
           if (request.url.includes("coverartarchive.org/release/release-1")) return { status: 200, json: {
@@ -68,7 +70,7 @@ async function runMusicMetadataTests() {
           }] } };
           if (request.url.includes("/release/release-1?")) return { status: 200, json: {
             id: "release-1", title: "Blue Hour", "artist-credit": [{ name: "Test Artist" }], date: "2024-05-01",
-            "release-group": { id: "group-1", "first-release-date": "2024-05-01" },
+            "release-group": { id: "group-1", "first-release-date": "2024-05-01", "primary-type":"Album" },
             genres: [{ name: "Dream Pop" }],
             media: [{ position: 1, format: "Digital Media", tracks: [
               { position: 1, title: "Quiet Night", length: 210000, recording: { id: "recording-1", title: "Quiet Night", length: 210000, "artist-credit": [{ name: "Test Artist" }] } },
@@ -141,6 +143,10 @@ async function runMusicMetadataTests() {
     assert.ok(!note.includes("What does this song mean to me?"));
     assert.match(note, /LyricsFile: ""/);
     assert.match(note, /## Personal Reflections/);
+    assert.match(note, /Composer:\n  - "Fixture Composer"/);
+    assert.match(note, /Language:\n  - "eng"/);
+    assert.match(note, /MetadataCheckedAt: "\d{4}-\d{2}-\d{2}T/);
+    assert.match(note, /MetadataSources:\n  - "MusicBrainz"/);
     assert.match(note, /What feeling or memory does this song leave with you/);
     assert.ok(!note.includes("actual lyric text"));
     assert.ok(state.requests.some(url => url.includes("musicbrainz.org/ws/2/recording/")));
@@ -153,11 +159,18 @@ async function runMusicMetadataTests() {
     const note = await importer(state.tp, "album");
     assert.match(note, /categories:\n  - "\[\[Albums\]\]"/);
     assert.match(note, /ReleaseGroupId: "group-1"/);
+    assert.match(note, /ReleaseType: "Album"/);
     assert.match(note, /## Album Impressions/);
     assert.match(note, /What story does this album tell/);
     assert.match(note, /## Tracklist/);
     assert.equal(state.created.length, 2);
     assert.match(state.created[0].content, /Album: "\[\[Blue Hour\]\]"/);
+    assert.match(state.created[0].content, /TrackCount: 2/);
+    assert.match(state.created[0].content, /Genre:\n  - "Dream Pop"/);
+    assert.match(state.created[0].content, /ReleaseType: "Album"/);
+    assert.match(state.created[0].content, /Format: "Digital Media"/);
+    assert.match(state.created[0].content, /MetadataCheckedAt: "\d{4}-\d{2}-\d{2}T/);
+    assert.match(state.created[0].content, /MetadataSources:\n  - "MusicBrainz"/);
     assert.ok(!state.created[0].content.includes("## Lyrics"));
     assert.match(state.created[0].content, /## Personal Reflections/);
     checkProgress(state,"Album Import");
@@ -231,6 +244,57 @@ async function runMusicMetadataTests() {
     const note = await importer(state.tp,"song");
     assert.match(note,/## Personal Reflections/);
     assert.equal(state.progressEvents.length,0);
+  }
+  {
+    const state = makeTp({
+      query: "Everybody Loves Somebody",
+      respond: async url => {
+        if (url.includes("/recording/?query=")) return { status: 200, json: { recordings: [{
+          id: "rec-live-1", title: "Everybody Loves Somebody",
+          "artist-credit": [{ name: "Dean Martin" }],
+          length: 218000,
+          releases: [{
+            id: "rel-live-1", title: "1977-06-10: Sabre Room, Chicago, IL, USA",
+            "artist-credit": [{ name: "Frank Sinatra", joinphrase: " & " }, { name: "Dean Martin", joinphrase: "" }]
+          }]
+        }] } };
+        if (url.includes("/recording/rec-live-1?")) return { status: 200, json: {
+          id: "rec-live-1", title: "Everybody Loves Somebody",
+          "artist-credit": [{
+            name: "Dean Martin",
+            artist: {
+              name: "Dean Martin",
+              genres: [
+                { name: "christmas music", count: 1 },
+                { name: "vocal jazz", count: 1 },
+                { name: "pop", count: 6 },
+                { name: "big band", count: 2 }
+              ]
+            }
+          }],
+          length: 218000,
+          genres: [],
+          tags: [],
+          releases: [{
+            id: "rel-live-1", title: "1977-06-10: Sabre Room, Chicago, IL, USA",
+            "artist-credit": [{ name: "Frank Sinatra", joinphrase: " & " }, { name: "Dean Martin", joinphrase: "" }]
+          }]
+        } };
+        if (url.includes("/release/rel-live-1?")) return { status: 200, json: {
+          id: "rel-live-1", title: "1977-06-10: Sabre Room, Chicago, IL, USA",
+          "artist-credit": [{ name: "Frank Sinatra", joinphrase: " & " }, { name: "Dean Martin", joinphrase: "" }],
+          genres: [], tags: []
+        } };
+        if (url.includes("coverartarchive.org") || url.includes("itunes.apple.com") || url.includes("lrclib.net")) {
+          return { status: 200, json: { results: [], images: [] } };
+        }
+        throw new Error("Unexpected URL: " + url);
+      }
+    });
+    const note = await importer(state.tp, "song");
+    assert.match(note, /AlbumArtist: "Frank Sinatra & Dean Martin"/);
+    assert.match(note, /Genre:\n  - "Pop"\n  - "Big Band"\n  - "Vocal Jazz"/);
+    assert.ok(!note.includes("Christmas Music"));
   }
 
   console.log("Music metadata and import progress tests passed.");

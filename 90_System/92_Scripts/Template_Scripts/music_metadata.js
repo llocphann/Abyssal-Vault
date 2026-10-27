@@ -1,5 +1,9 @@
+// Keep provider requests bounded across template runs in one Obsidian session.
+// JSON only: this cache never downloads artwork, previews, or audio.
+const musicSessions = new WeakMap();
 module.exports = async function musicMetadata(tp, mode) {
-  const refreshing = mode === "refresh";
+  const enriching = mode === "enrich";
+  const refreshing = mode === "refresh" || enriching;
   const refreshPath = tp?.config?.target_file?.path || tp?.app?.workspace?.getActiveFile?.()?.path || "";
   const kind = mode === "album" || (refreshing && /\/Albums\//.test(refreshPath)) ? "album" : "song";
   const MUSIC_ROOT = "20_Personal_Life/28_Music_Tracker";
@@ -27,6 +31,7 @@ module.exports = async function musicMetadata(tp, mode) {
     ? (kind === "album" ? "Album " : "Song ") + tp.date.now("YYYYMMDD-HHmmss")
     : originalTitle;
   const notify = message => {
+    if (enriching) return;
     try { if (tp.obsidian && tp.obsidian.Notice) new tp.obsidian.Notice(message, 8000); } catch (_) {}
   };
   const txt = value => String(value == null ? "" : value).trim();
@@ -40,17 +45,68 @@ module.exports = async function musicMetadata(tp, mode) {
     .trim() || (kind === "album" ? "Untitled Album" : "Untitled Song");
   const creditName = credit => (Array.isArray(credit) ? credit : []).map(item => {
     if (typeof item === "string") return item;
-    return txt(item && (item.name || (item.artist && item.artist.name))) + txt(item && item.joinphrase);
-  }).join("").trim();
-  const genreNames = record => unique([
-    ...(Array.isArray(record && record.genres) ? record.genres : []).map(item => typeof item === "string" ? item : item && item.name),
-    ...(Array.isArray(record && record.tags) ? record.tags : []).map(item => typeof item === "string" ? item : item && item.name)
-  ]).slice(0, 8);
+    const name = txt(item && (item.name || (item.artist && item.artist.name)));
+    const join = String(item && item.joinphrase != null ? item.joinphrase : "").replace(/\r?\n/g, " ").replace(/^\s*&\s*$/, " & ");
+    return name + join;
+  }).join("").replace(/\s*&\s*/g, " & ").replace(/\s{2,}/g, " ").trim();
+  const formatGenre = value => {
+    const raw = txt(value);
+    if (!raw) return "";
+    if (raw !== raw.toLowerCase()) return raw;
+    if (raw === "r&b" || raw === "r & b") return "R&B";
+    return raw.replace(/\b([a-z])/g, char => char.toUpperCase());
+  };
+  const extractGenreList = (source, titleText) => {
+    if (!source || typeof source !== "object") return [];
+    const seasonal = /christmas|noel|xmas|holiday|winter|santa|jingle|silent night/i.test(txt(titleText));
+    const list = type => (Array.isArray(source[type]) ? source[type] : [])
+      .filter(item => typeof item === "string" || (item && item.name && (item.count == null || Number(item.count) > 0)))
+      .slice()
+      .sort((a, b) => (typeof b === "object" ? Number(b.count ?? 1) : 1) - (typeof a === "object" ? Number(a.count ?? 1) : 1))
+      .map(item => typeof item === "string" ? item : item.name)
+      .filter(name => seasonal || !/^christmas\b/i.test(txt(name)))
+      .map(formatGenre);
+    return unique([...list("genres"), ...list("tags")]);
+  };
+  const genreNames = record => {
+    if (!record || typeof record !== "object") return [];
+    const titleText = txt(record.title);
+    const direct = extractGenreList(record, titleText);
+    if (direct.length) return direct.slice(0, 8);
+    const related = unique([
+      ...extractGenreList(record["release-group"], titleText),
+      ...(Array.isArray(record.releases) ? record.releases : []).flatMap(rel => [
+        ...extractGenreList(rel, titleText),
+        ...extractGenreList(rel && rel["release-group"], titleText)
+      ]),
+      ...(Array.isArray(record.relations) ? record.relations : []).flatMap(rel => [
+        ...extractGenreList(rel && rel.work, titleText),
+        ...extractGenreList(rel && rel.release, titleText)
+      ]),
+      ...(Array.isArray(record.media) ? record.media : []).flatMap(medium =>
+        (Array.isArray(medium && medium.tracks) ? medium.tracks : []).flatMap(track =>
+          extractGenreList(track && track.recording, titleText)))
+    ]);
+    if (related.length) return related.slice(0, 8);
+    const artistGenres = unique([
+      ...(Array.isArray(record["artist-credit"]) ? record["artist-credit"] : []).flatMap(credit =>
+        extractGenreList(credit && credit.artist, titleText)),
+      ...(Array.isArray(record.releases) ? record.releases : []).flatMap(rel =>
+        (Array.isArray(rel && rel["artist-credit"]) ? rel["artist-credit"] : []).flatMap(credit =>
+          extractGenreList(credit && credit.artist, titleText)))
+    ]);
+    return artistGenres.slice(0, 8);
+  };
   const formatDuration = milliseconds => {
     const seconds = Math.max(0, Math.round(Number(milliseconds || 0) / 1000));
     return seconds ? Math.floor(seconds / 60) + ":" + String(seconds % 60).padStart(2, "0") : "";
   };
   const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  let session = musicSessions.get(tp.app);
+  if (!session) {
+    session = { cache: new Map(), queues: {}, last: {} };
+    musicSessions.set(tp.app, session);
+  }
   async function withTimeout(operation, seconds) {
     let timer;
     try {
@@ -66,23 +122,32 @@ module.exports = async function musicMetadata(tp, mode) {
   }
   async function requestJson(url, extraHeaders) {
     if (!tp.obsidian || typeof tp.obsidian.requestUrl !== "function") throw new Error("Obsidian requestUrl is unavailable.");
-    const headers = Object.assign({ Accept: "application/json" }, extraHeaders || {});
-    const response = await withTimeout(() => tp.obsidian.requestUrl({ url: url, method: "GET", headers: headers }), 15);
-    if (response.status != null && (response.status < 200 || response.status >= 300)) {
-      throw new Error("HTTP " + response.status);
-    }
-    if (response.json != null) return response.json;
-    return JSON.parse(response.text || "{}");
+    const cached = session.cache.get(url);
+    if (cached && cached.expires > Date.now()) return cached.promise;
+    const provider = url.startsWith(MUSICBRAINZ + "/") ? "musicbrainz" : url.startsWith(ITUNES + "/") ? "apple" : "other";
+    const gap = provider === "musicbrainz" ? 1100 : provider === "apple" ? 3100 : 0;
+    const operation = async () => {
+      const wait = gap - (Date.now() - (session.last[provider] || 0));
+      if (wait > 0) await sleep(wait);
+      session.last[provider] = Date.now();
+      const headers = Object.assign({ Accept: "application/json" }, extraHeaders || {});
+      const response = await withTimeout(() => tp.obsidian.requestUrl({ url, method: "GET", headers }), 15);
+      if (response.status != null && (response.status < 200 || response.status >= 300)) throw new Error("HTTP " + response.status);
+      return response.json != null ? response.json : JSON.parse(response.text || "{}");
+    };
+    const promise = gap ? (session.queues[provider] || Promise.resolve()).catch(() => {}).then(operation) : operation();
+    if (gap) session.queues[provider] = promise;
+    const entry = { promise, expires: Date.now() + 3600000 };
+    session.cache.set(url, entry);
+    promise.catch(() => { entry.expires = Date.now() + 60000; });
+    if (session.cache.size > 128) session.cache.delete(session.cache.keys().next().value);
+    return promise;
   }
 
-  let lastMusicBrainzRequest = 0;
   async function musicBrainzJson(url) {
-    const wait = 1100 - (Date.now() - lastMusicBrainzRequest);
-    if (wait > 0) await sleep(wait);
-    lastMusicBrainzRequest = Date.now();
     return requestJson(url, { "User-Agent": USER_AGENT });
   }
-  const validImage = value => /^https:\/\/[a-z0-9.-]+\//i.test(txt(value)) ? txt(value) : "";
+  const validImage = value => /^https:\/\/[a-z0-9.-]+\//i.test(txt(value)) ? txt(value).replace(/\/100x100(bb\.[a-z0-9]+)$/i, "/600x600$1") : "";
   const normName = value => txt(value).normalize("NFKC").toLowerCase()
     .replace(/\([^)]*(?:feat|ft|remaster|version)[^)]*\)/gi,"")
     .replace(/[^a-z0-9\u00c0-\u024f\u1e00-\u1eff]+/gi," ").trim();
@@ -90,6 +155,269 @@ module.exports = async function musicMetadata(tp, mode) {
     const x=normName(a),y=normName(b);
     return !!x&&!!y&&(x===y||(x.length>7&&y.length>7&&(x.startsWith(y+" ")||y.startsWith(x+" "))));
   };
+  // Enrichment requires the same edition. Prefix matches and stripped version
+  // suffixes are useful for search, but unsafe for merging provider records.
+  const exactName = value => txt(value).normalize("NFKC").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+  const sameName = (a, b) => Boolean(exactName(a)) && exactName(a) === exactName(b);
+  const empty = value => value == null || (Array.isArray(value) ? !value.length : typeof value === "number" ? !Number.isFinite(value) || value <= 0 : typeof value === "string" ? !value.trim() || value.trim() === "0" : false);
+  const editionWords = value => unique((txt(value).toLowerCase().match(/\b(live|remix|acoustic|instrumental|demo|karaoke|mono|stereo)\b/g) || [])).sort().join(" ");
+  const compatibleRecord = (item, expected, entity, songCount) => {
+    if (!sameName(entity === "album" ? item.collectionName : item.trackName, expected.title) || !sameName(item.artistName, expected.artist)) return false;
+    if (entity === "song" && expected.album && !sameName(item.collectionName, expected.album)) return false;
+    const edition = editionWords([expected.title, expected.album, expected.description].join(" "));
+    if (edition !== editionWords([item.trackName, item.collectionName, item.description].join(" "))) return false;
+    if (entity === "album" && Number(expected.trackCount) > 0 && Number(item.trackCount) > 0 &&
+        Number(expected.trackCount) !== Number(item.trackCount) &&
+        (!Number(songCount) || Number(expected.trackCount) !== Number(songCount))) return false;
+    const duration = Number(expected.durationMs || 0), actual = Number(item.trackTimeMillis || 0);
+    return entity !== "song" || !duration || !actual || Math.abs(duration - actual) <= Math.max(5000, duration * 0.02);
+  };
+  function appleIdentity(storeUrl, entity) {
+    try {
+      const url = new URL(storeUrl);
+      if (!/^(music\.apple\.com|itunes\.apple\.com)$/.test(url.hostname)) return {};
+      const pathId = (url.pathname.match(/\/(?:id)?(\d+)\/?$/) || [])[1] || "";
+      return { id: entity === "song" ? url.searchParams.get("i") || (/\/song\//.test(url.pathname) ? pathId : "") : pathId || url.searchParams.get("id") || "",
+        country: (url.pathname.match(/^\/([a-z]{2})\//i) || [])[1] || "US" };
+    } catch (_) { return {}; }
+  }
+  async function appleMetadata(expected, entity) {
+    if (!expected.title || !expected.artist) return { item: null };
+    const store = appleIdentity(expected.storeUrl, entity);
+    const id = txt(entity === "album" ? expected.appleCollectionId : expected.appleTrackId) || store.id;
+    const countries = unique([store.country || "US", "VN", "US"]);
+    let checked = false, failed = false;
+    if (/^\d+$/.test(id)) {
+      for (const country of countries.slice(0, 2)) {
+        try {
+          const data = await requestJson(ITUNES + "/lookup?id=" + encodeURIComponent(id) + "&country=" + country + (entity === "album" ? "&entity=song&limit=200" : ""));
+          checked = true;
+          const item = (data.results || []).find(value => String(entity === "album" ? value.collectionId : value.trackId) === id &&
+            (entity === "album" ? value.wrapperType === "collection" : value.kind === "song"));
+          if (!item) continue;
+          if (!txt(entity === "album" ? item.collectionName : item.trackName) || !txt(item.artistName)) { failed = true; continue; }
+          const songCount = entity === "album" ? (data.results || []).filter(value => value.kind === "song" && String(value.collectionId) === id).length : 0;
+          if (!compatibleRecord(item, expected, entity, songCount)) return { item: null, conflict: "Apple record differs in title, artist, album, version, or duration. Existing metadata was preserved." };
+          return { item, results: data.results || [], checked: true };
+        } catch (_) { failed = true; }
+      }
+    }
+    // A stored ID that cannot be resolved must not be silently replaced by a
+    // different edition from a name search.
+    if (/^\d+$/.test(id)) return { item: null, checked, failed };
+    for (const country of countries.slice(0, 2)) {
+      try {
+        const data = await requestJson(ITUNES + "/search?term=" + encodeURIComponent(expected.title + " " + expected.artist) + "&entity=" + entity + "&limit=30&country=" + country);
+        checked = true;
+        const items = (data.results || []).filter(item => compatibleRecord(item, expected, entity));
+        // Without an album or stable ID, several distinct releases are ambiguous.
+        const identities = unique(items.map(item => entity === "album" ? item.collectionId : item.collectionId + ":" + item.trackTimeMillis));
+        if (items.length && identities.length === 1) return { item: items[0], checked: true };
+      } catch (_) { failed = true; }
+    }
+    return { item: null, checked, failed };
+  }
+  const fieldValue = (object, key) => object?.[key] ?? object?.[key.toLowerCase()] ?? "";
+  const plainAlbum = value => txt(value).replace(/^\[\[(.*?)\]\]$/, "$1").split("|")[0].split("/").pop();
+  const durationMatches = (a, b) => !Number(a) || !Number(b) || Math.abs(Number(a) - Number(b)) <= Math.max(5000, Number(a) * 0.02);
+  function mbIdentity(value, entity) {
+    const match = txt(value).match(/^https:\/\/musicbrainz\.org\/(recording|release)\/([a-z0-9-]+)(?:[/?#]|$)/i);
+    return match && match[1] === (entity === "album" ? "release" : "recording") ? match[2] : "";
+  }
+  function relationshipMetadata(record) {
+    // Work languages describe the performed composition. Release text language
+    // only describes its printed metadata and is deliberately not used here.
+    const relations = Array.isArray(record?.relations) ? record.relations : [];
+    const works = relations.filter(relation => relation.type === "performance" && relation.work).map(relation => relation.work);
+    const credits = [...relations, ...works.flatMap(work => work.relations || [])];
+    const names = types => unique(credits.filter(relation => types.includes(relation.type) && relation.artist)
+      .map(relation => relation["target-credit"] || relation.artist.name));
+    return { Composer: names(["composer"]), Writer: names(["writer", "lyricist"]), Producer: names(["producer"]),
+      Language: unique(works.flatMap(work => [...(work.languages || []), work.language]).filter(value => value && value !== "zxx" && value !== "mul")) };
+  }
+  function releaseMetadata(release) {
+    const group = release?.["release-group"] || {};
+    const media = Array.isArray(release?.media) ? release.media : [];
+    const tracks = media.flatMap(medium => (medium.tracks || []).map(track => ({ ...track, medium })));
+    const date = txt(release?.date);
+    return { AlbumArtist: creditName(release?.["artist-credit"]), ReleaseDate: date, Year: yearOf(date),
+      Genre: genreNames(release).length ? genreNames(release) : genreNames(group),
+      TrackCount: media.reduce((total, medium) => total + Number(medium["track-count"] || medium.tracks?.length || 0), 0),
+      Duration: tracks.length && tracks.every(track => Number(track.length || track.recording?.length) > 0)
+        ? Math.round(tracks.reduce((sum, track) => sum + Number(track.length || track.recording?.length || 0), 0) / 1000) : 0,
+      Label: unique((release?.["label-info"] || []).map(entry => entry.label?.name)).join(", "),
+      Country: txt(release?.country), Format: unique(media.map(medium => medium.format)).join(", "),
+      ReleaseType: unique([group["primary-type"], ...(group["secondary-types"] || [])]).join(" · "),
+      Description: txt(release?.disambiguation || group.disambiguation),
+      Tracklist: tracks.map(track => txt(track.title || track.recording?.title)).filter(Boolean),
+      ...relationshipMetadata(release) };
+  }
+  async function enrichFrontmatter(frontmatter, entity) {
+    const field = key => fieldValue(frontmatter, key);
+    const expected = { title: txt(field("Title")), artist: txt(field("Artist") || field("AlbumArtist")),
+      album: plainAlbum(field("Album")), durationMs: Number(field("Duration") || 0) * 1000,
+      description: txt(field("Description")), trackCount: Number(field("TrackCount") || 0), storeUrl: txt(field("StoreUrl")),
+      appleTrackId: txt(field("AppleTrackId")), appleCollectionId: txt(field("AppleCollectionId")) };
+    const patch = {}, sources = [], warnings = [];
+    let checked = false, failed = false, recording = null, release = null, matchedAppleTracks = [];
+    const add = values => { for (const [key, value] of Object.entries(values)) if (empty(field(key)) && !empty(value) && empty(patch[key])) patch[key] = value; };
+    const mbid = txt(field("MusicBrainzId")) || mbIdentity(field("SourceUrl"), entity);
+    const endpoint = entity === "album" ? "release" : "recording";
+    const mbUrl = id => MUSICBRAINZ + "/" + endpoint + "/" + encodeURIComponent(id) +
+      (entity === "album" ? "?inc=artists+recordings+release-groups+labels+tags+genres+artist-rels&fmt=json"
+        : "?inc=artists+releases+isrcs+tags+genres+artist-rels+work-rels+work-level-rels&fmt=json");
+    if (/^[a-z0-9-]{3,64}$/i.test(mbid)) {
+      try {
+        const record = await musicBrainzJson(mbUrl(mbid));
+        checked = true;
+        if (!record.id || !txt(record.title) || !creditName(record["artist-credit"])) {
+          failed = true;
+        } else if (record.id !== mbid || !sameName(record.title, expected.title) || !sameName(creditName(record["artist-credit"]), expected.artist) ||
+          (entity === "song" && !durationMatches(expected.durationMs, record.length))) {
+          warnings.push("The saved MusicBrainz ID differs in title, artist, or duration. Existing metadata was preserved.");
+        } else {
+          sources.push("MusicBrainz");
+          if (entity === "album") release = record;
+          else {
+            recording = record;
+            const releases = (record.releases || []).filter(value => value.id);
+            const matches = expected.album ? releases.filter(value => sameName(value.title, expected.album)) : releases;
+            if (expected.album && releases.length && !matches.length) {
+              warnings.push("The saved MusicBrainz recording belongs to a different album or edition. Existing metadata was preserved.");
+            } else {
+              const identities = unique(matches.map(value => value.id));
+              const chosen = matches.find(value => txt(value.id) === txt(field("MusicBrainzReleaseId"))) || (identities.length === 1 ? matches[0] : null);
+              if (chosen) {
+                release = chosen;
+                try {
+                  const details = await musicBrainzJson(MUSICBRAINZ + "/release/" + encodeURIComponent(chosen.id) + "?inc=artists+recordings+release-groups+labels+tags+genres+artist-rels&fmt=json");
+                  if (!details.id || !txt(details.title)) failed = true;
+                  else if (details.id !== chosen.id || !sameName(details.title, chosen.title))
+                    warnings.push("The MusicBrainz release lookup returned a different album or edition. Existing metadata was preserved.");
+                  else release = details;
+                }
+                catch (_) { failed = true; }
+              }
+            }
+          }
+        }
+      } catch (_) { failed = true; }
+    }
+    if (recording && !warnings.length) {
+      const releaseValues = release ? releaseMetadata(release) : {};
+      const tracks = (release?.media || []).flatMap(medium => (medium.tracks || []).map(track => ({ ...track, medium })));
+      const track = tracks.find(value => value.recording?.id === recording.id && sameName(value.title || value.recording.title, expected.title));
+      add({ Genre: genreNames(recording), Duration: Math.round(Number(recording.length || 0) / 1000), ISRC: unique(recording.isrcs || [])[0] || "",
+        Album: txt(release?.title), AlbumArtist: releaseValues.AlbumArtist,
+        ReleaseDate: releaseValues.ReleaseDate, Year: releaseValues.Year,
+        TrackNumber: Number(track?.position || track?.number || 0), DiscNumber: Number(track?.medium?.position || 0),
+        TrackCount: releaseValues.TrackCount, ReleaseType: releaseValues.ReleaseType, Label: releaseValues.Label, Country: releaseValues.Country, Format: releaseValues.Format,
+        Description: txt(recording.disambiguation), ...relationshipMetadata(recording) });
+      add({ Genre: releaseValues.Genre });
+      if (!expected.album && patch.Album) expected.album = patch.Album;
+      if (!expected.durationMs && patch.Duration) expected.durationMs = patch.Duration * 1000;
+      if (!expected.description && patch.Description) expected.description = patch.Description;
+    }
+    if (entity === "album" && release && !warnings.length) {
+      add(releaseMetadata(release));
+      if (!expected.trackCount && patch.TrackCount) expected.trackCount = patch.TrackCount;
+    }
+    // An unresolved primary identity must be retried rather than borrowing a
+    // similarly named secondary-provider record while its edition is unknown.
+    if (mbid && failed && !sources.length && !warnings.length)
+      return {patch:{},sources,warnings,status:"unavailable",failed:true,releaseIds:[],groupIds:[]};
+    // Cross-provider matching must agree with the current edition, including
+    // album and duration. A stored Apple ID is looked up before any search.
+    if (!warnings.length && expected.title && expected.artist) {
+      const apple = await appleMetadata(expected, entity);
+      checked = checked || Boolean(apple.checked || apple.item || apple.conflict);
+      failed = failed || Boolean(apple.failed);
+      if (apple.conflict) warnings.push(apple.conflict);
+      if (apple.item) {
+        const item = apple.item;
+        sources.push("Apple iTunes Search API");
+        let appleTracks = apple.results || [];
+        if (entity === "album" && !apple.results && item.collectionId) {
+          try {
+            const lookup = await requestJson(ITUNES + "/lookup?id=" + encodeURIComponent(item.collectionId) + "&entity=song&limit=200");
+            appleTracks = (lookup.results || []).filter(value => String(value.collectionId) === String(item.collectionId));
+          } catch (_) { failed = true; }
+        }
+        appleTracks = appleTracks.filter(value => value.kind === "song" && String(value.collectionId) === String(item.collectionId));
+        matchedAppleTracks = appleTracks;
+        const date = txt(item.releaseDate).slice(0, 10);
+        add({ Genre: unique([formatGenre(item.primaryGenreName)]), Year: yearOf(date), ReleaseDate: date,
+          Album: entity === "song" ? txt(item.collectionName) : "", AlbumArtist: txt(item.collectionArtistName || item.artistName),
+          Duration: entity === "song" ? Math.round(Number(item.trackTimeMillis || 0) / 1000)
+            : appleTracks.length && appleTracks.every(value => Number(value.trackTimeMillis) > 0) ? Math.round(appleTracks.reduce((sum, value) => sum + Number(value.trackTimeMillis), 0) / 1000) : 0,
+          TrackNumber: entity === "song" ? Number(item.trackNumber || 0) : 0,
+          DiscNumber: entity === "song" ? Number(item.discNumber || 0) : 0,
+          TrackCount: Number(item.trackCount || 0),
+          Tracklist: entity === "album" ? appleTracks.map(value => value.trackName).filter(Boolean) : [],
+          ISRC: txt(item.isrc),
+          AppleTrackId: entity === "song" ? txt(item.trackId) : "", AppleCollectionId: txt(item.collectionId),
+          StoreUrl: txt(entity === "album" ? item.collectionViewUrl : item.trackViewUrl),
+          Cover: validImage(item.artworkUrl100), CoverSource: !field("Cover") ? "Apple iTunes Search API" : "" });
+      }
+    }
+    // A rejected secondary provider cannot erase independently verified
+    // MusicBrainz facts. Its own values were never added to the patch.
+    const required = entity === "album" ? ["Year", "ReleaseDate", "Duration", "Genre", "TrackCount", "Label", "Country", "Format", "ReleaseType"]
+      : ["Year", "ReleaseDate", "Duration", "Genre", "Album", "AlbumArtist", "TrackNumber", "DiscNumber", "ISRC"];
+    const complete = required.every(key => !empty(patch[key] ?? field(key)));
+    const status = warnings.length ? "identity_conflict" : sources.length ? (complete ? "updated" : "partial") : "unavailable";
+    return { patch, sources, warnings, status, failed: failed && !sources.length && !warnings.length,
+      appleTracks: matchedAppleTracks,
+      releaseIds: release?.id ? [release.id] : entity === "album" && mbid && sources.includes("MusicBrainz") ? [mbid] : [],
+      groupIds: release?.["release-group"]?.id ? [release["release-group"].id] : [] };
+  }
+  function enrichmentStamp(result, draft) {
+    draft.MetadataCheckedAt = new Date().toISOString();
+    draft.MetadataSources = unique([...(Array.isArray(fieldValue(draft, "MetadataSources")) ? fieldValue(draft, "MetadataSources") : []), ...result.sources]);
+    draft.MetadataStatus = result.status;
+    if (result.warnings.length) draft.MetadataWarning = result.warnings.join(" ");
+    else if (result.sources.length) { delete draft.MetadataWarning; delete draft.metadatawarning; }
+    draft.MetadataVersion = Number(tp.config?.music_enrichment_version || 2);
+    if (typeof tp.config?.music_enrichment_signature === "function") draft.MetadataSignature = tp.config.music_enrichment_signature(draft);
+  }
+  const dataFields = { Title:"title", Artist:"artist", Album:"album", AlbumArtist:"albumArtist", Year:"year", ReleaseDate:"releaseDate", Genre:"genres",
+    Duration:"durationMs", TrackNumber:"trackNumber", DiscNumber:"discNumber", TrackCount:"trackCount", Label:"label", Country:"country", Format:"format",
+    ISRC:"isrc", ReleaseType:"releaseType", Language:"languages", Composer:"composers", Writer:"writers", Producer:"producers", Description:"description",
+    MusicBrainzId:"musicBrainzId", AppleTrackId:"appleTrackId", AppleCollectionId:"appleCollectionId", StoreUrl:"storeUrl", SourceUrl:"sourceUrl", Cover:"cover", CoverSource:"coverSource" };
+  async function enrichData(data, entity) {
+    const frontmatter = Object.fromEntries(Object.entries(dataFields).map(([field, name]) => [field, field === "Duration" ? Number(data[name] || 0) / 1000 : data[name]]));
+    const result = await enrichFrontmatter(frontmatter, entity);
+    for (const [field, value] of Object.entries(result.patch)) if (dataFields[field]) data[dataFields[field]] = field === "Duration" ? Number(value) * 1000 : value;
+    if (entity === "album" && Array.isArray(data.tracks) && Array.isArray(result.appleTracks) && result.appleTracks.length) {
+      data.tracks.forEach(track => {
+        const match = result.appleTracks.find(item =>
+          Number(track.trackNumber) > 0 && Number(item.trackNumber) === Number(track.trackNumber) &&
+          (!Number(track.discNumber) || !Number(item.discNumber) || Number(item.discNumber) === Number(track.discNumber)) &&
+          sameName(item.trackName, track.title)
+        ) || result.appleTracks.find(item => sameName(item.trackName, track.title));
+        if (!match) return;
+        if (empty(track.appleTrackId) && match.trackId) track.appleTrackId = String(match.trackId);
+        if (empty(track.appleCollectionId) && match.collectionId) track.appleCollectionId = String(match.collectionId);
+        if (empty(track.storeUrl) && match.trackViewUrl) track.storeUrl = txt(match.trackViewUrl);
+        if (empty(track.isrc) && match.isrc) track.isrc = txt(match.isrc);
+        if (empty(track.genres) && match.primaryGenreName) track.genres = unique([formatGenre(match.primaryGenreName)]);
+        if (empty(track.durationMs) && match.trackTimeMillis) track.durationMs = Number(match.trackTimeMillis);
+      });
+    }
+    enrichmentStamp(result, frontmatter);
+    data.enrichment = frontmatter;
+    return data;
+  }
+  function pushEnrichment(lines, data) {
+    ["ReleaseType"].forEach(key => lines.push(key + ": " + yaml(data[dataFields[key]])));
+    ["Language", "Composer", "Writer", "Producer"].forEach(key => pushList(lines, key, data[dataFields[key]]));
+    if (!data.enrichment) return;
+    lines.push("MetadataCheckedAt: " + yaml(data.enrichment.MetadataCheckedAt), "MetadataStatus: " + yaml(data.enrichment.MetadataStatus));
+    pushList(lines, "MetadataSources", data.enrichment.MetadataSources);
+    if (data.enrichment.MetadataWarning) lines.push("MetadataWarning: " + yaml(data.enrichment.MetadataWarning));
+    lines.push("MetadataVersion: " + Number(data.enrichment.MetadataVersion || 2));
+  }
+
   async function archiveCover(type, id) {
     if(!/^[a-z0-9-]{3,64}$/i.test(txt(id))) return "";
     try {
@@ -106,20 +434,16 @@ module.exports = async function musicMetadata(tp, mode) {
       try {
         const data=await requestJson(ITUNES+"/search?term="+encodeURIComponent(title+" "+artist)+
           "&entity="+(entity==="album"?"album":"song")+"&limit=30&country="+country);
-        const items=(data.results||[]).filter(item=>matches(entity==="album"?item.collectionName:item.trackName,title)&&
-          matches(item.artistName,artist));
-        // Preserve an exact album match when possible. For standalone songs,
-        // a verified artist/track match on another edition is preferable to no art.
-        const item=(entity==="song"&&albumName?
-          items.find(candidate=>matches(candidate.collectionName,albumName)):null)||items[0];
+        const items=(data.results||[]).filter(item=>compatibleRecord(item,{title,artist,album:albumName},entity));
+        const item=items[0];
         const image=validImage(item?.artworkUrl100);
         const store=txt(entity==="album"?item?.collectionViewUrl:item?.trackViewUrl);
-        if(image&&/^https:\/\//i.test(store))return {cover:image,coverSource:"Apple iTunes Search API",storeUrl:store};
+        if(image&&/^https:\/\//i.test(store))return {cover:image,coverSource:"Apple iTunes Search API",storeUrl:store,genre:formatGenre(item?.primaryGenreName)};
       } catch (_) {}
     }
     return null;
   }
-  async function resolveArtwork({releaseIds=[],groupIds=[],title,artist,albumName,entity}) {
+  async function resolveArtwork({releaseIds=[],groupIds=[],title,artist,albumName,entity,allowApple=true}) {
     for(const id of unique(releaseIds).slice(0,4)) {
       const cover=await archiveCover("release",id);
       if(cover)return {cover,coverSource:"Cover Art Archive",storeUrl:""};
@@ -128,7 +452,7 @@ module.exports = async function musicMetadata(tp, mode) {
       const cover=await archiveCover("release-group",id);
       if(cover)return {cover,coverSource:"Cover Art Archive",storeUrl:""};
     }
-    return await appleArtwork(title,artist,entity,albumName)||{cover:"",coverSource:"",storeUrl:""};
+    return (allowApple ? await appleArtwork(title,artist,entity,albumName) : null)||{cover:"",coverSource:"",storeUrl:""};
   }
   async function lookupLyrics(song) {
     const title=txt(song?.title),artist=txt(song?.artist);
@@ -218,9 +542,11 @@ module.exports = async function musicMetadata(tp, mode) {
       "ReleaseDate: " + yaml(data.releaseDate),
       "Duration: " + Math.max(0, Math.round(Number(data.durationMs || 0) / 1000)),
       "TrackNumber: " + Math.max(0, Number(data.trackNumber || 0)),
-      "DiscNumber: " + Math.max(0, Number(data.discNumber || 0))
+      "DiscNumber: " + Math.max(0, Number(data.discNumber || 0)),
+      "TrackCount: " + Math.max(0, Number(data.trackCount || 0))
     ];
     pushList(lines, "Genre", data.genres);
+    pushEnrichment(lines, data);
     lines.push(
       "Cover: " + yaml(data.cover),
       "CoverSource: " + yaml(data.coverSource),
@@ -232,6 +558,9 @@ module.exports = async function musicMetadata(tp, mode) {
       "PersonalRating: 0",
       "MusicBrainzId: " + yaml(data.musicBrainzId),
       "ISRC: " + yaml(data.isrc),
+      "Label: " + yaml(data.label),
+      "Country: " + yaml(data.country),
+      "Format: " + yaml(data.format),
       "AppleTrackId: " + yaml(data.appleTrackId),
       "AppleCollectionId: " + yaml(data.appleCollectionId),
       "Description: " + yaml(data.description),
@@ -487,7 +816,7 @@ module.exports = async function musicMetadata(tp, mode) {
     let release = candidate.item || {};
     try {
       release = await musicBrainzJson(MUSICBRAINZ + "/release/" + encodeURIComponent(candidate.id) +
-        "?inc=artists+recordings+release-groups+labels+tags+genres&fmt=json");
+        "?inc=artists+recordings+release-groups+labels+tags+genres+artist-rels&fmt=json");
     } catch (_) {
       notify("MusicBrainz release details were unavailable; using the search result metadata.");
     }
@@ -497,6 +826,7 @@ module.exports = async function musicMetadata(tp, mode) {
         const recording = track.recording || {};
         const recordingId = txt(recording.id);
         const recordingTitle = txt(recording.title || track.title);
+        const relMeta = relationshipMetadata(recording);
         tracks.push({
           title: recordingTitle,
           artist: creditName(recording["artist-credit"]) || creditName(release["artist-credit"]),
@@ -506,6 +836,11 @@ module.exports = async function musicMetadata(tp, mode) {
           musicBrainzId: recordingId,
           isrc: (recording.isrcs || [])[0] || "",
           genres: genreNames(recording).length ? genreNames(recording) : genreNames(release),
+          description: txt(recording.disambiguation),
+          composers: relMeta.Composer,
+          writers: relMeta.Writer,
+          producers: relMeta.Producer,
+          languages: relMeta.Language,
           source: "MusicBrainz",
           sourceUrl: recordingId ? "https://musicbrainz.org/recording/" + recordingId : "",
           storeUrl: "",
@@ -524,13 +859,14 @@ module.exports = async function musicMetadata(tp, mode) {
       releaseIds:[releaseId],groupIds:[group.id],title:txt(release.title||candidate.title),
       artist:creditName(release["artist-credit"])||candidate.artist,entity:"album"
     });
+    const finalGenres = genres.length ? genres : unique([artwork.genre]);
     return {
       title: txt(release.title || candidate.title),
       artist: creditName(release["artist-credit"]) || candidate.artist,
       albumArtist: creditName(release["artist-credit"]) || candidate.artist,
       releaseDate: date,
       year: yearOf(date),
-      genres: genres,
+      genres: finalGenres,
       trackCount: tracks.length || Number(candidate.trackCount || 0),
       durationMs: tracks.reduce((sum, track) => sum + Number(track.durationMs || 0), 0),
       cover: artwork.cover,
@@ -567,7 +903,7 @@ module.exports = async function musicMetadata(tp, mode) {
       durationMs: Number(item.trackTimeMillis || 0),
       musicBrainzId: "",
       isrc: txt(item.isrc),
-      genres: unique([item.primaryGenreName]),
+      genres: unique([formatGenre(item.primaryGenreName)]),
       source: "Apple iTunes Search API",
       sourceUrl: txt(item.trackViewUrl),
       storeUrl: txt(item.trackViewUrl),
@@ -581,7 +917,7 @@ module.exports = async function musicMetadata(tp, mode) {
       albumArtist: txt(album.artistName || candidate.artist),
       releaseDate: date,
       year: yearOf(date),
-      genres: unique([album.primaryGenreName || candidate.genre]),
+      genres: unique([formatGenre(album.primaryGenreName || candidate.genre)]),
       trackCount: tracks.length || Number(album.trackCount || candidate.trackCount || 0),
       durationMs: tracks.reduce((sum, track) => sum + Number(track.durationMs || 0), 0),
       cover: validImage(album.artworkUrl100||candidate.item?.artworkUrl100),
@@ -590,7 +926,7 @@ module.exports = async function musicMetadata(tp, mode) {
       musicBrainzId: "",
       releaseGroupId: "",
       label: "",
-      country: txt(album.country),
+      country: "", // iTunes country identifies the storefront, not the release territory.
       format: "",
       source: "Apple iTunes Search API",
       sourceUrl: txt(album.collectionViewUrl || candidate.storeUrl),
@@ -604,7 +940,7 @@ module.exports = async function musicMetadata(tp, mode) {
     let recording = candidate.item || {};
     try {
       recording = await musicBrainzJson(MUSICBRAINZ + "/recording/" + encodeURIComponent(candidate.id) +
-        "?inc=artists+releases+isrcs+tags+genres&fmt=json");
+        "?inc=artists+releases+isrcs+tags+genres+artist-rels+work-rels+work-level-rels&fmt=json");
     } catch (_) {
       notify("MusicBrainz recording details were unavailable; using the search result metadata.");
     }
@@ -619,6 +955,7 @@ module.exports = async function musicMetadata(tp, mode) {
     });
     const date = txt(release.date || recording["first-release-date"] || candidate.date);
     const recordingId = txt(recording.id || candidate.id);
+    const recGenres = genreNames(recording);
     return {
       title: txt(recording.title || candidate.title),
       artist: creditName(recording["artist-credit"]) || candidate.artist,
@@ -629,7 +966,7 @@ module.exports = async function musicMetadata(tp, mode) {
       durationMs: Number(recording.length || candidate.length || 0),
       trackNumber: 0,
       discNumber: 0,
-      genres: genreNames(recording),
+      genres: recGenres.length ? recGenres : unique([artwork.genre]),
       cover: artwork.cover,
       coverSource: artwork.coverSource,
       musicBrainzId: recordingId,
@@ -656,7 +993,7 @@ module.exports = async function musicMetadata(tp, mode) {
       durationMs: Number(item.trackTimeMillis || candidate.length || 0),
       trackNumber: Number(item.trackNumber || candidate.trackNumber || 0),
       discNumber: Number(item.discNumber || candidate.discNumber || 0),
-      genres: unique([item.primaryGenreName || candidate.genre]),
+      genres: unique([formatGenre(item.primaryGenreName || candidate.genre)]),
       cover: validImage(item.artworkUrl100||candidate.item?.artworkUrl100),
       coverSource: "Apple iTunes Search API",
       musicBrainzId: "",
@@ -736,6 +1073,7 @@ module.exports = async function musicMetadata(tp, mode) {
         continue;
       }
       const filename = availableName(track.title, SONG_FOLDER, track.artist || album.artist, album.title);
+      const trackGenres = unique((track.genres && track.genres.length ? track.genres : album.genres || []).map(formatGenre));
       const songData = {
         title: track.title,
         artist: track.artist || album.artist,
@@ -746,7 +1084,8 @@ module.exports = async function musicMetadata(tp, mode) {
         durationMs: track.durationMs,
         trackNumber: track.trackNumber,
         discNumber: track.discNumber,
-        genres: track.genres && track.genres.length ? track.genres : album.genres,
+        trackCount: Number(album.trackCount || (album.tracks || []).length || 0),
+        genres: trackGenres,
         cover: album.cover,
         coverSource: album.coverSource,
         lyricsId: "",
@@ -757,10 +1096,22 @@ module.exports = async function musicMetadata(tp, mode) {
         isrc: track.isrc,
         appleTrackId: track.appleTrackId,
         appleCollectionId: track.appleCollectionId || album.appleCollectionId,
-        description: "",
+        description: txt(track.description),
+        releaseType: album.releaseType, label: album.label, country: album.country, format: album.format,
+        composers: track.composers && track.composers.length ? track.composers : (album.composers || []),
+        writers: track.writers && track.writers.length ? track.writers : (album.writers || []),
+        producers: track.producers && track.producers.length ? track.producers : (album.producers || []),
+        languages: track.languages && track.languages.length ? track.languages : (album.languages || []),
         source: track.source || album.source,
         sourceUrl: track.sourceUrl,
-        storeUrl: track.storeUrl || album.storeUrl
+        storeUrl: track.storeUrl || album.storeUrl,
+        enrichment: album.enrichment ? {
+          MetadataCheckedAt: album.enrichment.MetadataCheckedAt,
+          MetadataStatus: album.enrichment.MetadataStatus,
+          MetadataSources: album.enrichment.MetadataSources,
+          MetadataWarning: album.enrichment.MetadataWarning,
+          MetadataVersion: album.enrichment.MetadataVersion
+        } : null
       };
       try {
         const created = await tp.file.create_new(renderSong(songData, album.noteName), filename, false, SONG_FOLDER);
@@ -791,6 +1142,7 @@ module.exports = async function musicMetadata(tp, mode) {
       "Duration: " + Math.max(0, Math.round(Number(album.durationMs || 0) / 1000))
     ];
     pushList(lines, "Genre", album.genres);
+    pushEnrichment(lines, album);
     const tracklist = (album.tracks || []).map((track, index) => {
       const identity = txt(track.musicBrainzId || track.appleTrackId);
       const key = identity || (txt(track.title).toLowerCase() + "|" + txt(track.artist || album.artist).toLowerCase());
@@ -836,50 +1188,53 @@ module.exports = async function musicMetadata(tp, mode) {
     return lines.join("\n");
   }
 
-  // Explicitly refresh an existing note without replacing personal content.
-  if(refreshing) {
-    const file=(target&&String(target.path||"").startsWith(MUSIC_ROOT+"/")?target:null)||tp.app.workspace?.getActiveFile?.();
-    if(!file||!file.path.startsWith(MUSIC_ROOT+"/")||!/\/(Songs|Albums)\/[^/]+\.md$/i.test(file.path)) {
-      notify("Open an existing Song or Album note before refreshing.");return "";
+  // Automatic enrichment never invokes prompts or fetches/saves lyrics. All
+  // existing personal values remain canonical, including non-empty arrays.
+  if (refreshing) {
+    const file = (target && String(target.path || "").startsWith(MUSIC_ROOT + "/") ? target : null) || tp.app.workspace?.getActiveFile?.();
+    if (!file || !/^20_Personal_Life\/28_Music_Tracker\/(Songs|Albums)\/[^/\\\x00-\x1f]+\.md$/.test(file.path) || file.path.split("/").includes("..")) {
+      notify("Open an existing Song or Album note before refreshing."); return "";
     }
-    if(typeof tp.app.fileManager?.processFrontMatter!=="function") {notify("Frontmatter editing unavailable.");return "";}
-    const fm=tp.app.metadataCache?.getFileCache?.(file)?.frontmatter||{};
-    const field=key=>fm[key]??fm[key.toLowerCase()]??"";
-    const title=txt(field("Title")||file.basename),artist=txt(field("Artist")||field("AlbumArtist"));
-    const albumName=txt(field("Album")).replace(/^\[\[|\]\]$/g,"");
-    const patch={};
-    if(!txt(field("Cover"))&&title&&artist) {
-      let releaseIds=[],groupIds=[];
-      if(kind==="album") {
-        releaseIds=[txt(field("MusicBrainzId"))];groupIds=[txt(field("ReleaseGroupId"))];
-      } else if(field("MusicBrainzId")) {
-        try {
-          const record=await musicBrainzJson(MUSICBRAINZ+"/recording/"+encodeURIComponent(txt(field("MusicBrainzId")))+"?inc=releases&fmt=json");
-          releaseIds=(record.releases||[]).map(item=>item.id);
-          groupIds=(record.releases||[]).map(item=>item["release-group"]?.id);
-        } catch (_) {}
-      }
-      const art=await resolveArtwork({releaseIds,groupIds,title,artist,albumName,entity:kind});
-      if(art.cover) {
-        patch.Cover=art.cover;patch.CoverSource=art.coverSource;
-        if(art.storeUrl&&!field("StoreUrl"))patch.StoreUrl=art.storeUrl;
+    if (typeof tp.app.fileManager?.processFrontMatter !== "function") { notify("Frontmatter editing unavailable."); return ""; }
+    let fm = tp.app.metadataCache?.getFileCache?.(file)?.frontmatter || {};
+    const raw = existingContent.match(/^\uFEFF?---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+    if (raw && typeof tp.obsidian?.parseYaml === "function") {
+      try { fm = tp.obsidian.parseYaml(raw[1]) || {}; } catch (_) { return {status:"failed"}; }
+    }
+    const field = key => fieldValue(fm, key);
+    const title = txt(field("Title") || file.basename), artist = txt(field("Artist") || field("AlbumArtist"));
+    const albumName = plainAlbum(field("Album"));
+    if (!title || !artist) return {status:"unidentified"};
+    const identityKeys = ["Title","Artist","Album","AlbumArtist","MusicBrainzId","ReleaseGroupId","AppleTrackId","AppleCollectionId","SourceUrl","StoreUrl"];
+    const identitySignature = value => JSON.stringify(identityKeys.map(key => fieldValue(value,key)));
+    const initialIdentity = identitySignature(fm);
+    const result = await enrichFrontmatter({...fm, Title:title, Artist:artist}, kind);
+    if (result.failed) return {status:"failed"};
+    const patch = result.patch;
+    if (empty(field("Cover")) && !patch.Cover && !result.warnings.length) {
+      const art = await resolveArtwork({releaseIds:result.releaseIds, groupIds:result.groupIds, title, artist, albumName, entity:kind, allowApple:false});
+      if (art.cover) {
+        patch.Cover = art.cover; patch.CoverSource = art.coverSource;
+        if (art.storeUrl && empty(field("StoreUrl"))) patch.StoreUrl = art.storeUrl;
       }
     }
-    if(kind==="song"&&!txt(field("LyricsId"))) {
-      const lyrics=await lookupLyrics({title,artist,album:albumName,durationMs:Number(field("Duration")||0)*1000});
-      if(lyrics.id){
-        patch.LyricsId=lyrics.id;patch.LyricsUrl=lyrics.url;
-        if(!field("LyricsFile")) patch.LyricsFile=await persistLyrics(lyrics);
+    if (!enriching && kind === "song" && empty(field("LyricsId")) && !result.warnings.length) {
+      const lyrics = await lookupLyrics({title,artist,album:albumName,durationMs:Number(field("Duration") || patch.Duration || 0)*1000});
+      if (lyrics.id) {
+        patch.LyricsId = lyrics.id; patch.LyricsUrl = lyrics.url;
+        if (empty(field("LyricsFile"))) patch.LyricsFile = await persistLyrics(lyrics);
       }
-      patch.LyricsStatus=lyrics.status;
+      patch.LyricsStatus = lyrics.status;
     }
-    if(Object.keys(patch).length) {
-      await tp.app.fileManager.processFrontMatter(file,draft=>{
-        for(const [key,value] of Object.entries(patch))if(!draft[key]&&!draft[key.toLowerCase()])draft[key]=value;
-      });
-      notify("Music metadata refreshed: "+Object.keys(patch).join(", "));
-    } else notify("Music refresh completed. No additional artwork or lyrics record found.");
-    return "";
+    let superseded = false;
+    await tp.app.fileManager.processFrontMatter(file, draft => {
+      if (identitySignature(draft) !== initialIdentity) { superseded = true; return; }
+      for (const [key,value] of Object.entries(patch)) if (empty(fieldValue(draft,key))) draft[key] = value;
+      enrichmentStamp(result, draft);
+    });
+    if (superseded) return {status:"failed"};
+    notify(result.warnings.length ? result.warnings.join(" ") : "Music metadata refreshed: " + (Object.keys(patch).join(", ") || "no additional fields found"));
+    return enriching ? {status:result.status} : "";
   }
 
   if (target && target.path && !String(target.path).startsWith((kind === "album" ? ALBUM_FOLDER : SONG_FOLDER) + "/")) {
@@ -942,6 +1297,7 @@ module.exports = async function musicMetadata(tp, mode) {
       } : songFromITunes(chosen);
       notify("Some Song metadata was unavailable; the available fields were kept.");
     }
+    await enrichData(song, "song");
     progress.update(4, "Checking artwork and searching LRCLIB lyrics...");
     const identity = txt(song.musicBrainzId || song.appleTrackId);
     const identityKey = song.musicBrainzId ? "MusicBrainzId" : "AppleTrackId";
@@ -974,6 +1330,7 @@ module.exports = async function musicMetadata(tp, mode) {
     notify("Album details were unavailable. Creating a blank Album note.");
     return renderBlank();
   }
+  await enrichData(album, "album");
   progress.update(4, "Checking album artwork and tracklist...");
   const existingAlbum = album.musicBrainzId
     ? findByIdentity(ALBUM_FOLDER, "MusicBrainzId", album.musicBrainzId)

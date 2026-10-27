@@ -92,6 +92,100 @@ const synced=await synchronizeMusicViews();
 // Live source sync while Obsidian remains open. A manual Templater run also
 // forces re-render; listeners are de-duplicated between invocations.
 const syncWindow=app.workspace?.containerEl?.ownerDocument?.defaultView;
+/* Enrich only an opened, identified Music note. The importer owns provider
+ * matching and missing-only frontmatter edits; the startup note is never its
+ * target. Keep a signature/cooldown across source-sync reruns, and let the
+ * importer persist the same signature after its own metadata changes. */
+if(syncWindow){
+  const stateKey="__abyssalMusicEnrichmentState";
+  const state=syncWindow[stateKey] || {inflight:new Map(),attempts:new Map()};
+  syncWindow[stateKey]=state;
+  const metadataVersion=2;
+  const cooldown=24*60*60*1000;
+  const failureCooldown=60*1000;
+  const importerPath="90_System/92_Scripts/Template_Scripts/music_metadata.js";
+  const signatureFields=[
+    "Title","Artist","Album","AlbumArtist","MusicBrainzId","ReleaseGroupId",
+    "AppleTrackId","AppleCollectionId","SourceUrl","StoreUrl","Year",
+    "ReleaseDate","Duration","Genre","Description","TrackNumber","DiscNumber",
+    "TrackCount","Tracklist","Label","Country","Format","ISRC",
+    "ReleaseType","Language","Composer","Writer","Producer"
+  ];
+  const field=(frontmatter,key)=>frontmatter[key]??frontmatter[key.toLowerCase()]??"";
+  const filled=value=>Array.isArray(value)?value.length>0:
+    (typeof value==="number"?Number.isFinite(value)&&value>0:String(value??"").trim()!==""&&String(value)!=="0");
+  const supported=path=>typeof path==="string" &&
+    /^20_Personal_Life\/28_Music_Tracker\/(Songs|Albums)\/[^/\\\u0000-\u001f]+\.md$/.test(path) &&
+    !path.split("/").includes("..");
+  const signature=frontmatter=>{
+    const source=app.vault.getAbstractFileByPath(importerPath)?.stat;
+    return JSON.stringify([metadataVersion,source?.mtime||0,source?.size||0,
+      ...signatureFields.map(key=>field(frontmatter,key))]);
+  };
+  const readFrontmatter=(file,content)=>{
+    if(typeof tp.obsidian?.parseYaml==="function"){
+      const match=String(content).match(/^\uFEFF?---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
+      if(match){
+        try{
+          const parsed=tp.obsidian.parseYaml(match[1])||{};
+          return typeof parsed==="object"&&!Array.isArray(parsed)?parsed:null;
+        }catch(_){return null;}
+      }
+    }
+    return app.metadataCache?.getFileCache?.(file)?.frontmatter||{};
+  };
+  syncWindow.__abyssalMusicEnrich=async (path,options={})=>{
+    if(!supported(path))return {status:"ignored"};
+    if(state.inflight.has(path))return state.inflight.get(path);
+    if(typeof tp.user?.music_metadata!=="function" || typeof app.vault.read!=="function")
+      return {status:"unavailable"};
+    const operation=(async()=>{
+      let attemptSignature="";
+      try{
+        const file=app.vault.getAbstractFileByPath(path);
+        if(!file||file.path!==path)return {status:"ignored"};
+        const content=await app.vault.read(file);
+        const frontmatter=readFrontmatter(file,content);
+        if(!frontmatter)return {status:"invalid"};
+        if(!filled(field(frontmatter,"Artist"))&&!filled(field(frontmatter,"AlbumArtist")))
+          return {status:"unidentified"};
+        const keys=path.includes("/Albums/")
+          ?["Year","ReleaseDate","Duration","Genre","Description","TrackCount","Tracklist","Label","Country","Format","ReleaseType","Language","Composer","Writer","Producer"]
+          :["Year","ReleaseDate","Duration","Genre","Description","Album","AlbumArtist","TrackNumber","DiscNumber","ISRC","Composer","Writer","Producer"];
+        if(!options.force&&keys.every(key=>filled(field(frontmatter,key))))return {status:"complete"};
+        attemptSignature=signature(frontmatter);
+        const now=Date.now();
+        const previous=state.attempts.get(path);
+        const checkedAt=Date.parse(String(field(frontmatter,"MetadataCheckedAt")));
+        if(!options.force&&((previous?.signature===attemptSignature&&previous.until>now)||
+          (Number(field(frontmatter,"MetadataVersion"))===metadataVersion&&
+           field(frontmatter,"MetadataSignature")===attemptSignature&&
+           Number.isFinite(checkedAt)&&checkedAt<=now&&now-checkedAt<cooldown)))
+          return {status:"cached"};
+        let completedSignature="";
+        const context={...tp,app,
+          config:{...tp.config,target_file:file,active_file:file,run_mode:0,
+            music_enrichment_version:metadataVersion,
+            music_enrichment_signature:draft=>(completedSignature=signature(draft))},
+          file:{title:file.basename||path.split("/").at(-1).replace(/\.md$/i,""),content}
+        };
+        const result=await tp.user.music_metadata(context,"enrich");
+        if(result?.status==="failed"){
+          state.attempts.set(path,{signature:attemptSignature,until:Date.now()+failureCooldown});
+          return {status:"failed",path};
+        }
+        state.attempts.set(path,{signature:completedSignature||attemptSignature,until:Date.now()+cooldown});
+        return {status:"checked",path};
+      }catch(error){
+        if(attemptSignature)state.attempts.set(path,{signature:attemptSignature,until:Date.now()+failureCooldown});
+        console.warn("[Music] Automatic metadata enrichment unavailable:",error);
+        return {status:"failed",path};
+      }
+    })();
+    state.inflight.set(path,operation);
+    try{return await operation;}finally{state.inflight.delete(path);}
+  };
+}
 if(syncWindow){
   const key="__abyssalMusicSyncSubscriptions";
   const previous=syncWindow[key];
@@ -117,50 +211,32 @@ if(syncWindow){
   const opened=app.workspace.on("file-open",file=>{
     if(!file?.path?.startsWith("20_Personal_Life/28_Music_Tracker/"))return;
     if(musicSourceVersion()!==lastSourceVersion)schedule();
+    void syncWindow.__abyssalMusicEnrich?.(file.path);
   });
   if(opened)state.refs.push(opened);
   syncWindow[key]=state;
+  const activeFile=app.workspace.getActiveFile?.();
+  if(activeFile?.path)void syncWindow.__abyssalMusicEnrich?.(activeFile.path);
 }
 
-/* Music Base hover cards may sit at the gallery's right edge. Choose which
- * direction their floating drawer should open at pointer/focus time. Native
- * Base cards keep their layout slot fixed, so siblings never reflow. */
+/* The Music Base drawer now expands to the right through CSS. Remove the
+ * previous side-selection handlers and their per-card overrides when this
+ * startup template is rerun in an already open Obsidian window. */
 if(syncWindow){
-  const doc=app.workspace?.containerEl?.ownerDocument;
   const key="__abyssalMusicPeekListeners";
   const previous=syncWindow[key];
   if(previous?.doc&&previous?.handler){
-    previous.doc.removeEventListener("pointerover",previous.handler,true);
-    previous.doc.removeEventListener("focusin",previous.handler,true);
+    previous.doc.removeEventListener?.("pointerover",previous.handler,true);
+    previous.doc.removeEventListener?.("focusin",previous.handler,true);
   }
-  if(doc?.addEventListener){
-    const names=new Set(["Music Library","Favourite Songs","Favourite Albums"]);
-    const chooseSide=event=>{
-      const item=event.target?.closest?.(".bases-cards-item:has(.music-peek-card)");
-      if(!item)return;
-      const view=item.closest(".bases-view");
-      if(!names.has(view?.getAttribute("data-view-name")))return;
-      if(syncWindow.matchMedia?.("(hover: none), (max-width: 700px)")?.matches)return;
-      const rect=item.getBoundingClientRect();
-      const pane=item.closest(".workspace-leaf-content") ||
-        item.closest(".workspace-leaf");
-      const bounds=pane?.getBoundingClientRect?.();
-      const viewportWidth=doc.documentElement?.clientWidth||syncWindow.innerWidth;
-      const edgeLeft=Math.max(0,bounds?.left??0);
-      const edgeRight=Math.min(viewportWidth,bounds?.right??viewportWidth);
-      const availableRight=Math.max(0,edgeRight-rect.right);
-      const availableLeft=Math.max(0,rect.left-edgeLeft);
-      const side=availableRight>=availableLeft?"right":"left";
-      item.dataset.musicPeekSide=side;
-      const room=side==="right"?availableRight:availableLeft;
-      // The drawer is kept within the Bases workspace pane (not just
-      // browser viewport, which may include Calendar or DevTools panes).
-      const size=Math.max(185,Math.min(325,room-10));
-      item.style?.setProperty?.("--music-peek-drawer-width",size+"px");
-    };
-    doc.addEventListener("pointerover",chooseSide,true);
-    doc.addEventListener("focusin",chooseSide,true);
-    syncWindow[key]={doc,handler:chooseSide};
+  delete syncWindow[key];
+  const musicCards='.bases-view:is([data-view-name="Music Library"],[data-view-name="Favourite Songs"],[data-view-name="Favourite Albums"]) .bases-cards-item';
+  const documents=new Set([previous?.doc,app.workspace?.containerEl?.ownerDocument]);
+  for(const doc of documents){
+    doc?.querySelectorAll?.(musicCards)?.forEach(item=>{
+      item.removeAttribute?.("data-music-peek-side");
+      item.style?.removeProperty?.("--music-peek-drawer-width");
+    });
   }
 }
 

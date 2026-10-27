@@ -1,13 +1,13 @@
 ---
-id: "Adductor_Groin"
-name: "Adductor/Groin"
-level: "intermediate"
-force: "static"
-mechanic: "None"
-equipment: "None"
-category: "stretching"
+id: Adductor_Groin
+name: Adductor/Groin
+level: intermediate
+force: static
+mechanic: None
+equipment: None
+category: stretching
 primaryMuscles:
-  - "adductors"
+  - adductors
 secondaryMuscles: []
 tags:
   - calisthenics
@@ -15,6 +15,11 @@ preview: "[[Adductor_Groin-preview.webp]]"
 animation: "[[Adductor_Groin.gif]]"
 images:
   - "[[Adductor_Groin.gif]]"
+instruction_done:
+  - false
+  - false
+  - false
+  - false
 ---
 
 ## How to Perform

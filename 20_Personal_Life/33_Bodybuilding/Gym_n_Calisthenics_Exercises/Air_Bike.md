@@ -15,6 +15,13 @@ preview: "[[Air_Bike-preview.webp]]"
 animation: "[[Air_Bike.gif]]"
 images:
   - "[[Air_Bike.gif]]"
+instruction_done:
+  - false
+  - false
+  - false
+  - false
+  - false
+  - false
 ---
 
 ## How to Perform

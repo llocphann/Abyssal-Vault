@@ -26,7 +26,7 @@ if (musicRoot) {
 
   function musicSourceImage(value) {
     const raw = musicText(Array.isArray(value) ? value[0] : value);
-    if (/^https:\/\//i.test(raw)) return raw;
+    if (/^https:\/\//i.test(raw)) return raw.replace(/\/100x100(bb\.[a-z0-9]+)$/i, "/600x600$1");
     if (/^http:\/\//i.test(raw)) return "";
     const matched = raw.match(/^!?\[\[([^\]]+)\]\]$/);
     const candidate = matched ? matched[1].split("|")[0] : raw;
@@ -63,10 +63,19 @@ if (musicRoot) {
     const mins = Math.floor(secs / 60);
     return (mins >= 60 ? Math.floor(mins / 60) + " hr " + mins % 60 + " min" : mins + " min " + secs % 60 + " sec");
   }
+  function musicFormatCredit(value, multiline = false) {
+    const raw = Array.isArray(value) ? value.map(musicCleanWiki).join(" & ") : musicText(value);
+    const spaced = raw.replace(/\s*&\s*/g, " & ").replace(/\s{2,}/g, " ").trim();
+    return multiline ? spaced.replace(/\s+&\s+/g, " &\n") : spaced;
+  }
   function musicDetail(label, value) {
-    const textValue = musicText(value);
+    const isAlbumArtist = label === "Album artist";
+    const textValue = isAlbumArtist
+      ? musicFormatCredit(value, true)
+      : (Array.isArray(value) ? value.map(musicCleanWiki).join(", ") : musicText(value));
     if (!musicDetails || !textValue || textValue === "0") return;
     const row = musicDocument.createElement("div");
+    if (row.dataset) row.dataset.detail = label.toLowerCase().replace(/\s+/g, "-");
     const dt = musicDocument.createElement("dt");
     dt.textContent = label;
     const dd = musicDocument.createElement("dd");
@@ -76,7 +85,7 @@ if (musicRoot) {
   }
   function musicRenderMetadata() {
     musicSet('[data-role="music-title"]', musicGet("Title") || musicFile?.basename || "Untitled");
-    musicSet('[data-role="music-artist"]', musicGet("Artist") || musicGet("AlbumArtist") || "Unknown artist");
+    musicSet('[data-role="music-artist"]', musicFormatCredit(musicGet("Artist") || musicGet("AlbumArtist")) || "Unknown artist");
     const year = Number(musicGet("Year") || 0);
     musicSet('[data-role="music-year"]', year > 0 ? String(year) : musicText(musicGet("ReleaseDate")).slice(0, 4) || "Undated");
     const length = musicDuration(musicGet("Duration"));
@@ -126,6 +135,15 @@ if (musicRoot) {
       musicDetail("MusicBrainz", musicGet("MusicBrainzId"));
       musicDetail("Source", musicGet("Source"));
     }
+    musicDetail("Release type", musicGet("ReleaseType"));
+    musicDetail("Language", musicGet("Language"));
+    musicDetail("Composer", musicGet("Composer"));
+    musicDetail("Writer", musicGet("Writer"));
+    musicDetail("Producer", musicGet("Producer"));
+    musicDetail("Metadata sources", musicGet("MetadataSources"));
+    musicDetail("Metadata note", musicGet("MetadataWarning"));
+    const checkedAt = musicText(musicGet("MetadataCheckedAt"));
+    if (checkedAt) musicDetail("Metadata checked", checkedAt.slice(0, 10));
     if (musicKind === "song") {
       const albumButton = musicQ('[data-role="music-open-album"]');
       const album = musicText(musicGet("Album"));
@@ -388,8 +406,21 @@ if (musicRoot) {
     const title=musicText(musicGet("Title")||musicFile?.basename);
     const artist=musicText(musicGet("Artist")||musicGet("AlbumArtist"));
     const album=musicCleanWiki(musicGet("Album"));
+    const sameEditionName=value=>musicText(value).normalize("NFKC").toLowerCase()
+      .replace(/[^\p{L}\p{N}]+/gu," ").trim();
+    const editionWords=value=>Array.from(new Set(musicText(value).toLowerCase()
+      .match(/\b(live|remix|acoustic|instrumental|demo|karaoke|mono|stereo)\b/g)||[])).sort().join(" ");
+    const expectedEdition=editionWords([title,album,musicGet("Description")].join(" "));
+    const matchesArtwork=item=>{
+      if(sameEditionName(musicKind==="album"?item.collectionName:item.trackName)!==sameEditionName(title)||
+        sameEditionName(item.artistName)!==sameEditionName(artist))return false;
+      if(musicKind==="song"&&album&&sameEditionName(item.collectionName)!==sameEditionName(album))return false;
+      if(expectedEdition!==editionWords([item.trackName,item.collectionName,item.description].join(" ")))return false;
+      const expected=Number(musicGet("Duration"))*1000,actual=Number(item.trackTimeMillis);
+      return musicKind!=="song"||!expected||!actual||Math.abs(expected-actual)<=Math.max(5000,expected*.02);
+    };
     try {
-      let cover="",source="",storeUrl="";
+      let cover="",source="",storeUrl="",foundGenre="";
       const key=musicText(musicGet("ReleaseGroupId"));
       const release=musicKind==="album"?musicText(musicGet("MusicBrainzId")):"";
       for(const url of [
@@ -412,15 +443,11 @@ if (musicRoot) {
           let data;
           try{data=await musicFetchJSON("https://itunes.apple.com/search?term="+q+
             "&entity="+(musicKind==="album"?"album":"song")+"&limit=30&country="+country);}catch(_){continue;}
-          const candidates=(data.results||[]).filter(item=>
-            musicRemoteMatches(musicKind==="album"?item.collectionName:item.trackName,title)&&
-            musicRemoteMatches(item.artistName,artist));
-          const selected=(musicKind==="song"&&album?
-            candidates.find(item=>musicRemoteMatches(item.collectionName,album)):null)||candidates[0];
-          const art=musicText(selected?.artworkUrl100);
+          const selected=(data.results||[]).find(matchesArtwork);
+          const art=musicText(selected?.artworkUrl100).replace(/\/100x100(bb\.[a-z0-9]+)$/i,"/600x600$1");
           const store=musicText(musicKind==="album"?selected?.collectionViewUrl:selected?.trackViewUrl);
           if(/^https:\/\//i.test(art)&&/^https:\/\//i.test(store)){
-            cover=art;source="Apple iTunes Search API";storeUrl=store;break;
+            cover=art;source="Apple iTunes Search API";storeUrl=store;foundGenre=musicText(selected?.primaryGenreName);break;
           }
         }
       }
@@ -428,6 +455,10 @@ if (musicRoot) {
       await musicUpdate("Cover",cover);
       await musicUpdate("CoverSource",source);
       if(storeUrl&&!musicGet("StoreUrl")) await musicUpdate("StoreUrl",storeUrl);
+      if(foundGenre&&!musicList(musicGet("Genre")).length){
+        await musicUpdate("Genre",[foundGenre]);
+        musicFrontmatter.Genre=[foundGenre];
+      }
       musicFrontmatter.Cover=cover;
       musicFrontmatter.CoverSource=source;
       if(storeUrl)musicFrontmatter.StoreUrl=storeUrl;
@@ -446,6 +477,11 @@ if (musicRoot) {
       musicArtworkRecoveryAttempted=true;
       void musicFindArtwork();
     }
+  }
+  if(!musicList(musicGet("Genre")).length && musicFile?.path) {
+    const enrichFn = musicContext?.activeWindow?.__abyssalMusicEnrich ||
+      musicRoot.ownerDocument?.defaultView?.__abyssalMusicEnrich;
+    if(typeof enrichFn==="function") void enrichFn(musicFile.path);
   }
 
   // Move any hand-written legacy Lyrics section to an independent local file

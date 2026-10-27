@@ -74,9 +74,14 @@ async function run(kind) {
   const frontmatter = {
     Title: file.basename,
     Artist: "Test Artist",
+    AlbumArtist: "Frank Sinatra&Dean Martin",
     Year: 2024,
     ReleaseDate: "2024-10-20",
     Genre: ["Dream Pop"],
+    Composer: ["Test Composer", "Second Composer"],
+    Language: "English",
+    MetadataSources: ["MusicBrainz", "Apple iTunes"],
+    MetadataWarning: "Edition information remains incomplete",
     Cover: "https://coverartarchive.org/test-cover.jpg",
     Duration: 420,
     Favourite: false,
@@ -108,6 +113,11 @@ async function run(kind) {
   assert.equal(elements["music-artist"].textContent, "Test Artist");
   assert.equal(elements["music-cover"].src, "https://coverartarchive.org/test-cover.jpg");
   assert.equal(elements["music-genres"].children[0].textContent, "Dream Pop");
+  const details=elements["music-details"].children.map(row=>row.children.map(el=>el.textContent));
+  assert.ok(details.some(([label,value])=>label==="Album artist"&&value==="Frank Sinatra &\nDean Martin"));
+  assert.ok(details.some(([label,value])=>label==="Composer"&&value==="Test Composer, Second Composer"));
+  assert.ok(details.some(([label,value])=>label==="Metadata sources"&&value==="MusicBrainz, Apple iTunes"));
+  assert.ok(details.some(([label,value])=>label==="Metadata note"&&value==="Edition information remains incomplete"));
   await elements["music-favourite"].events.click();
   await ratings[3].events.click();
   assert.deepEqual(written, [{ Favourite: true }, { PersonalRating: 4 }]);
