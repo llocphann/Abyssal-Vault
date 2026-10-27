@@ -35,6 +35,7 @@ Several workflows expect stable folder locations.
 
 - Finance records are stored beneath `20_Personal_Life/22_Finance/Records`.
 - Place discovery scans the configured Places/Food & Drinks source folders.
+- Book assets are stored under `90_System/95_Media_Assets/Books`.
 - Movie assets are stored under `90_System/95_Media_Assets/Movies`.
 - TV assets are stored under `90_System/95_Media_Assets/TV_Series`.
 - Game assets are stored under `90_System/95_Media_Assets/Games`.

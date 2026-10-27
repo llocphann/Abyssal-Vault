@@ -2,6 +2,30 @@
 
 All notable changes to Abyssal Vault are documented here.
 
+## 1.0.2 — 2026-10-28
+
+### Added
+
+- Added the Music Tracker system (`20_Personal_Life/28_Music_Tracker/Music_Tracker.base`) with `Music Library`, `Favourite Songs`, `Favourite Albums`, `Songs Data`, and `Albums Data` views, plus bundled sample Album and Song notes.
+- Added `music-song-v1` and `music-album-v1` Custom Views featuring a cover-first hero, interactive Favourite and 5-star Personal Rating controls, linked Album tracklists, local LRCLIB lyrics loading (`Lyrics/LRCLIB-<id>.txt`), and Journal-style writing paper that switches to Live Preview on click.
+- Added the Music metadata importer (`music_metadata.js`) and Templater startup bridge (`Sync_Music_Custom_Views.md`) supporting MusicBrainz, Cover Art Archive, Apple iTunes Search API fallback, LRCLIB lyrics persistence, and non-destructive background metadata enrichment.
+- Added the Book metadata importer (`book_metadata.js`) with Open Library and Google Books fallback and multilingual search preferences.
+- Added the shared 5-step non-blocking import progress notice (`import_progress.js`) across Movie, TV Series, Game, Recipe, Book, Song, and Album template workflows.
+
+### Fixed
+
+- Upgraded Apple iTunes cover artwork URLs from `100x100bb.jpg` to high-resolution `600x600bb.jpg` across the importer, Custom View artwork recovery, and existing Music notes.
+- Eliminated the fixed right-side blank gutter in `Music_Tracker.base` and fixed `.bases-group-heading` width so category dividers span the full container width.
+- Reflowed Music Base cards across rows when a card expands (`2-column` span with automatic row wrapping) and anchored right-corner cards to open their metadata drawer to the left without clipping or covering adjacent cards.
+- Synchronized Album-generated Song notes (`createSongNotes`) with standalone Song note creation, including `TrackCount`, formatted `Genre` fallback, work credits, Apple track metadata, and enrichment provenance stamps.
+- Fixed false `identity_conflict` warnings on Apple iTunes albums whose collection `trackCount` includes digital booklets or bonus videos alongside song tracks.
+- Removed hover tooltip attributes (`title`, `aria-label`) from Exercise Custom View target maps, movement profiles, and Music Base cards.
+
+### Improved
+
+- Styled Music Base cards and category group headers (`01 ALBUMS · LONG-PLAY RELEASES`, `02 SONGS · SINGLES & TRACKS`) to match the Media Library aesthetic using Core snippet color tokens (`--bases-*`, `--lake-*`, `--cc-p*`) in both Dark and Abyssal Light (`.theme-light`) themes.
+- Differentiated genre chip indicator colors in both compact and expanded Music Base card views, and allowed long `Album artist` metadata values in Song Custom Views to wrap cleanly across lines.
+
 ## 1.0.1.1 — 2026-09-26
 
 ### Fixed

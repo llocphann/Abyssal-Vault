@@ -2,6 +2,15 @@
 
 `20_Personal_Life/27_Game_Tracker` stores game catalog metadata, personal notes, and optional platform statistics as Markdown records.
 
+## Shared import progress
+
+The Game metadata importer displays the same five-step English progress
+Notice. It tracks Steam search, game selection, metadata/details, artwork
+and optional statistics, then note creation. When Steam has no result or
+fails, it reports RAWG fallback without resetting the progress bar.
+Manual skeleton notes and errors also close the indicator reliably.
+The Game Tracker schema and personal statistics behavior are unchanged.
+
 ## Game records
 
 Current records include `Core Keeper.md`, `Crimson Desert Enhanced.md`, `Cult of the Lamb.md`, and `DEATH STRANDING DIRECTOR'S CUT.md`.

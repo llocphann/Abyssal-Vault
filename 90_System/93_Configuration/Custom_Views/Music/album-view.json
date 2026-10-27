@@ -1,0 +1,19 @@
+{
+  "id": "music-album-v1",
+  "name": "Albums",
+  "rules": {
+    "type": "group",
+    "operator": "AND",
+    "conditions": [
+      {
+        "type": "filter",
+        "field": "file",
+        "operator": "in folder",
+        "value": "20_Personal_Life/28_Music_Tracker/Albums"
+      }
+    ]
+  },
+  "showProperties": false,
+  "showInlineTitle": false,
+  "showNavigationBar": true
+}

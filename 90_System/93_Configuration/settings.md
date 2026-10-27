@@ -13,6 +13,8 @@ openweathermap_unit: metric
 tmdb_key: fill in your api key
 spoonacular_key: fill in your spoonacular_api_key
 recipe_provider: auto
+book_provider: auto
+book_language: auto
 rawg_api_key: fill in your rawg_api_key
 steam_api_key: fill in your steam_api_key
 steam_id: fill in your steam_id

@@ -2240,3 +2240,22 @@ box-shadow:none !important;
   max-width: none !important;
   margin-inline: 0 !important;
 }
+
+
+/* Music Custom Views: suppress retired UI even when an older plugin snapshot
+   is cached in memory before the authoritative Templater sync has run. */
+.obsidian-custom-view-render .cv-music .cv-music-prompt-panel,
+.cv-music .cv-music-prompt-panel {
+  display: none !important;
+}
+.obsidian-custom-view-render .cv-music .cv-music-lyrics-foot > span,
+.cv-music .cv-music-lyrics-foot > span {
+  display: none !important;
+}
+.cv-music .cv-music-lyrics-panel:has(.cv-music-lyrics-text:not([hidden]))
+  .cv-music-lyrics-status {
+  display: none !important;
+}
+.cv-music .cv-music-section-heading > :is(span,p) {
+  display: none !important;
+}

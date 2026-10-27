@@ -6,8 +6,6 @@
   regions to the 17 free-exercise-db muscle groups used by Exercise notes.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 98" preserveAspectRatio="xMidYMid meet" role="img">
-  <title>Anterior and posterior muscle target map</title>
-  <desc>Detailed local anatomy map grouped for Exercise note primary and secondary muscle highlighting.</desc>
   <g class="muscle-map__body" aria-hidden="true">
     <path data-source-id="head" d="m 11.671635,6.3585449 -0.0482,-2.59085 4.20648,-2.46806 4.42769,2.95361 -0.0405,1.94408 0.24197,-3.34467 -2.03129,-2.31103004 -2.84508,-0.51629 -2.20423,0.52915 -1.9363,2.63077004 z" />
     <path data-source-id="face" d="m 19.748825,6.7034949 0.0203,-2.20747 -3.96689,-2.7637 -3.74099,2.23559 -0.006,2.63528 -0.60741,0.0403 0.27408,1.82447 0.97635,0.33932 0.44244,2.1802901 1.82222,2.06556 2.03518,-0.0607 1.79223,-1.94408 0.35957,-2.2406601 0.97616,-0.33932 0.25159,-1.78416 z" />

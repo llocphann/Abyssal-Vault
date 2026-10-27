@@ -1,0 +1,250 @@
+formulas:
+  music_card: |-
+    if(
+      categories.containsAny(link("Albums")),
+          html((
+            "<article class='music-peek-card music-peek-album'>" +
+            "<div class='music-peek-head'><div class='music-peek-identity'><h3 class='music-peek-title'><a class='internal-link music-peek-note-link' href=\"{note}\" data-href=\"{note}\">{title}</a></h3><p class='music-peek-artist'>{artist}</p></div>{heart}</div>" +
+            "<div class='music-peek-chips'>{genres}{yearChip}</div></article>"
+          )
+            .replace(/\{note\}/g, escapeHTML(file.path.toString()))
+            .replace(/\{title\}/g, escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+            .replace(/\{artist\}/g, escapeHTML(if(Artist, Artist.toString(), if(AlbumArtist, AlbumArtist.toString(), "Unknown artist"))))
+            .replace(/\{heart\}/g, if(Favourite, "<span class='music-peek-heart'>♥</span>", "<span class='music-peek-heart is-empty'>♡</span>"))
+            .replace(/\{genres\}/g, if(Genre, list(Genre).slice(0, 2).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
+            .replace(/\{yearChip\}/g, if(Year, "<span class='music-peek-chip music-peek-year'>" + Year.toString() + "</span>", if(ReleaseDate, "<span class='music-peek-chip music-peek-year'>" + ReleaseDate.toString().slice(0,4) + "</span>", "")))),
+      if(
+        categories.containsAny(link("Songs")),
+              html((
+                "<article class='music-peek-card music-peek-song'>" +
+                "<div class='music-peek-head'><div class='music-peek-identity'><h3 class='music-peek-title'><a class='internal-link music-peek-note-link' href=\"{note}\" data-href=\"{note}\">{title}</a></h3><p class='music-peek-artist'>{artist}</p></div>{heart}</div>" +
+                "<div class='music-peek-chips'>{genres}{yearChip}</div></article>"
+              )
+                .replace(/\{note\}/g, escapeHTML(file.path.toString()))
+                .replace(/\{title\}/g, escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+                .replace(/\{artist\}/g, escapeHTML(if(Artist, Artist.toString(), "Unknown artist")))
+                .replace(/\{heart\}/g, if(Favourite, "<span class='music-peek-heart'>♥</span>", "<span class='music-peek-heart is-empty'>♡</span>"))
+                .replace(/\{genres\}/g, if(Genre, list(Genre).slice(0, 2).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
+                .replace(/\{yearChip\}/g, if(Year, "<span class='music-peek-chip music-peek-year'>" + Year.toString() + "</span>", if(ReleaseDate, "<span class='music-peek-chip music-peek-year'>" + ReleaseDate.toString().slice(0,4) + "</span>", "")))),
+        null
+      )
+    )
+  music_details: |-
+    if(
+      categories.containsAny(link("Albums")),
+          html((
+            "<section class='music-peek-detail music-peek-album-detail'><header class='music-peek-detail-head'><div><h3 class='music-peek-detail-title'><a class='internal-link music-peek-note-link' href=\"{note}\" data-href=\"{note}\">{title}</a></h3><p class='music-peek-artist'>{artist}</p></div>{heart}</header>" +
+            "<div class='music-peek-meta'><span class='music-peek-meta-year'>{year}</span><span class='music-peek-meta-tracks'>{tracks}</span><span class='music-peek-meta-duration'>{duration}</span></div><div class='music-peek-tags'>{genres}</div>" +
+            "<p class='music-peek-description'>{description}</p></section>"
+          )
+            .replace(/\{note\}/g, escapeHTML(file.path.toString()))
+            .replace(/\{title\}/g, escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+            .replace(/\{artist\}/g, escapeHTML(if(Artist, Artist.toString(), if(AlbumArtist, AlbumArtist.toString(), "Unknown artist"))))
+            .replace(/\{heart\}/g, if(Favourite, "<span class='music-peek-heart'>♥</span>", "<span class='music-peek-heart is-empty'>♡</span>"))
+            .replace(/\{year\}/g, if(Year, Year.toString(), if(ReleaseDate, ReleaseDate.toString().slice(0, 4), "")))
+            .replace(/\{duration\}/g, if(Duration, (Duration / 60).round().toString() + " min", ""))
+            .replace(/\{tracks\}/g, if(TrackCount, TrackCount.toString() + " tracks", ""))
+            .replace(/\{genres\}/g, if(Genre, list(Genre).slice(0, 3).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
+            .replace(/\{description\}/g, escapeHTML(if(Description, Description.toString(), "")))),
+      if(
+        categories.containsAny(link("Songs")),
+              html((
+                "<section class='music-peek-detail music-peek-song-detail'><header class='music-peek-detail-head'><div><h3 class='music-peek-detail-title'><a class='internal-link music-peek-note-link' href=\"{note}\" data-href=\"{note}\">{title}</a></h3><p class='music-peek-artist'>{artist}</p></div>{heart}</header>" +
+                "<div class='music-peek-meta'><span class='music-peek-meta-year'>{year}</span><span class='music-peek-meta-tracks'>{track}</span><span class='music-peek-meta-duration'>{duration}</span></div><div class='music-peek-tags'>{genres}</div><p class='music-peek-album'>{album}</p>" +
+                "<p class='music-peek-description'>{description}</p></section>"
+              )
+                .replace(/\{note\}/g, escapeHTML(file.path.toString()))
+                .replace(/\{title\}/g, escapeHTML(if(Title, Title.toString(), file.basename.toString())))
+                .replace(/\{artist\}/g, escapeHTML(if(Artist, Artist.toString(), "Unknown artist")))
+                .replace(/\{heart\}/g, if(Favourite, "<span class='music-peek-heart'>♥</span>", "<span class='music-peek-heart is-empty'>♡</span>"))
+                .replace(/\{year\}/g, if(Year, Year.toString(), if(ReleaseDate, ReleaseDate.toString().slice(0, 4), "")))
+                .replace(/\{duration\}/g, if(Duration, (Duration / 60).floor().toString() + ":" + if(Duration % 60 < 10, "0", "") + (Duration % 60).round().toString(), ""))
+                .replace(/\{track\}/g, if(TrackNumber, "Track " + TrackNumber.toString(), "Single"))
+                .replace(/\{album\}/g, escapeHTML(if(Album, Album.toString(), "Single release")).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1"))
+                .replace(/\{genres\}/g, if(Genre, list(Genre).slice(0, 3).map("<span class='music-peek-chip'>" + escapeHTML(value.toString()).replace(/\[\[([^\|\]]+)\|([^\]]+)\]\]/g, "$2").replace(/\[\[([^\]]+)\]\]/g, "$1") + "</span>").join(""), ""))
+                .replace(/\{description\}/g, escapeHTML(if(Description, Description.toString(), "")))),
+        null
+      )
+    )
+properties:
+  Title:
+    displayName: Title
+  Artist:
+    displayName: Artist
+  Album:
+    displayName: Album
+  AlbumArtist:
+    displayName: Album artist
+  Genre:
+    displayName: Genres
+  Year:
+    displayName: Year
+  ReleaseDate:
+    displayName: Release date
+  Duration:
+    displayName: Duration (seconds)
+  TrackNumber:
+    displayName: Track
+  DiscNumber:
+    displayName: Disc
+  TrackCount:
+    displayName: Tracks
+  Favourite:
+    displayName: Favourite
+  PersonalRating:
+    displayName: Personal rating
+  Cover:
+    displayName: Cover art URL
+  Description:
+    displayName: Description
+  Tracklist:
+    displayName: Tracklist
+  Source:
+    displayName: Metadata source
+  SourceUrl:
+    displayName: Source URL
+  StoreUrl:
+    displayName: Music link
+  MusicBrainzId:
+    displayName: MusicBrainz ID
+  ReleaseGroupId:
+    displayName: Release group ID
+  AppleTrackId:
+    displayName: Apple track ID
+  AppleCollectionId:
+    displayName: Apple collection ID
+  ISRC:
+    displayName: ISRC
+  LyricsFile:
+    displayName: Lyrics (local text file)
+  LyricsUrl:
+    displayName: Lyrics source
+  LyricsStatus:
+    displayName: Lyrics status
+  Label:
+    displayName: Label
+  Country:
+    displayName: Country
+  Format:
+    displayName: Format
+  ReleaseType:
+    displayName: Release type
+  Language:
+    displayName: Language
+  Composer:
+    displayName: Composer
+  Writer:
+    displayName: Writer
+  Producer:
+    displayName: Producer
+  MetadataSources:
+    displayName: Metadata sources
+  MetadataWarning:
+    displayName: Metadata warning
+views:
+  - type: cards
+    name: Music Library
+    filters:
+      and:
+        - categories.containsAny(link("Songs"), link("Albums"))
+    groupBy:
+      property: categories
+      direction: ASC
+    order:
+      - formula.music_card
+      - formula.music_details
+    sort:
+      - property: file.name
+        direction: ASC
+    image: note.Cover
+    imageAspectRatio: 1
+    cardSize: 190
+  - type: cards
+    name: Favourite Songs
+    filters:
+      and:
+        - categories.containsAny(link("Songs"))
+        - Favourite == true
+    order:
+      - formula.music_card
+      - formula.music_details
+    sort:
+      - property: Title
+        direction: ASC
+    image: note.Cover
+    imageAspectRatio: 1
+    cardSize: 250
+  - type: cards
+    name: Favourite Albums
+    filters:
+      and:
+        - categories.containsAny(link("Albums"))
+        - Favourite == true
+    order:
+      - formula.music_card
+      - formula.music_details
+    sort:
+      - property: Title
+        direction: ASC
+    image: note.Cover
+    imageAspectRatio: 1
+    cardSize: 250
+  - type: table
+    name: Songs Data
+    filters:
+      and:
+        - categories.containsAny(link("Songs"))
+    order:
+      - file.name
+      - Title
+      - Artist
+      - Album
+      - AlbumArtist
+      - Genre
+      - Year
+      - ReleaseDate
+      - Duration
+      - TrackNumber
+      - DiscNumber
+      - Favourite
+      - PersonalRating
+      - Cover
+      - Description
+      - Source
+      - SourceUrl
+      - StoreUrl
+      - MusicBrainzId
+      - ISRC
+      - AppleTrackId
+      - LyricsFile
+      - LyricsUrl
+      - LyricsStatus
+  - type: table
+    name: Albums Data
+    filters:
+      and:
+        - categories.containsAny(link("Albums"))
+    order:
+      - file.name
+      - Title
+      - Artist
+      - AlbumArtist
+      - Genre
+      - Year
+      - ReleaseDate
+      - TrackCount
+      - Duration
+      - Favourite
+      - PersonalRating
+      - Cover
+      - Description
+      - Tracklist
+      - Label
+      - Country
+      - Format
+      - Source
+      - SourceUrl
+      - StoreUrl
+      - MusicBrainzId
+      - ReleaseGroupId
+      - AppleCollectionId

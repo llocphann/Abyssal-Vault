@@ -115,6 +115,7 @@ Abyssal Vault is designed so information is entered or fetched once and reused t
 
 - **Movies & TV:** TMDB provides metadata, credits, posters, and backdrops.
 - **Games:** external metadata providers populate game records; Steam integration can synchronize playtime and achievements.
+- **Books:** Open Library / Google Books import precise editions, ISBN metadata, synopses, and cached local covers.
 - **Recipes:** Spoonacular / TheMealDB can populate structured recipe data, ingredients, instructions, and artwork.
 - **Finance:** standardized records feed Bases and reporting dashboards automatically.
 - **UI:** templates and YAML hold state; Bases, Dataview, scripts, and Custom Views turn that data into interfaces.

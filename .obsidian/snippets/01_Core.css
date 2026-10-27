@@ -114,6 +114,17 @@
         var(--vault-note-paper);
 }
 
+.theme-light {
+    --vault-note-paper: color-mix(in srgb, var(--cc-p13, #e6edef) 52%, #f9fcfd 48%);
+    --vault-note-paper-rule: color-mix(in srgb, var(--cc-p07, #3e5965) 26%, transparent);
+    --vault-note-paper-margin-rule: color-mix(in srgb, #18647d 28%, transparent);
+    --vault-note-paper-edge: color-mix(in srgb, var(--cc-p07, #3e5965) 42%, transparent);
+    --vault-note-paper-stain: color-mix(in srgb, var(--cc-p09, #5f899b) 12%, transparent);
+    --vault-note-paper-pencil: color-mix(in srgb, var(--cc-p08, #4e707e) 7%, transparent);
+    --vault-note-paper-tape: color-mix(in oklch, var(--cc-p12, #c6d6dc) 78%, var(--cc-p10, #7da0b0) 22%);
+    --vault-note-paper-tape-edge: color-mix(in oklch, var(--cc-p07, #3e5965) 44%, transparent);
+}
+
 /* ---------- Dark theme: Obsidian Lake surfaces + bases ---------- */
 .theme-dark {
 --lake-bg:var(--cc-p02);
@@ -176,47 +187,55 @@
 }
 
 .theme-light {
---lake-bg:var(--background-primary);
---lake-surface:var(--background-primary);
---lake-surface-2:var(--background-secondary);
---lake-surface-3:var(--background-secondary-alt, var(--background-secondary));
---lake-surface-4:var(--background-modifier-hover);
---lake-active:var(--background-modifier-active-hover, var(--background-modifier-hover));
---lake-accent:var(--interactive-accent);
---lake-accent-soft:var(--interactive-accent-hover, var(--interactive-accent));
---lake-text:var(--text-normal);
---lake-text-soft:var(--text-muted);
---lake-border:var(--background-modifier-border);
---lake-border-2:var(--background-modifier-border-hover, var(--background-modifier-border));
---lake-border-3:var(--background-modifier-border-focus, var(--background-modifier-border));
---lake-shadow:0 6px 18px color-mix(in srgb, var(--text-normal) 10%, transparent);
---bases-bg:var(--background-primary);
---bases-bg-alt:var(--background-secondary);
---bases-header:var(--background-secondary);
---bases-hover:var(--background-modifier-hover);
---bases-active:var(--background-modifier-active-hover, var(--background-modifier-hover));
---bases-border:var(--background-modifier-border);
---bases-border-2:var(--background-modifier-border-hover, var(--background-modifier-border));
---bases-text:var(--text-normal);
---bases-text-soft:var(--text-muted);
---bases-heading:var(--interactive-accent);
---bases-accent:var(--interactive-accent);
+--lake-bg:color-mix(in srgb, var(--cc-p13) 64%, #f7fbfc 36%);
+--lake-surface:color-mix(in srgb, var(--cc-p13) 74%, #f4f9fb 26%);
+--lake-surface-2:color-mix(in srgb, var(--cc-p12) 48%, var(--cc-p13) 52%);
+--lake-surface-3:color-mix(in srgb, var(--cc-p12) 72%, var(--cc-p13) 28%);
+--lake-surface-4:color-mix(in srgb, var(--cc-p11) 48%, var(--cc-p13) 52%);
+--lake-active:color-mix(in srgb, var(--cc-p10) 45%, var(--cc-p12) 55%);
+--lake-accent:var(--cc-p06);
+--lake-accent-soft:var(--cc-p07);
+--lake-text:var(--cc-p01);
+--lake-text-soft:var(--cc-p05);
+--lake-border:color-mix(in srgb, var(--cc-p06) 32%, transparent);
+--lake-border-2:color-mix(in srgb, var(--cc-p06) 54%, transparent);
+--lake-border-3:var(--cc-p06);
+--lake-shadow:0 8px 22px color-mix(in srgb, var(--cc-p01) 12%, transparent);
+--bases-bg:color-mix(in srgb, var(--cc-p13) 68%, #f6fafb 32%);
+--bases-bg-alt:color-mix(in srgb, var(--cc-p12) 46%, var(--cc-p13) 54%);
+--bases-header:color-mix(in srgb, var(--cc-p12) 66%, var(--cc-p13) 34%);
+--bases-hover:color-mix(in srgb, var(--cc-p11) 42%, var(--cc-p13) 58%);
+--bases-active:color-mix(in srgb, var(--cc-p10) 42%, var(--cc-p12) 58%);
+--bases-border:color-mix(in srgb, var(--cc-p06) 34%, transparent);
+--bases-border-2:var(--cc-p07);
+--bases-text:var(--cc-p02);
+--bases-text-soft:var(--cc-p05);
+--bases-heading:var(--cc-p00);
+--bases-accent:var(--cc-p06);
 }
 
 .theme-light {
     --contrast-color: var(--text-normal);
     --default-text-color: var(--text-normal);
-    --bg-contrast-amount: 70%;
-    --fg-contrast-amount: 30%;
-    --medium-contrast-amount: 60%;
-    --active-contrast-amount: 30%;
+    --highlight: #165a72;
+    --bright-accent: #165a72;
+    --bg-contrast-amount: 18%;
+    --fg-contrast-amount: 35%;
+    --medium-contrast-amount: 35%;
+    --active-contrast-amount: 22%;
 
-    --soft-cyan: var(--color-yellow);
-    --seafoam: var(--color-green);
-    --mint: var(--color-green);
-    --cyan: var(--color-cyan);
-    --cool-cyan: var(--color-cyan);
-    --light-blue: var(--color-blue);
+    --soft-cyan: #165a72;
+    --seafoam: #156d63;
+    --mint: #156d63;
+    --cyan: #0f647d;
+    --cool-cyan: #0f647d;
+    --light-blue: #1c588c;
+    --teal: #1d5d6b;
+    --deep-teal: #244f5c;
+    --dark-teal: #244f5c;
+    --pine: #26363e;
+    --deep-pine: #26363e;
+    --forest-teal: #1d2a2f;
 }
 
 /*******************************************************************************
@@ -290,6 +309,15 @@
   background: var(--cc-p05);
   border-color: var(--cc-p06);
   color: var(--cc-accent);
+}
+.theme-light .markdown-rendered :is(strong, table strong),
+.theme-light .markdown-source-view.mod-cm6 table strong { color: var(--cc-p00); }
+.theme-light .markdown-rendered em { color: #165a72; }
+.theme-light .markdown-rendered :is(code, table code),
+.theme-light .markdown-source-view.mod-cm6 table code {
+  background: color-mix(in srgb, var(--cc-p12) 55%, #f4f8fa 45%);
+  border-color: color-mix(in srgb, var(--cc-p06) 35%, transparent);
+  color: var(--cc-p02);
 }
 
 /*******************************************************************************

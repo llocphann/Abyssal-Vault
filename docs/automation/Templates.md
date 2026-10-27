@@ -76,17 +76,20 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 
 ## `Book_Template.md`
 
-- **Book identity** — initializes a Book record compatible with `Book_Tracker.base`.
-- **Author / Cover** — provides author and artwork fields.
-- **Reading state** — initializes status to `Haven't started`.
-- **Page progress** — initializes CurrentPage and TotalPages.
-- **Reading dates** — provides DateStarted and DateFinished.
-- **Rating / Genre** — provides evaluation and classification fields.
-- **Synopsis** — creates summary space.
-- **Notes & Takeaways** — creates knowledge-extraction space.
-- **Highlights** — creates quotation/excerpt space.
-- **Review & Thoughts** — creates personal review space.
-- **Connections** — creates links to related books, topics, applications, or projects.
+- **Templater entrypoint** — delegates to `tp.user.book_metadata(tp)` when a new blank note is created inside the Books folder.
+- **Provider search** — supports Open Library and Google Books, searching by title, author or ISBN and selecting a precise edition/volume.
+- **Schema compatibility** — imports `Title`, `Author`, `Cover`, `Genre`, `TotalPages`, and synopsis without changing existing Book Base or Custom View contracts.
+- **Local cover** — downloads a provider-scoped image under `90_System/95_Media_Assets/Books` and stores a basename wikilink.
+- **Personal state** — initializes `Status`, `CurrentPage`, reading dates and `Rating` without inventing personal activity.
+- **Safe fallback** — preserves existing nonempty notes; failed search/cancellation creates a blank template, while detected duplicate records are not generated.
+
+## Album_Template.md and Song_Template.md
+
+- **Automatic metadata** — MusicBrainz is queried first; the no-key Apple iTunes Search API is used when MusicBrainz has no usable results.
+- **Album track creation** — offers create-all, choose-tracks, or album-only modes. Existing Song notes are reused by provider identity.
+- **Song reflection structure** — creates empty Personal Reflections and Notes sections, with no prewritten lyric placeholder or journal questions. LRCLIB lyrics are stored in separate local text assets when available.
+- **Cover art** — uses remote Cover Art Archive artwork when available instead of downloading or caching store artwork.
+- **Safe fallback** — preserves nonempty notes, keeps available metadata when a provider fails, and avoids duplicate records.
 
 ## `Place_Template.md`
 
@@ -130,6 +133,8 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 
 ## `Movie_Template.md`
 
+- **Progress UI** — the shared English five-step Notice shows TMDB search, selection, detail retrieval, assets and final note generation, closing on error/cancel.
+
 - **Private TMDB configuration** — reads the TMDB key from local configuration.
 - **Search** — searches TMDB by prompt or filename.
 - **Result selection** — lets the user choose the correct match.
@@ -147,6 +152,8 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 
 ## `TV_Show_Template.md`
 
+- **Progress UI** — the same shared Notice follows TMDB TV search, selection, detail retrieval, artwork and note generation; closes on early return.
+
 - **Private TMDB configuration** — reads TMDB credentials locally.
 - **TV search and selection** — searches the TMDB TV catalog and lets the user choose a result.
 - **Metadata import** — imports creators, directors, writers, cast, genres, networks, seasons, episodes, runtime, status, dates, language, description, tagline, and external IDs.
@@ -156,6 +163,8 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 - **Failure safety** — protects existing records.
 
 ## `Game_Template.md`
+
+- **Progress UI** — `game_metadata.js` opens a shared five-step Notice for Steam/RAWG and closes it with `finally`.
 
 - **Metadata import** — calls `tp.user.game_metadata(tp)`.
 - **Personal Log** — adds gameplay-reflection prompts.
@@ -169,6 +178,8 @@ Templates live under `90_System/91_Templates` and define the initial schema and 
 - **Existing-record update** — synchronizes personal statistics without recreating the Game record.
 
 ## `Recipe_Template.md`
+
+- **Progress UI** — `spoonacular_recipe.js` uses the shared five-step Notice across Spoonacular/TheMealDB search, selection, details, local cover and note generation.
 
 - **Importer entrypoint** — calls `tp.user.spoonacular_recipe(tp)`.
 - **Provider abstraction** — delegates provider choice and schema normalization to the importer.

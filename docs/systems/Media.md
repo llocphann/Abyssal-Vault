@@ -2,6 +2,17 @@
 
 `20_Personal_Life/25_Media_Tracker` stores Movies and TV Series as Markdown records and presents them through `Media_Tracker.base`.
 
+## Shared import progress
+
+Both Movie and TV Series templates now call `tp.user.import_progress` from
+`90_System/92_Scripts/Template_Scripts/import_progress.js`. A non-blocking,
+English-language Notice shows five workflow steps (TMDB search, selection,
+metadata, artwork, note creation) and elapsed time; the Notice is closed
+on normal completion, error or cancellation. The bar represents *steps*, not
+bytes or a guessed percentage. Existing Media Tracker Bases, Custom Views and
+YAML schemas are unchanged. Restart Obsidian after pulling updates so
+Templater loads the new helper.
+
 ## Movie records
 
 Movie notes are created by `Movie_Template.md` and enriched from TMDB.

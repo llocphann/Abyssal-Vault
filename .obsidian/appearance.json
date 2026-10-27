@@ -8,5 +8,6 @@
   "cssTheme": "Border",
   "interfaceFontFamily": "GeistMono Nerd Font",
   "textFontFamily": "GeistMono Nerd Font",
-  "monospaceFontFamily": "GeistMono Nerd Font"
+  "monospaceFontFamily": "GeistMono Nerd Font",
+  "theme": "system"
 }

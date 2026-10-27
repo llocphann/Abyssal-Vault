@@ -2,6 +2,15 @@
 
 `20_Personal_Life/26_Food_&_Drinks` combines a recipe database with Restaurants, Cafes, and Bars that also participate in the wider Places system.
 
+## Shared import progress
+
+The Spoonacular/TheMealDB importer displays a five-step English progress
+Notice for provider search, secondary-provider lookup (when enabled), recipe
+selection and metadata, local cover, and note creation. The elapsed-time
+counter refreshes while a provider responds; the Notice closes on
+cancellation, a blank-template fallback, or success. Existing recipe note
+schema and the Food & Drinks Base remain unchanged.
+
 ## Recipe records
 
 Current recipe records include examples such as `Asian Beef.md`, `Beef pho.md`, `Chicken Ranch Burgers.md`, `Chipotle Chicken Soup.md`, `Lamb Moussaka.md`, `Lemon Baked Fish.md`, and `Vietnamese Banh Mi.md`.

@@ -16,6 +16,11 @@ preview: "[[Ab_Roller-preview.webp]]"
 animation: "[[Ab_Roller.gif]]"
 images:
   - "[[Ab_Roller.gif]]"
+instruction_done:
+  - false
+  - false
+  - false
+  - false
 ---
 
 ## How to Perform

@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "9f0c726901136d8f",
+        "id": "39a73eca2f01ff34",
         "type": "tabs",
         "children": [
           {
-            "id": "0a5f392973893cf7",
+            "id": "dcf434c3c11fce6a",
             "type": "leaf",
             "pinned": true,
             "state": {
@@ -22,8 +22,61 @@
               "icon": "lucide-file",
               "title": "Homepage"
             }
+          },
+          {
+            "id": "eeb75d0cc925d256",
+            "type": "leaf",
+            "state": {
+              "type": "bases",
+              "state": {
+                "file": "20_Personal_Life/28_Music_Tracker/Music_Tracker.base",
+                "viewName": "Music Library"
+              },
+              "icon": "lucide-layout-grid",
+              "title": "Music_Tracker"
+            }
+          },
+          {
+            "id": "e2050bb230f90534",
+            "type": "leaf",
+            "state": {
+              "type": "bases",
+              "state": {
+                "file": "20_Personal_Life/28_Music_Tracker/Music_Tracker.base",
+                "viewName": "Music Library"
+              },
+              "icon": "lucide-layout-grid",
+              "title": "Music_Tracker"
+            }
+          },
+          {
+            "id": "bba29ca3d1c59063",
+            "type": "leaf",
+            "state": {
+              "type": "bases",
+              "state": {
+                "file": "20_Personal_Life/28_Music_Tracker/Music_Tracker.base",
+                "viewName": "Music Library"
+              },
+              "icon": "lucide-layout-grid",
+              "title": "Music_Tracker"
+            }
+          },
+          {
+            "id": "228948fae47c29ba",
+            "type": "leaf",
+            "state": {
+              "type": "bases",
+              "state": {
+                "file": "20_Personal_Life/28_Music_Tracker/Music_Tracker.base",
+                "viewName": "Music Library"
+              },
+              "icon": "lucide-layout-grid",
+              "title": "Music_Tracker"
+            }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "vertical"
@@ -239,8 +292,18 @@
             "state": {
               "type": "planner-time-tracker",
               "state": {},
-              "icon": "timer",
-              "title": "Time Tracker"
+              "icon": "lucide-ghost",
+              "title": "planner-time-tracker"
+            }
+          },
+          {
+            "id": "643ce42128601598",
+            "type": "leaf",
+            "state": {
+              "type": "planner-timeline",
+              "state": {},
+              "icon": "calendar-with-checkmark",
+              "title": "Timeline"
             }
           }
         ]
@@ -285,74 +348,72 @@
   },
   "left-ribbon": {
     "hiddenItems": {
-      "homepage:Open homepage": false,
       "switcher:Open quick switcher": false,
       "graph:Open graph view": false,
       "canvas:Create new canvas": false,
       "daily-notes:Open today's daily note": false,
       "templates:Insert template": false,
       "command-palette:Open command palette": false,
-      "markdown-importer:Open format converter": false,
       "zk-prefixer:Create new unique note": false,
       "publish:Publish changes...": false,
       "bases:Create new base": false,
+      "homepage:Open homepage": false,
+      "templater-obsidian:Templater": false,
       "obsidian-day-planner:Open Timeline": false,
-      "obsidian-day-planner:Open Multi-Day View": false,
-      "templater-obsidian:Templater": false
+      "obsidian-day-planner:Open Multi-Day View": false
     }
   },
-  "active": "0a5f392973893cf7",
+  "active": "228948fae47c29ba",
   "lastOpenFiles": [
-    "90_System/95_Media_Assets/Exercise/Anatomy/muscle-map.svg",
-    "90_System/95_Media_Assets/Exercise/Anatomy/SOURCE.md",
-    "90_System/95_Media_Assets/Exercise/Anatomy/NOTICE.txt",
-    "90_System/95_Media_Assets/Exercise/Anatomy/LICENSE.txt",
-    "90_System/95_Media_Assets/Exercise/Anatomy",
-    "90_System/95_Media_Assets/Exercise",
-    "90_System/93_Configuration/settings.md",
-    "20_Personal_Life/23_Places/Map.base",
-    "20_Personal_Life/33_Bodybuilding/Bodybuilding.base",
-    "20_Personal_Life/26_Food_&_Drinks/FoodnDrinks.base",
-    "20_Personal_Life/22_Finance/Finance_Dashboard.md",
-    "20_Personal_Life/27_Game_Tracker/Game_Collection.base",
-    "20_Personal_Life/24_Book_Tracker/Book_Tracker.base",
-    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
+    "20_Personal_Life/28_Music_Tracker/Albums/My World 2.0 (Bonus Track Version).md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Eenie Meenie.md",
+    "20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-38703638.txt",
+    "20_Personal_Life/28_Music_Tracker/Albums/Fearless.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Fearless.md",
+    "20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-13618.txt",
+    "20_Personal_Life/28_Music_Tracker/Songs/Breathe (feat. Colbie Caillat).md",
+    "20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-13382.txt",
+    "20_Personal_Life/28_Music_Tracker/Music_Tracker.base",
     "90_System/98_Homepage/Homepage.md",
-    "CHANGELOG.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Song 20261028-024147.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Untitled.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Change.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/The Best Day.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Forever Always.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/The Way I Loved You.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Youre Not Sorry.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Tell Me Why.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/You Belong With Me.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/White Horse.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Hey Stephen.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Love Story.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Fifteen.md",
+    "20_Personal_Life/28_Music_Tracker/Albums/Album 20261028-021323.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Kiss and Tell (Bonus Track).md",
+    "20_Personal_Life/28_Music_Tracker/Songs/That Should Be Me.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Up.md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Overboard (feat. Jessica Jarrell).md",
+    "20_Personal_Life/28_Music_Tracker/Songs/Never Let You Go.md",
+    "20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-37043145.txt",
+    "20_Personal_Life/27_Game_Tracker/Game_Collection.base",
+    "20_Personal_Life/25_Media_Tracker/Media_Tracker.base",
+    "20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-3679568.txt",
+    "20_Personal_Life/33_Bodybuilding/Bodybuilding.base",
+    "20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-36985988.txt",
+    "20_Personal_Life/24_Book_Tracker/Books/Donquixote.jpg",
+    "90_System/95_Media_Assets/Books/openlibrary-OL59008592M-cover.jpg",
+    "90_System/95_Media_Assets/Books/openlibrary-OL37063643M-cover.jpg",
+    "90_System/95_Media_Assets/Books/openlibrary-OL61278269M-cover.jpg",
+    "90_System/95_Media_Assets/Exercise/Anatomy/muscle-map.svg",
     "90_System/95_Media_Assets/TV_Series/65733-cover.jpg",
     "90_System/95_Media_Assets/TV_Series/71728-cover.jpg",
     "90_System/95_Media_Assets/TV_Series/76479-backdrop.jpg",
     "90_System/95_Media_Assets/TV_Series/76479-cover.jpg",
     "90_System/95_Media_Assets/TV_Series/79240-cover.jpg",
-    "90_System/95_Media_Assets/TV_Series/79588-backdrop.jpg",
-    "90_System/95_Media_Assets/TV_Series/79588-cover.jpg",
-    "90_System/95_Media_Assets/TV_Series/84958-backdrop.jpg",
-    "90_System/95_Media_Assets/TV_Series/84958-cover.jpg",
-    "90_System/95_Media_Assets/TV_Series/86831-backdrop.jpg",
-    "20_Personal_Life/27_Game_Tracker/Games/Crimson Desert Enhanced.md",
-    "20_Personal_Life/26_Food_&_Drinks/Recipes/Lamb Moussaka.md",
-    "__morphic_competitive_bench__/First.md",
-    "__morphic_competitive_bench__/Reset.md",
-    "__morphic_competitive_bench__/Warm.md",
     "__morphic_competitive_bench__/Canvas-100.canvas",
     "__morphic_competitive_bench__/Canvas-50.canvas",
     "__morphic_competitive_bench__/Canvas-10.canvas",
     "__morphic_competitive_bench__/Canvas-1.canvas",
-    "__morphic_competitive_bench__/Resource.md",
-    "__morphic_competitive_bench__/Current-C.md",
-    "__morphic_competitive_bench__/Current-B.md",
-    "__morphic_competitive_bench__/Current-A.md",
-    "__morphic_competitive_bench__/Canvas-Target.md",
-    "__morphic_competitive_bench__/Filter.md",
-    "__morphic_competitive_bench__/Bases.md",
-    "__morphic_competitive_bench__/Loop.md",
-    "__morphic_competitive_bench__/Expression.md",
-    "__morphic_competitive_bench__/Linked-Source.md",
-    "__morphic_competitive_bench__/Linked.md",
-    "__morphic_competitive_bench__/Body.md",
-    "__morphic_competitive_bench__/Metadata.md",
-    "__morphic_competitive_bench__/Noop.md",
-    "__morphic_competitive_bench__/Nav-B.md",
     "__morphic_canvas_error_probe__/Probe.canvas",
     "__morphic_canvas_readiness_probe__/Probe.canvas"
   ]

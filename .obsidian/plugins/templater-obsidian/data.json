@@ -60,6 +60,14 @@
     {
       "folder": "20_Personal_Life/26_Food_&_Drinks/Bars",
       "template": "90_System/91_Templates/Place_Template.md"
+    },
+    {
+      "folder": "20_Personal_Life/28_Music_Tracker/Songs",
+      "template": "90_System/91_Templates/Song_Template.md"
+    },
+    {
+      "folder": "20_Personal_Life/28_Music_Tracker/Albums",
+      "template": "90_System/91_Templates/Album_Template.md"
     }
   ],
   "file_templates": [],
@@ -68,7 +76,8 @@
   "enabled_templates_hotkeys": [],
   "startup_templates": [
     "90_System/91_Templates/Sync_Places_Custom_View.md",
-    "90_System/91_Templates/Sync_Settings_Custom_View.md"
+    "90_System/91_Templates/Sync_Settings_Custom_View.md",
+    "90_System/91_Templates/Sync_Music_Custom_Views.md"
   ],
   "intellisense_render": "1",
   "ignore_folders_on_creation": [],

@@ -54,6 +54,9 @@ function failGeneratedNote(reason) {
   });
 }
 
+const importProgress = typeof tp.user?.import_progress === "function"
+  ? tp.user.import_progress(tp, {title:"TV Series Import",totalSteps:5})
+  : {update:()=>{},close:()=>{}};
 try {
 const settingsPath = "90_System/93_Configuration/settings.local.md";
 const settingsFile = tp.app.vault.getAbstractFileByPath(settingsPath);
@@ -80,6 +83,7 @@ const searchUrl =
 
 let searchResponse;
 try {
+  importProgress.update(1,"Searching TMDB for TV series...");
   searchResponse = await tp.web.request(searchUrl);
 } catch (error) {
   failGeneratedNote(`TMDB search error: ${error.message || error}`);
@@ -100,6 +104,7 @@ const display = limited.map(result => {
   return `${title} (${year}) [${language}]`;
 });
 
+importProgress.update(2,"Waiting for TV series selection...");
 const chosenSeries = await tp.system.suggester(display, limited, true, "Pick a TV series");
 if (!chosenSeries) {
   failGeneratedNote("Selection cancelled.");
@@ -113,6 +118,7 @@ const detailsUrl =
 
 let details, credits, externalIds;
 try {
+  importProgress.update(3,"Fetching TMDB TV series details...");
   details = await tp.web.request(detailsUrl);
   credits = details?.credits || {};
   externalIds = details?.external_ids || {};
@@ -213,6 +219,7 @@ const directorsProcessed = await linkPeople(directorNames);
 const writersProcessed = await linkPeople(writerNames);
 const castProcessed = await linkPeople(castNames);
 
+importProgress.update(4,"Preparing artwork and metadata...");
 // Store binaries under 90_System/95_Media_Assets; YAML keeps basename-only wikilinks.
 let localMedia = { cover: "", backdrop: "" };
 try {
@@ -235,6 +242,7 @@ const localMediaLink = value => {
 const coverLink = localMediaLink(localMedia.cover);
 const backdropLink = localMediaLink(localMedia.backdrop);
 
+importProgress.update(5,"Finalizing TV series note...");
 const ratingChoices = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 let rating = await tp.system.suggester(
   ratingChoices,
@@ -331,5 +339,7 @@ tR += lines.join("\n");
 } catch (error) {
   failGeneratedNote(error);
   return;
+} finally {
+  importProgress.close();
 }
 %>

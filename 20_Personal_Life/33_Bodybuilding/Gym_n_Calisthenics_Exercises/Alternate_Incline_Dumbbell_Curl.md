@@ -16,6 +16,12 @@ preview: "[[Alternate_Incline_Dumbbell_Curl-preview.webp]]"
 animation: "[[Alternate_Incline_Dumbbell_Curl.gif]]"
 images:
   - "[[Alternate_Incline_Dumbbell_Curl.gif]]"
+instruction_done:
+  - false
+  - false
+  - false
+  - false
+  - false
 ---
 
 ## How to Perform

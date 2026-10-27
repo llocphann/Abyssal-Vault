@@ -140,7 +140,8 @@ function steamPlatforms(platforms = {}) {
   return result;
 }
 
-async function fetchSteamDetails(tp, appId) {
+async function fetchSteamDetails(tp, appId, progress) {
+  progress?.update(3,"Fetching Steam game details...");
   const requestUrl = tp.obsidian.requestUrl;
   const endpoint = `https://store.steampowered.com/api/appdetails?appids=${encodeURIComponent(appId)}&l=english&cc=US`;
   const payload = await jsonRequest(requestUrl, endpoint);
@@ -150,6 +151,7 @@ async function fetchSteamDetails(tp, appId) {
   const id = String(data.steam_appid || appId);
   const storeUrl = `https://store.steampowered.com/app/${id}/`;
   const portraitUrl = `https://shared.cloudflare.steamstatic.com/store_item_assets/steam/apps/${id}/library_600x900.jpg`;
+  progress?.update(4,"Downloading Steam game artwork...");
   const cover = await downloadFirst(tp, id, "cover", [portraitUrl, data.header_image, data.capsule_image]);
   const backdrop = await downloadFirst(tp, id, "backdrop", [
     data.screenshots?.[0]?.path_full,
@@ -184,9 +186,9 @@ async function searchSteam(tp, query) {
   return (payload?.items || []).slice(0, 12).filter(item => item?.id && item?.name);
 }
 
-async function pickSteam(tp, query) {
+async function pickSteam(tp, query, progress) {
   const directId = steamIdFromInput(query);
-  if (directId) return fetchSteamDetails(tp, directId);
+  if (directId) return fetchSteamDetails(tp, directId, progress);
 
   let items = [];
   try {
@@ -200,9 +202,10 @@ async function pickSteam(tp, query) {
     const platforms = steamPlatforms(item.platforms).join("/");
     return `${item.name}${platforms ? ` · ${platforms}` : ""}`;
   });
+  progress?.update(2,"Waiting for Steam game selection...");
   const selected = await tp.system.suggester(labels, items, false, "Pick a Steam game (Esc = try fallback)");
   if (!selected) return null;
-  return fetchSteamDetails(tp, selected.id);
+  return fetchSteamDetails(tp, selected.id, progress);
 }
 
 async function searchRawg(tp, query, key) {
@@ -212,13 +215,15 @@ async function searchRawg(tp, query, key) {
   return (payload?.results || []).slice(0, 10).filter(item => item?.id && item?.name);
 }
 
-async function fetchRawgDetails(tp, game, key) {
+async function fetchRawgDetails(tp, game, key, progress) {
+  progress?.update(3,"Fetching RAWG game details...");
   const requestUrl = tp.obsidian.requestUrl;
   const data = await jsonRequest(
     requestUrl,
     `https://api.rawg.io/api/games/${encodeURIComponent(game.id)}?key=${encodeURIComponent(key)}`,
   );
   const identity = `rawg-${data.id}`;
+  progress?.update(4,"Downloading RAWG game artwork...");
   const cover = await downloadFirst(tp, identity, "cover", [data.background_image]);
   const backdrop = await downloadFirst(tp, identity, "backdrop", [
     data.background_image_additional,
@@ -247,7 +252,7 @@ async function fetchRawgDetails(tp, game, key) {
   };
 }
 
-async function pickRawg(tp, query) {
+async function pickRawg(tp, query, progress) {
   const key = readOptionalRawgKey(tp);
   if (!key) return null;
   let items = [];
@@ -263,9 +268,10 @@ async function pickRawg(tp, query) {
     const year = text(item.released).slice(0, 4);
     return `${item.name}${year ? ` (${year})` : ""}`;
   });
+  progress?.update(2,"Waiting for RAWG game selection...");
   const selected = await tp.system.suggester(labels, items, false, "Pick a RAWG game (Esc = manual note)");
   if (!selected) return null;
-  return fetchRawgDetails(tp, selected, key);
+  return fetchRawgDetails(tp, selected, key, progress);
 }
 
 function manualMetadata(title) {
@@ -387,30 +393,39 @@ module.exports = async function gameMetadata(tp) {
   const requested = text(await tp.system.prompt("Game name, Steam URL or Steam App ID (blank = file name):")) || currentTitle;
   let metadata = null;
   let steamError = null;
+  const progress = typeof tp.user?.import_progress === "function"
+    ? tp.user.import_progress(tp, {title:"Game Import",totalSteps:5})
+    : {update:()=>{},close:()=>{}};
+  try {
+  progress.update(1,"Searching Steam...");
 
   try {
-    metadata = await pickSteam(tp, requested);
+    metadata = await pickSteam(tp, requested, progress);
   } catch (error) {
     steamError = error;
     console.warn("[game-metadata] Steam details failed", error);
   }
 
   if (!metadata) {
+    progress.update(2,"Steam unavailable or skipped. Searching RAWG...");
     try {
-      metadata = await pickRawg(tp, requested);
+      metadata = await pickRawg(tp, requested, progress);
     } catch (error) {
       console.warn("[game-metadata] RAWG fallback failed", error);
     }
   }
 
   if (!metadata) {
+    progress.update(3,"Provider metadata unavailable. Preparing a manual game note...");
     metadata = manualMetadata(requested);
     const detail = steamError?.message ? ` Steam: ${steamError.message}` : "";
     new tp.obsidian.Notice(`Game metadata unavailable; created a manual skeleton.${detail}`, 8000);
   }
 
+  progress.update(4,"Checking Steam statistics and artwork...");
   metadata = await enrichSteamStats(tp, metadata);
 
+  progress.update(5,"Writing game note...");
   const targetName = portableFileName(metadata.title || requested || currentTitle);
   const currentPath = tp.config?.target_file?.path || tp.file.path(true);
   const currentFolder = currentPath.includes("/") ? currentPath.slice(0, currentPath.lastIndexOf("/")) : "";
@@ -427,4 +442,7 @@ module.exports = async function gameMetadata(tp) {
   }
 
   return renderNote(metadata);
+  } finally {
+    progress.close();
+  }
 };

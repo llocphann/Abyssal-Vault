@@ -1,0 +1,169 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const js=fs.readFileSync(path.join(__dirname,"../90_System/93_Configuration/Custom_Views/Music/script.js"),"utf8");
+class El{
+ constructor(tag="div"){this.tagName=tag;this.children=[];this.textContent="";this.hidden=false;this.dataset={};this.events={};this.attrs={};
+ this.classList={toggle:(k,v)=>this.attrs["class-"+k]=v};}
+ append(...x){this.children.push(...x)}appendChild(x){this.children.push(x)}replaceChildren(...x){this.children=x}
+ setAttribute(k,v){this.attrs[k]=v}querySelector(s){return s==="span"?this.children.find(x=>x.tagName==="span"):null}
+ addEventListener(k,v){this.events[k]=v}
+}
+async function run(){
+ const names="music-cover music-cover-fallback music-title music-artist music-year music-duration music-track music-tracks music-genres music-description music-source-link music-open-album music-details music-tracklist music-track-count music-favourite music-favourite-label music-feedback music-rating-value music-lyrics-status music-lyrics-text music-lyrics-source music-retry-lyrics music-find-artwork music-paper-content".split(" ");
+ const elements=Object.fromEntries(names.map(n=>[n,new El]));
+ elements["music-favourite"].append(new El("span"));
+ const doc={createElement:tag=>new El(tag)},root=new El;root.dataset.musicKind="song";root.ownerDocument=doc;
+ root.querySelector=s=>elements[s.match(/^\[data-role="([^"]+)"\]$/)?.[1]]||null;
+ root.querySelectorAll=()=>[];
+ const calls=[],patches=[];
+ const localFiles=new Map();
+ const directories=new Set(["20_Personal_Life/28_Music_Tracker","20_Personal_Life/28_Music_Tracker/Songs"]);
+ const fetchMock=async url=>{
+  calls.push(url);
+  if(url.startsWith("https://lrclib.net/api/get?"))return {ok:true,json:async()=>({
+   id:76,trackName:"Quiet Night",artistName:"Test Artist",duration:210,plainLyrics:"Fictional lyrics fixture line.",instrumental:false
+  })};
+  if(url.startsWith("https://itunes.apple.com/search?"))return {ok:true,json:async()=>({
+   results:[{trackName:"Quiet Night",artistName:"Test Artist",collectionName:"Blue Hour",
+    artworkUrl100:"https://is1-ssl.mzstatic.com/test-cover.jpg",trackViewUrl:"https://music.apple.com/song/123"}]
+  })};
+  throw Error(url);
+ };
+ const file={basename:"Quiet Night",path:"20_Personal_Life/28_Music_Tracker/Songs/Quiet Night.md"};
+ const tp={container:{querySelector:()=>root},file,activeDocument:doc,
+  bodyContent:"## Personal Reflections\n\n## Notes\n",
+  frontmatter:{Title:"Quiet Night",Artist:"Test Artist",Album:"Blue Hour",Duration:210,Cover:""},
+  app:{metadataCache:{getFirstLinkpathDest:()=>null},vault:{
+    getResourcePath:()=>"",
+    getAbstractFileByPath:path=>localFiles.has(path)||directories.has(path)?{path}:null,
+    createFolder:async path=>directories.add(path),
+    create:async(path,contents)=>{localFiles.set(path,contents);return {path};},
+    cachedRead:async file=>localFiles.get(file.path)||""
+   },
+   fileManager:{processFrontMatter:async(_,cb)=>{const patch={};cb(patch);patches.push(patch)}},
+   workspace:{openLinkText:()=>{}}}
+ };
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(tp,fetchMock,undefined,undefined,undefined);
+ for(let n=0;n<24;n++)await Promise.resolve();
+
+ assert.equal(elements["music-lyrics-status"].hidden,true);
+ assert.ok([...localFiles.keys()].some(path=>path.endsWith("/LRCLIB-76.txt")));
+ assert.ok([...localFiles.values()].some(value=>value.includes("Fictional lyrics fixture line.")));
+ assert.ok(patches.some(p=>typeof p.LyricsFile==="string" && p.LyricsFile.endsWith("LRCLIB-76.txt")));
+ assert.equal(elements["music-lyrics-text"].textContent,"Fictional lyrics fixture line.");
+ assert.equal(elements["music-lyrics-source"].href,"https://lrclib.net/api/get/76");
+ assert.equal(elements["music-lyrics-text"].hidden,false);
+ assert.ok(patches.some(p=>p.LyricsId==="76"));
+ assert.ok(patches.every(p=>!Object.hasOwn(p,"Lyrics")));
+ // Artwork backfill now starts automatically when the note opens with no Cover.
+ for(let n=0;n<48;n++)await Promise.resolve();
+ assert.equal(elements["music-cover"].src,"https://is1-ssl.mzstatic.com/test-cover.jpg");
+ assert.equal(elements["music-find-artwork"].hidden,true);
+ assert.ok(patches.some(p=>p.Cover==="https://is1-ssl.mzstatic.com/test-cover.jpg"));
+ assert.ok(patches.some(p=>p.StoreUrl==="https://music.apple.com/song/123"));
+ assert.ok(calls.some(url=>url.startsWith("https://lrclib.net/api/get?")));
+ assert.ok(calls.some(url=>url.startsWith("https://itunes.apple.com/search?")));
+ // Re-open the note offline: local lyrics remain available without HTTP.
+ const leafState=[];
+ let focused=false;
+ const leaf={view:{file,containerEl:{contains:()=>true},getState:()=>({file:file.path,mode:"preview",source:false}),
+    editor:{focus:()=>{focused=true;}}},
+   setViewState:async state=>{leafState.push(state);}};
+ tp.app.workspace.getLeavesOfType=()=>[leaf];
+ tp.app.workspace.revealLeaf=async()=>{};
+ elements["music-paper-content"].events.click({target:{closest:()=>null}});
+ for(let n=0;n<12;n++)await Promise.resolve();
+ assert.equal(leafState.length,1);
+ assert.equal(leafState[0].state.mode,"source");
+ assert.equal(leafState[0].state.source,false);
+ assert.equal(focused,true);
+ const beforeOfflineCalls=calls.length;
+ tp.frontmatter.LyricsFile="20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-76.txt";
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,async()=>{throw Error("Offline mode must not fetch lyrics");},undefined,undefined,undefined
+ );
+ for(let n=0;n<36;n++)await Promise.resolve();
+ assert.equal(elements["music-lyrics-status"].hidden,true);
+ assert.equal(elements["music-lyrics-text"].textContent.trim(),"Fictional lyrics fixture line.");
+ assert.equal(calls.length,beforeOfflineCalls);
+ // Legacy scaffold cleanup is exact-match only; authored reflections survive.
+ const generatedReminder="> Add lyrics only when you have permission to store them. Otherwise, keep a link to an official or licensed lyrics source.";
+ let noteText="---\nTitle: Quiet Night\n---\n\n## Lyrics\n\n"+
+   generatedReminder+"\n\n## Personal Reflections\n\n"+
+   "- What does this song mean to me?\n"+
+   "This is my own reflection and must be preserved.\n\n## Notes\n\n";
+ const previouslyCachedRead=tp.app.vault.cachedRead;
+ tp.app.vault.cachedRead=async f=>f.path===file.path?noteText:previouslyCachedRead(f);
+ tp.app.vault.process=async (_file,modify)=>{noteText=modify(noteText);return noteText;};
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,async()=>{throw Error("Offline: existing lyrics file should load");},undefined,undefined,undefined
+ );
+ for(let n=0;n<36;n++)await Promise.resolve();
+ assert.ok(!noteText.includes("## Lyrics"));
+ assert.ok(!noteText.includes(generatedReminder));
+ assert.ok(!noteText.includes("What does this song mean to me?"));
+ assert.ok(noteText.includes("This is my own reflection and must be preserved."));
+ assert.ok(noteText.includes("## Personal Reflections"));
+
+ // A manually populated Lyrics section is migrated to a separate local
+ // text asset before being removed from the note, without losing reflections.
+ noteText="---\nTitle: Quiet Night\n---\n\n## Lyrics\n\n"+
+   "My personally transcribed lyric line.\n\n## Personal Reflections\n\n"+
+   "This reflection must survive lyrics migration.\n";
+ tp.frontmatter.LyricsFile="20_Personal_Life/28_Music_Tracker/Lyrics/LRCLIB-76.txt";
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,async()=>{throw Error("Lyrics are available locally");},undefined,undefined,undefined
+ );
+ for(let n=0;n<80;n++)await Promise.resolve();
+ assert.ok(!noteText.includes("## Lyrics"));
+ assert.ok(noteText.includes("This reflection must survive lyrics migration."));
+ const personalPath=[...localFiles.keys()].find(path=>path.includes("/Personal-Quiet Night.txt"));
+ assert.ok(personalPath);
+ assert.ok(localFiles.get(personalPath).includes("My personally transcribed lyric line."));
+ assert.ok(patches.some(p=>p.LyricsFile===personalPath));
+ // Never overwrite an existing *different* personal transcription.
+ noteText="---\nTitle: Quiet Night\n---\n\n## Lyrics\n\n"+
+   "A different handwritten line.\n\n## Personal Reflections\n\nKeep this note.\n";
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,async()=>{throw Error("Lyrics are available locally");},undefined,undefined,undefined
+ );
+ for(let n=0;n<80;n++)await Promise.resolve();
+ assert.ok(noteText.includes("## Lyrics"));
+ assert.ok(noteText.includes("A different handwritten line."));
+ assert.ok(localFiles.get(personalPath).includes("My personally transcribed lyric line."));
+
+ // Authored reflections should hide the on-paper question hint.
+ tp.bodyContent="## Personal Reflections\n\nThis song reminds me of home.\n\n## Notes\n";
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,async()=>{throw Error("Lyrics use local file");},undefined,undefined,undefined
+ );
+ for(let n=0;n<30;n++)await Promise.resolve();
+
+ // Simulate an old note without a LyricsFile; check the metadata bridge.
+ tp.frontmatter.LyricsFile="";
+ localFiles.clear();
+ // With an allowlisted Obsidian request bridge, no browser fetch is needed.
+ const bridgeCalls=[];
+ tp.activeWindow={__abyssalMusicRequest:async url=>{
+   bridgeCalls.push(url);
+   if(url.startsWith("https://lrclib.net/"))return {
+     id:76,trackName:"Quiet Night",artistName:"Test Artist",plainLyrics:"Fixture lyric"
+   };
+   if(url.startsWith("https://itunes.apple.com/"))return {results:[{
+     trackName:"Quiet Night",artistName:"Test Artist",collectionName:"Blue Hour",
+     artworkUrl100:"https://is1-ssl.mzstatic.com/test-cover.jpg",
+     trackViewUrl:"https://music.apple.com/song/123"
+   }]};
+   throw Error("Unexpected music request "+url);
+ }};
+ const blockedFetch=async()=>{throw Error("Browser fetch must not run with an Obsidian bridge");};
+ new Function("tp","fetch","AbortController","setTimeout","clearTimeout",js)(
+   tp,blockedFetch,undefined,undefined,undefined
+ );
+ for(let n=0;n<60;n++)await Promise.resolve();
+ assert.ok(bridgeCalls.some(url=>url.startsWith("https://itunes.apple.com/")));
+ assert.ok(bridgeCalls.some(url=>url.startsWith("https://lrclib.net/")));
+ console.log("Music Custom View enrichment and CORS bridge passed.");
+}
+run().catch(error=>{console.error(error);process.exitCode=1;});

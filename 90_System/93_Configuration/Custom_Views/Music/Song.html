@@ -1,0 +1,63 @@
+<div class="cv-music cv-music--song" data-music-kind="song">
+  <header class="cv-music-hero">
+    <figure class="cv-music-art">
+      <img data-role="music-cover" alt="Song cover artwork" hidden />
+      <div data-role="music-cover-fallback" class="cv-music-art-fallback" aria-hidden="true">♪</div>
+      <figcaption class="cv-music-vinyl-mark">ABYSSAL · MUSIC ARCHIVE</figcaption>
+    </figure>
+    <section class="cv-music-identity">
+      <div class="cv-music-eyebrow"><span>FAVOURITE SONGS</span><span class="cv-music-divider">/</span><span data-role="music-subtype">SONG NOTE</span></div>
+      <h1 data-role="music-title">{{file.basename}}</h1>
+      <p class="cv-music-byline" data-role="music-artist">Unknown artist</p>
+      <div class="cv-music-facts">
+        <span data-role="music-year">—</span><span data-role="music-duration">—</span><span data-role="music-track">SINGLE</span>
+      </div>
+      <div class="cv-music-genres" data-role="music-genres"></div>
+      <p class="cv-music-summary" data-role="music-description"></p>
+      <div class="cv-music-actions">
+        <button type="button" class="cv-music-fav" data-role="music-favourite" aria-pressed="false"><span aria-hidden="true">♡</span><span data-role="music-favourite-label">Add favourite</span></button>
+        <a data-role="music-source-link" target="_blank" rel="noopener noreferrer" hidden>Open music source ↗</a>
+        <button type="button" data-role="music-open-album" hidden>View album ↗</button>
+        <button type="button" data-role="music-find-artwork" hidden>Find artwork ↻</button>
+      </div>
+      <span class="cv-music-feedback" data-role="music-feedback" aria-live="polite"></span>
+    </section>
+  </header>
+  <main class="cv-music-layout">
+    <section class="cv-music-journal">
+      <header class="cv-music-section-heading"><h2>Listening journal</h2></header>
+      <div class="cv-music-paper" data-role="music-paper">
+        <span class="cv-music-paper-label" aria-hidden="true">LISTENING NOTES · ABYSSAL</span>
+        <div class="cv-music-content" data-role="music-paper-content">{{file.content}}</div>
+      </div>
+    </section>
+    <aside class="cv-music-sidebar">
+      <section class="cv-music-panel cv-music-lyrics-panel">
+        <div class="cv-music-lyrics-head"><div><h2>Lyrics</h2></div>
+          <button type="button" data-role="music-retry-lyrics">Refresh ↻</button></div>
+        <p class="cv-music-lyrics-status" data-role="music-lyrics-status" role="status">Searching lyrics…</p>
+        <pre class="cv-music-lyrics-text" data-role="music-lyrics-text" hidden></pre>
+        <div class="cv-music-lyrics-foot">
+          <a data-role="music-lyrics-source" href="https://lrclib.net" target="_blank" rel="noopener noreferrer">Source: LRCLIB ↗</a>
+        </div>
+      </section>
+      <section class="cv-music-panel">
+        <span class="cv-music-panel-kicker">YOUR RECORD</span>
+        <h2>Personal rating</h2>
+        <div class="cv-music-rating" data-role="music-rating" role="group" aria-label="Personal rating from 1 to 5">
+          <button type="button" data-music-rate="1" aria-label="1 star">★</button>
+          <button type="button" data-music-rate="2" aria-label="2 stars">★</button>
+          <button type="button" data-music-rate="3" aria-label="3 stars">★</button>
+          <button type="button" data-music-rate="4" aria-label="4 stars">★</button>
+          <button type="button" data-music-rate="5" aria-label="5 stars">★</button>
+          <output data-role="music-rating-value">Unrated</output>
+        </div>
+      </section>
+      <section class="cv-music-panel">
+        <span class="cv-music-panel-kicker">RELEASE INFORMATION</span>
+        <h2>Song details</h2>
+        <dl class="cv-music-detail-list" data-role="music-details"></dl>
+      </section>
+    </aside>
+  </main>
+</div>
